@@ -1,0 +1,10 @@
+label,threshold
+delivery_shipping,0.8000000000000002
+redemption_activation,0.6000000000000002
+product_quality,0.6000000000000002
+customer_service,0.45000000000000007
+refund_return,0.45000000000000007
+usability,0.7500000000000002
+value_price,0.5500000000000002
+fraud_scam,0.5500000000000002
+other,0.1
