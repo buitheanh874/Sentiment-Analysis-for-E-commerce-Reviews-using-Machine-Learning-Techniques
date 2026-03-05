@@ -1,8 +1,8 @@
 # N-gram Language Model Summary
 
 Add-k smoothing value: 1.00
-Unigram test perplexity: 377.453
-Bigram test perplexity: 362.721
+Unigram test perplexity: 378.019
+Bigram test perplexity: 363.077
 
 Lower perplexity is better. Bigram should improve over unigram on this corpus.
 

@@ -1,0 +1,16 @@
+{
+  "variant": "V6",
+  "description": "Word 1-2 + char 3-5 + negation",
+  "k": 10000,
+  "class_weight": "w10",
+  "enable_abbrev_norm": false,
+  "negation": true,
+  "negation_window": 3,
+  "clause_split": false,
+  "char_ngrams": true,
+  "thresholds": [
+    0.4,
+    0.6
+  ],
+  "min_nnz": 2
+}

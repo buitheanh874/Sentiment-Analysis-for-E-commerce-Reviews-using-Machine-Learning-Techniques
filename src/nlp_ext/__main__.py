@@ -20,6 +20,7 @@ from src.dm2_steps.steps import _load_trained_artifacts, _train_best_lr
 from src.text_features import DEFAULT_NEGATION_WINDOW
 from .syllabus_upgrades import (
     build_course_fit_matrix,
+    run_rnn_lstm_baseline,
     run_classic_syllabus_bench,
     run_ngram_language_model,
 )
@@ -180,7 +181,7 @@ def transformer_finetune(args):
         per_device_eval_batch_size=args.batch_size,
         num_train_epochs=args.epochs,
         learning_rate=args.lr,
-        eval_strategy="epoch",
+        evaluation_strategy="epoch",
         logging_strategy="epoch",
         save_strategy="no",
         seed=42,
@@ -192,7 +193,7 @@ def transformer_finetune(args):
         args=train_args,
         train_dataset=train_ds,
         eval_dataset=val_ds,
-        processing_class=tokenizer,
+        tokenizer=tokenizer,
     )
 
     trainer.train()
@@ -392,6 +393,37 @@ def main():
         "--negation_window", type=int, default=DEFAULT_NEGATION_WINDOW
     )
 
+    rnn_parser = subparsers.add_parser(
+        "rnn_lstm_baseline",
+        help="Train/evaluate an LSTM sentiment baseline.",
+    )
+    rnn_parser.add_argument("--data_path", type=Path, default=Path("data/Gift_Cards.jsonl"))
+    rnn_parser.add_argument(
+        "--output_dir", type=Path, default=Path("results/nlp_ext/syllabus_upgrade")
+    )
+    rnn_parser.add_argument("--max_train_samples", type=int, default=12000)
+    rnn_parser.add_argument("--lstm_max_vocab", type=int, default=30000)
+    rnn_parser.add_argument("--lstm_max_len", type=int, default=80)
+    rnn_parser.add_argument("--lstm_emb_dim", type=int, default=128)
+    rnn_parser.add_argument("--lstm_hidden_dim", type=int, default=128)
+    rnn_parser.add_argument("--lstm_num_layers", type=int, default=1)
+    rnn_parser.add_argument("--lstm_dropout", type=float, default=0.2)
+    rnn_parser.add_argument("--lstm_batch_size", type=int, default=128)
+    rnn_parser.add_argument("--lstm_epochs", type=int, default=2)
+    rnn_parser.add_argument("--lstm_lr", type=float, default=1e-3)
+    rnn_parser.add_argument(
+        "--enable_abbrev_norm", action="store_true", help="Apply abbreviation normalization"
+    )
+    rnn_parser.add_argument(
+        "--enable_negation_tagging", action="store_true", help="Enable negation tagging in cleaning"
+    )
+    rnn_parser.add_argument(
+        "--negation_window", type=int, default=DEFAULT_NEGATION_WINDOW
+    )
+    rnn_parser.add_argument("--variant", type=str, default="V6")
+    rnn_parser.add_argument("--threshold_low", type=float, default=DEFAULT_THRESHOLDS[0])
+    rnn_parser.add_argument("--threshold_high", type=float, default=DEFAULT_THRESHOLDS[1])
+
     fit_parser = subparsers.add_parser(
         "course_fit_matrix",
         help="Build a syllabus topic-coverage matrix from project artifacts.",
@@ -414,6 +446,15 @@ def main():
     full_parser.add_argument("--mlp_max_iter", type=int, default=30)
     full_parser.add_argument("--add_k", type=float, default=1.0)
     full_parser.add_argument("--gen_max_len", type=int, default=18)
+    full_parser.add_argument("--lstm_max_vocab", type=int, default=30000)
+    full_parser.add_argument("--lstm_max_len", type=int, default=80)
+    full_parser.add_argument("--lstm_emb_dim", type=int, default=128)
+    full_parser.add_argument("--lstm_hidden_dim", type=int, default=128)
+    full_parser.add_argument("--lstm_num_layers", type=int, default=1)
+    full_parser.add_argument("--lstm_dropout", type=float, default=0.2)
+    full_parser.add_argument("--lstm_batch_size", type=int, default=128)
+    full_parser.add_argument("--lstm_epochs", type=int, default=2)
+    full_parser.add_argument("--lstm_lr", type=float, default=1e-3)
     full_parser.add_argument(
         "--enable_abbrev_norm", action="store_true", help="Apply abbreviation normalization"
     )
@@ -434,11 +475,14 @@ def main():
         run_classic_syllabus_bench(args)
     elif args.command == "ngram_language_model":
         run_ngram_language_model(args)
+    elif args.command == "rnn_lstm_baseline":
+        run_rnn_lstm_baseline(args)
     elif args.command == "course_fit_matrix":
         build_course_fit_matrix(args)
     elif args.command == "full_syllabus_upgrade":
         run_classic_syllabus_bench(args)
         run_ngram_language_model(args)
+        run_rnn_lstm_baseline(args)
         build_course_fit_matrix(args)
 
 

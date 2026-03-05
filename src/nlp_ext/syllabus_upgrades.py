@@ -104,6 +104,31 @@ class SyllabusRunContext:
     y_test: np.ndarray
 
 
+def _encode_texts_for_lstm(
+    texts: List[str],
+    vocab: Dict[str, int],
+    max_len: int,
+) -> np.ndarray:
+    arr = np.zeros((len(texts), max_len), dtype=np.int64)
+    unk = 1
+    for i, text in enumerate(texts):
+        toks = str(text).split()[:max_len]
+        ids = [vocab.get(tok, unk) for tok in toks]
+        if ids:
+            arr[i, : len(ids)] = ids
+    return arr
+
+
+def _build_vocab_for_lstm(train_texts: List[str], max_vocab: int) -> Dict[str, int]:
+    counter = Counter()
+    for text in train_texts:
+        counter.update(str(text).split())
+    vocab = {"<PAD>": 0, "<UNK>": 1}
+    for tok, _ in counter.most_common(max(0, max_vocab - len(vocab))):
+        vocab[tok] = len(vocab)
+    return vocab
+
+
 def _build_context(args) -> SyllabusRunContext:
     df = load_data(args.data_path)
     splits = make_splits(
@@ -353,6 +378,188 @@ def run_classic_syllabus_bench(args) -> None:
     print(f"[NLP EXT] Syllabus bench saved to {out_dir}")
 
 
+def run_rnn_lstm_baseline(args) -> None:
+    try:
+        import torch
+        from torch import nn
+        from torch.utils.data import DataLoader, TensorDataset
+    except ImportError:
+        print("[NLP EXT] torch not installed. Install optional deps to run LSTM baseline.")
+        return
+
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+
+    ctx = _build_context(args)
+    out_dir = args.output_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    train_texts_full = ctx.splits.train["clean_text"].tolist()
+    val_texts = ctx.splits.val["clean_text"].tolist()
+    test_texts = ctx.splits.test["clean_text"].tolist()
+    y_train_full = ctx.y_train
+
+    if args.max_train_samples > 0 and len(y_train_full) > args.max_train_samples:
+        rng = np.random.default_rng(SEED)
+        idx_neg = np.where(y_train_full == 0)[0]
+        idx_pos = np.where(y_train_full == 1)[0]
+        n_neg = int(round(args.max_train_samples * (len(idx_neg) / len(y_train_full))))
+        n_neg = min(len(idx_neg), max(1, n_neg))
+        n_pos = args.max_train_samples - n_neg
+        n_pos = min(len(idx_pos), max(1, n_pos))
+        choose_neg = rng.choice(idx_neg, size=n_neg, replace=False)
+        choose_pos = rng.choice(idx_pos, size=n_pos, replace=False)
+        sampled_idx = np.concatenate([choose_neg, choose_pos])
+        rng.shuffle(sampled_idx)
+        train_texts = [train_texts_full[i] for i in sampled_idx]
+        y_train = y_train_full[sampled_idx]
+    else:
+        train_texts = train_texts_full
+        y_train = y_train_full
+
+    vocab = _build_vocab_for_lstm(train_texts, max_vocab=args.lstm_max_vocab)
+    X_train = _encode_texts_for_lstm(train_texts, vocab=vocab, max_len=args.lstm_max_len)
+    X_val = _encode_texts_for_lstm(val_texts, vocab=vocab, max_len=args.lstm_max_len)
+    X_test = _encode_texts_for_lstm(test_texts, vocab=vocab, max_len=args.lstm_max_len)
+    y_val = ctx.y_val.astype(np.int64)
+    y_test = ctx.y_test.astype(np.int64)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    train_ds = TensorDataset(torch.LongTensor(X_train), torch.LongTensor(y_train))
+    val_ds = TensorDataset(torch.LongTensor(X_val), torch.LongTensor(y_val))
+    test_ds = TensorDataset(torch.LongTensor(X_test), torch.LongTensor(y_test))
+    train_loader = DataLoader(train_ds, batch_size=args.lstm_batch_size, shuffle=True)
+    val_loader = DataLoader(val_ds, batch_size=args.lstm_batch_size, shuffle=False)
+    test_loader = DataLoader(test_ds, batch_size=args.lstm_batch_size, shuffle=False)
+
+    class LSTMBaseline(nn.Module):
+        def __init__(self, vocab_size: int, emb_dim: int, hidden_dim: int, num_layers: int, dropout: float):
+            super().__init__()
+            self.embedding = nn.Embedding(vocab_size, emb_dim, padding_idx=0)
+            self.lstm = nn.LSTM(
+                input_size=emb_dim,
+                hidden_size=hidden_dim,
+                num_layers=num_layers,
+                batch_first=True,
+                dropout=dropout if num_layers > 1 else 0.0,
+            )
+            self.dropout = nn.Dropout(dropout)
+            self.head = nn.Linear(hidden_dim, 1)
+
+        def forward(self, x):
+            emb = self.embedding(x)
+            out, _ = self.lstm(emb)
+            pooled = out[:, -1, :]
+            pooled = self.dropout(pooled)
+            return self.head(pooled).squeeze(1)
+
+    model = LSTMBaseline(
+        vocab_size=len(vocab),
+        emb_dim=args.lstm_emb_dim,
+        hidden_dim=args.lstm_hidden_dim,
+        num_layers=args.lstm_num_layers,
+        dropout=args.lstm_dropout,
+    ).to(device)
+
+    neg = max(1, int((y_train == 0).sum()))
+    pos = max(1, int((y_train == 1).sum()))
+    pos_weight = torch.tensor([neg / pos], device=device, dtype=torch.float32)
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lstm_lr)
+
+    def _collect_logits(loader):
+        model.eval()
+        all_logits = []
+        all_y = []
+        with torch.no_grad():
+            for xb, yb in loader:
+                xb = xb.to(device)
+                logits = model(xb)
+                all_logits.append(logits.cpu().numpy())
+                all_y.append(yb.numpy())
+        return np.concatenate(all_logits), np.concatenate(all_y)
+
+    best_state = None
+    best_val_f2 = -1.0
+    t0 = time.time()
+    for _epoch in range(args.lstm_epochs):
+        model.train()
+        for xb, yb in train_loader:
+            xb = xb.to(device)
+            yb = yb.to(device).float()
+            optimizer.zero_grad()
+            logits = model(xb)
+            loss = criterion(logits, yb)
+            loss.backward()
+            optimizer.step()
+        val_logits, val_true = _collect_logits(val_loader)
+        val_probs = 1.0 / (1.0 + np.exp(-val_logits))
+        val_pred = (val_probs >= 0.5).astype(int)
+        val_metrics = _metrics_from_labels(val_true, val_pred)
+        if val_metrics["f2_0"] > best_val_f2:
+            best_val_f2 = val_metrics["f2_0"]
+            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+    train_seconds = time.time() - t0
+
+    if best_state is not None:
+        model.load_state_dict(best_state)
+
+    val_logits, val_true = _collect_logits(val_loader)
+    test_logits, test_true = _collect_logits(test_loader)
+    val_probs = 1.0 / (1.0 + np.exp(-val_logits))
+    test_probs = 1.0 / (1.0 + np.exp(-test_logits))
+    val_pred = (val_probs >= 0.5).astype(int)
+    test_pred = (test_probs >= 0.5).astype(int)
+    val_metrics = _metrics_from_labels(val_true, val_pred)
+    test_metrics = _metrics_from_labels(test_true, test_pred)
+
+    val_dec = _decision_from_probs(
+        val_probs,
+        val_texts,
+        args.threshold_low,
+        args.threshold_high,
+    )
+    test_dec = _decision_from_probs(
+        test_probs,
+        test_texts,
+        args.threshold_low,
+        args.threshold_high,
+    )
+    val_sel = selective_metrics(y_val, val_dec)
+    test_sel = selective_metrics(y_test, test_dec)
+
+    rows = [
+        {"model": "lstm_text", "split": "val", "train_seconds": train_seconds, **val_metrics},
+        {"model": "lstm_text", "split": "test", "train_seconds": train_seconds, **test_metrics},
+        {"model": "lstm_text_selective", "split": "val", "train_seconds": train_seconds, **val_sel},
+        {"model": "lstm_text_selective", "split": "test", "train_seconds": train_seconds, **test_sel},
+    ]
+    metrics_path = out_dir / "nlp_rnn_lstm_metrics.csv"
+    pd.DataFrame(rows).to_csv(metrics_path, index=False)
+
+    summary_lines = [
+        "# RNN/LSTM Baseline Summary",
+        "",
+        f"Model: single-direction LSTM ({args.lstm_num_layers} layer(s), hidden={args.lstm_hidden_dim})",
+        f"Train samples: {len(y_train)}",
+        f"Vocab size: {len(vocab)}",
+        f"Max sequence length: {args.lstm_max_len}",
+        f"Epochs: {args.lstm_epochs}",
+        "",
+        "Test metrics (threshold=0.5):",
+        f"recall_0={test_metrics['recall_0']:.3f}, precision_0={test_metrics['precision_0']:.3f}, f2_0={test_metrics['f2_0']:.3f}",
+        "",
+        "Selective test metrics (threshold band):",
+        f"coverage={test_sel.get('coverage', np.nan):.3f}, selective_recall_0={test_sel.get('selective_recall_0', np.nan):.3f}, selective_f2_0={test_sel.get('selective_f2_0', np.nan):.3f}",
+        "",
+        "File:",
+        "nlp_rnn_lstm_metrics.csv",
+    ]
+    (out_dir / "nlp_rnn_lstm_summary.md").write_text("\n".join(summary_lines), encoding="utf-8")
+    print(f"[NLP EXT] RNN/LSTM baseline outputs saved to {out_dir}")
+
+
 def _tokenize_for_lm(text: str) -> List[str]:
     tokens = [tok for tok in str(text).split() if tok]
     return ["<s>"] + tokens + ["</s>"]
@@ -526,11 +733,13 @@ def build_course_fit_matrix(args) -> None:
 
     bench_path = out_dir / "nlp_syllabus_bench_test_summary.csv"
     ngram_path = out_dir / "nlp_ngram_lm_metrics.csv"
+    rnn_path = out_dir / "nlp_rnn_lstm_metrics.csv"
     trans_path = Path("results/nlp_ext/nlp_metrics.csv")
     issue_path = Path("results/issue_steps_char_demo/02_metrics_overall.csv")
 
     has_bench = bench_path.exists()
     has_ngram = ngram_path.exists()
+    has_rnn = rnn_path.exists()
     has_trans = trans_path.exists()
     has_issue = issue_path.exists()
 
@@ -544,9 +753,9 @@ def build_course_fit_matrix(args) -> None:
         ("Perceptron", 1.0 if has_bench else 0.2),
         ("Logistic Regression", 1.0),
         ("Feed-forward Neural Networks", 1.0 if has_bench else 0.3),
-        ("Pytorch Basic", 0.6 if has_trans else 0.2),
+        ("Pytorch Basic", 1.0 if has_rnn or has_trans else 0.2),
         ("Vector Semantics and Embeddings", 0.8 if has_bench else 0.4),
-        ("Recurrent Neural Networks", 0.2),
+        ("Recurrent Neural Networks", 1.0 if has_rnn else 0.2),
         ("Transformers and LLMs", 1.0 if has_trans else 0.3),
         ("Masked Language Models", 0.2),
         ("Applications of LLMs", 0.3),

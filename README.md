@@ -1,63 +1,97 @@
-﻿# NLP Project: E-commerce Review Understanding
+# NLP Project: E-commerce Review Understanding
 
-Repository da duoc don gon de chi giu cac thanh phan phuc vu mon NLP.
+This repository contains a reproducible NLP minor-project pipeline aligned with course topics and rubric expectations.
 
 ## Scope
-- Task A: Sentiment classification (Negative/Positive/Uncertain) voi TF-IDF + chi-square + logistic regression.
-- Task B: Multi-label issue extraction (classic ML, one-vs-rest).
-- Task C: Transformer extension va syllabus-alignment benchmarks.
+
+- Task A: Sentiment classification (`Negative`, `Positive`, `Uncertain`) with TF-IDF, Chi-square selection, and logistic regression.
+- Task B: Multi-label issue extraction (classic ML one-vs-rest).
+- Task C: Transformer and syllabus-alignment extensions (N-gram LM, classic benchmark suite, course-fit matrix).
 
 ## Setup
+
 ```bash
 pip install -r requirements.txt
 pip install -r requirements-optional.txt
 ```
 
+For Windows CPU environments, if `torch` import fails with DLL initialization errors, install the CPU wheel explicitly:
+
+```bash
+pip uninstall -y torch
+pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+```
+
 ## Data
-- Main corpus: `data/Gift_Cards.jsonl` (bat buoc co cot `text`, `rating`).
+
+- Main corpus: `data/Gift_Cards.jsonl` (requires `text`, `rating`).
 - Manual issue labels: `data/issue_labels.csv`.
 
-## Core Commands
-```bash
-# Sentiment demo
-python demo.py "great product!" "terrible experience"
+## Reproducible Commands
 
-# Run full classic NLP sentiment pipeline (steps 01-10)
+```bash
+# 1) Classic sentiment end-to-end
 python -m src.run_all --data_path data/Gift_Cards.jsonl
 
-# Run a single sentiment step (module name dm2_steps la ten legacy)
+# 2) One sentiment step (legacy module name: dm2_steps)
 python -m src.dm2_steps 06b --data_path data/Gift_Cards.jsonl --enable_negation_tagging --enable_char_ngrams
 
-# Train/evaluate issue classifier
+# 3) Issue classifier train/eval
 python -m src.issue_steps train --labels_path data/issue_labels.csv --data_path data/Gift_Cards.jsonl
 
-# Issue inference
-python -m src.issue_steps predict --text "good but slow delivery"
-```
-
-## Transformer Extension (Optional)
-```bash
+# 4) Transformer fine-tuning (optional)
 python -m src.nlp_ext transformer_finetune --data_path data/Gift_Cards.jsonl
-python demo_transformer.py "not bad at all"
+
+# 5) Syllabus upgrade benchmark package (optional)
+python -m src.nlp_ext full_syllabus_upgrade --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade
+
+# 6) RNN/LSTM baseline (optional)
+python -m src.nlp_ext rnn_lstm_baseline --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade --lstm_epochs 2
+
+# 7) Unified cross-task scoreboard
+python scripts/build_scoreboard.py
 ```
 
-## Interactive Demo UI (Optional)
+## Demo
+
 ```bash
-pip install -r requirements-optional.txt
+# CLI sentiment demo
+python demo.py "great product!" "terrible experience"
+
+# Issue inference demo
+python -m src.issue_steps predict --text "good but slow delivery"
+
+# Transformer demo (optional model/deps)
+python demo_transformer.py "not bad at all"
+
+# UI demo (optional)
 streamlit run demo_app.py
 ```
 
-## Report
-- English report: `results/reports/NLP_project_report.tex` and `.pdf`
-- Vietnamese report: `results/reports/NLP_project_report_vi.tex` and `.pdf`
-- Rubric checklist and defense flow: `results/reports/NLP_max_score_checklist_vi.md`
+Demo smoke inputs and expected behavior:
 
-## Main Artifacts
-- `results/dm2_steps/`: classic sentiment experiment outputs.
-- `results/issue_steps/`: issue extraction metrics and plots.
+- `docs/demo_inputs.txt`
+- `docs/expected_outputs.md`
+
+## Rubric Alignment Artifacts
+
+- Rubric-to-evidence map: `docs/rubric_checklist.md`
+- Team process and cross-review matrix: `docs/contribution_matrix.md`
+- PR quality gate template: `.github/pull_request_template.md`
+- Unified metrics table:
+  - `results/scoreboard/model_scoreboard.csv`
+  - `results/scoreboard/model_scoreboard.md`
+
+## Main Outputs
+
+- `results/dm2_steps/`: classic sentiment artifacts.
+- `results/issue_steps/`: multi-label issue metrics and plots.
 - `results/nlp_ext/`: transformer and syllabus-upgrade outputs.
-- `models/`: trained artifacts for demo/inference.
+- `results/reports/`: project reports (EN + VI).
+- `models/`: trained artifacts used by demos.
 
-## Notes
-- Chi su dung text feature, khong dung metadata.
-- Split: rating 1-2 -> negative, 4-5 -> positive, rating 3 giu cho uncertainty analysis.
+## Testing
+
+```bash
+python -m pytest -q
+```
