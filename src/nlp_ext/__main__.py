@@ -20,6 +20,8 @@ from src.dm2_steps.steps import _load_trained_artifacts, _train_best_lr
 from src.text_features import DEFAULT_NEGATION_WINDOW
 from .syllabus_upgrades import (
     build_course_fit_matrix,
+    run_llm_prompt_baseline,
+    run_mlm_probe,
     run_rnn_lstm_baseline,
     run_classic_syllabus_bench,
     run_ngram_language_model,
@@ -116,6 +118,20 @@ def transformer_finetune(args):
         )
         return
 
+    max_train_samples = int(args.max_train_samples)
+    max_length = int(args.max_length)
+    epochs = float(args.epochs)
+    batch_size = int(args.batch_size)
+    if args.fast_mode:
+        max_train_samples = min(max_train_samples, int(args.fast_max_train_samples))
+        max_length = min(max_length, int(args.fast_max_length))
+        epochs = min(epochs, float(args.fast_epochs))
+        fast_eval_max = int(args.fast_eval_max_samples)
+        print(
+            "[NLP EXT] fast_mode enabled: "
+            f"max_train_samples={max_train_samples}, max_length={max_length}, epochs={epochs}, fast_eval_max_samples={fast_eval_max}"
+        )
+
     df = load_data(args.data_path)
     splits = make_splits(df, enable_abbrev_norm=args.enable_abbrev_norm)
     y_train = splits.train["label"].values
@@ -130,7 +146,7 @@ def transformer_finetune(args):
                 texts,
                 padding="max_length",
                 truncation=True,
-                max_length=args.max_length,
+                max_length=max_length,
                 return_tensors="pt",
             )
             self.labels = labels
@@ -145,15 +161,28 @@ def transformer_finetune(args):
 
     # Stratified-ish sampling for train size cap
     train_texts = splits.train["clean_text"].tolist()
-    if len(train_texts) > args.max_train_samples:
+    if len(train_texts) > max_train_samples:
         rng = np.random.default_rng(42)
-        idx = rng.choice(len(train_texts), size=args.max_train_samples, replace=False)
+        idx = rng.choice(len(train_texts), size=max_train_samples, replace=False)
         train_texts = [train_texts[i] for i in idx]
         y_train = y_train[idx]
 
+    val_texts = splits.val["clean_text"].tolist()
+    test_texts = splits.test["clean_text"].tolist()
+    if args.fast_mode:
+        rng_eval = np.random.default_rng(123)
+        if len(val_texts) > fast_eval_max:
+            vidx = rng_eval.choice(len(val_texts), size=fast_eval_max, replace=False)
+            val_texts = [val_texts[i] for i in vidx]
+            y_val = y_val[vidx]
+        if len(test_texts) > fast_eval_max:
+            tidx = rng_eval.choice(len(test_texts), size=fast_eval_max, replace=False)
+            test_texts = [test_texts[i] for i in tidx]
+            y_test = y_test[tidx]
+
     train_ds = ReviewDataset(train_texts, y_train)
-    val_ds = ReviewDataset(splits.val["clean_text"].tolist(), y_val)
-    test_ds = ReviewDataset(splits.test["clean_text"].tolist(), y_test)
+    val_ds = ReviewDataset(val_texts, y_val)
+    test_ds = ReviewDataset(test_texts, y_test)
 
     neg_count = max(1, int(np.sum(y_train == 0)))
     pos_count = max(1, int(np.sum(y_train == 1)))
@@ -176,14 +205,16 @@ def transformer_finetune(args):
     )
 
     train_args = TrainingArguments(
-        output_dir="results/nlp_ext/hf_runs",
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        num_train_epochs=args.epochs,
+        output_dir=str(Path(args.output_dir) / "hf_runs"),
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size,
+        num_train_epochs=epochs,
         learning_rate=args.lr,
-        evaluation_strategy="epoch",
-        logging_strategy="epoch",
+        evaluation_strategy="no" if args.fast_mode else "epoch",
+        logging_strategy="steps" if args.fast_mode else "epoch",
+        logging_steps=50 if args.fast_mode else 500,
         save_strategy="no",
+        dataloader_num_workers=0,
         seed=42,
         report_to=[],
     )
@@ -199,11 +230,12 @@ def transformer_finetune(args):
     trainer.train()
     
     # Save model for demo usage
-    model_save_path = Path("models/transformer_model")
-    model_save_path.mkdir(parents=True, exist_ok=True)
-    model.save_pretrained(model_save_path)
-    tokenizer.save_pretrained(model_save_path)
-    print(f"[NLP EXT] Model saved to {model_save_path}")
+    if not args.skip_model_save:
+        model_save_path = Path("models/transformer_model")
+        model_save_path.mkdir(parents=True, exist_ok=True)
+        model.save_pretrained(model_save_path)
+        tokenizer.save_pretrained(model_save_path)
+        print(f"[NLP EXT] Model saved to {model_save_path}")
 
     # Evaluation
     val_logits = trainer.predict(val_ds).predictions
@@ -214,8 +246,8 @@ def transformer_finetune(args):
     val_base = metrics_from_probs(y_val, val_probs, threshold=0.5)
     test_base = metrics_from_probs(y_test, test_probs, threshold=0.5)
 
-    val_dec = _decisions_from_probs(val_probs, splits.val["clean_text"].tolist(), (args.threshold_low, args.threshold_high))
-    test_dec = _decisions_from_probs(test_probs, splits.test["clean_text"].tolist(), (args.threshold_low, args.threshold_high))
+    val_dec = _decisions_from_probs(val_probs, val_texts, (args.threshold_low, args.threshold_high))
+    test_dec = _decisions_from_probs(test_probs, test_texts, (args.threshold_low, args.threshold_high))
     val_sel = selective_metrics(y_val, val_dec)
     test_sel = selective_metrics(y_test, test_dec)
 
@@ -224,7 +256,7 @@ def transformer_finetune(args):
         {"split": "test", **test_base, **test_sel},
     ]
 
-    out_dir = Path("results/nlp_ext")
+    out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(metrics_rows).to_csv(out_dir / "nlp_metrics.csv", index=False)
 
@@ -284,51 +316,52 @@ def transformer_finetune(args):
     plt.close()
 
     # Hard cases comparison
-    hard_cases = ["not bad", "not good", "good but late delivery", "gr8", "thx", "idk"]
-    baseline_preds = _baseline_predict(
-        hard_cases, args.enable_abbrev_norm, args.data_path, args.output_dir
-    )
-    hard_clean = [clean_text(h, args.enable_abbrev_norm) for h in hard_cases]
-    hard_inputs = tokenizer(
-        hard_clean,
-        padding="max_length",
-        truncation=True,
-        max_length=args.max_length,
-        return_tensors="pt",
-    )
-    with torch.no_grad():
-        hard_logits = model(
-            **{k: v.to(model.device) for k, v in hard_inputs.items()}
-        ).logits
-    hard_probs = torch.softmax(hard_logits, dim=1)[:, 1].cpu().numpy()
-    transformer_decisions = []
-    for prob, clean in zip(hard_probs, hard_clean):
-        dec = _decisions_from_probs(
-            np.array([prob]), [clean], (args.threshold_low, args.threshold_high)
-        ).iloc[0]
-        label = "Uncertain"
-        if dec["decision"] == 1:
-            label = "Positive"
-        elif dec["decision"] == 0:
-            label = "Negative"
-        transformer_decisions.append(
-            {"prob": float(prob), "decision": label, "reason": dec["reason"]}
+    if not args.skip_hard_cases:
+        hard_cases = ["not bad", "not good", "good but late delivery", "gr8", "thx", "idk"]
+        baseline_preds = _baseline_predict(
+            hard_cases, args.enable_abbrev_norm, args.data_path, args.output_dir
         )
+        hard_clean = [clean_text(h, args.enable_abbrev_norm) for h in hard_cases]
+        hard_inputs = tokenizer(
+            hard_clean,
+            padding="max_length",
+            truncation=True,
+            max_length=max_length,
+            return_tensors="pt",
+        )
+        with torch.no_grad():
+            hard_logits = model(
+                **{k: v.to(model.device) for k, v in hard_inputs.items()}
+            ).logits
+        hard_probs = torch.softmax(hard_logits, dim=1)[:, 1].cpu().numpy()
+        transformer_decisions = []
+        for prob, clean in zip(hard_probs, hard_clean):
+            dec = _decisions_from_probs(
+                np.array([prob]), [clean], (args.threshold_low, args.threshold_high)
+            ).iloc[0]
+            label = "Uncertain"
+            if dec["decision"] == 1:
+                label = "Positive"
+            elif dec["decision"] == 0:
+                label = "Negative"
+            transformer_decisions.append(
+                {"prob": float(prob), "decision": label, "reason": dec["reason"]}
+            )
 
-    comp_rows = []
-    for hc, base, trans in zip(hard_cases, baseline_preds, transformer_decisions):
-        comp_rows.append(
-            {
-                "text": hc,
-                "baseline_decision": base["decision"],
-                "baseline_prob": base["prob"],
-                "baseline_reason": base["reason"],
-                "transformer_decision": trans["decision"],
-                "transformer_prob": trans["prob"],
-                "transformer_reason": trans["reason"],
-            }
-        )
-    pd.DataFrame(comp_rows).to_csv(out_dir / "hard_cases_comparison.csv", index=False)
+        comp_rows = []
+        for hc, base, trans in zip(hard_cases, baseline_preds, transformer_decisions):
+            comp_rows.append(
+                {
+                    "text": hc,
+                    "baseline_decision": base["decision"],
+                    "baseline_prob": base["prob"],
+                    "baseline_reason": base["reason"],
+                    "transformer_decision": trans["decision"],
+                    "transformer_prob": trans["prob"],
+                    "transformer_reason": trans["reason"],
+                }
+            )
+        pd.DataFrame(comp_rows).to_csv(out_dir / "hard_cases_comparison.csv", index=False)
 
     print(f"[NLP EXT] Metrics saved to {out_dir}")
 
@@ -339,13 +372,20 @@ def main():
 
     tf_parser = subparsers.add_parser("transformer_finetune", help="Fine-tune a transformer baseline")
     tf_parser.add_argument("--data_path", type=Path, default=Path("data/Gift_Cards.jsonl"))
-    tf_parser.add_argument("--output_dir", type=Path, default=Path("results/dm2_steps"))
+    tf_parser.add_argument("--output_dir", type=Path, default=Path("results/nlp_ext"))
     tf_parser.add_argument("--model_name", type=str, default="distilbert-base-uncased")
     tf_parser.add_argument("--epochs", type=float, default=1.0)
     tf_parser.add_argument("--batch_size", type=int, default=16)
     tf_parser.add_argument("--max_train_samples", type=int, default=8000)
     tf_parser.add_argument("--max_length", type=int, default=256)
     tf_parser.add_argument("--lr", type=float, default=2e-5)
+    tf_parser.add_argument("--fast_mode", action="store_true", help="Use CPU-friendly light settings.")
+    tf_parser.add_argument("--fast_max_train_samples", type=int, default=1000)
+    tf_parser.add_argument("--fast_max_length", type=int, default=96)
+    tf_parser.add_argument("--fast_epochs", type=float, default=0.2)
+    tf_parser.add_argument("--fast_eval_max_samples", type=int, default=2000)
+    tf_parser.add_argument("--skip_hard_cases", action="store_true", help="Skip hard-case comparison generation.")
+    tf_parser.add_argument("--skip_model_save", action="store_true", help="Do not overwrite models/transformer_model.")
     tf_parser.add_argument(
         "--enable_abbrev_norm", action="store_true", help="Apply abbreviation normalization"
     )
@@ -392,6 +432,31 @@ def main():
     ngram_parser.add_argument(
         "--negation_window", type=int, default=DEFAULT_NEGATION_WINDOW
     )
+
+    mlm_parser = subparsers.add_parser(
+        "mlm_probe",
+        help="Run a masked language model probe and report hit@k.",
+    )
+    mlm_parser.add_argument("--output_dir", type=Path, default=Path("results/nlp_ext/syllabus_upgrade"))
+    mlm_parser.add_argument("--model_name", type=str, default="distilroberta-base")
+    mlm_parser.add_argument("--top_k", type=int, default=10)
+
+    llm_parser = subparsers.add_parser(
+        "llm_prompt_baseline",
+        help="Run prompt-style semantic baseline using sentence embeddings.",
+    )
+    llm_parser.add_argument("--data_path", type=Path, default=Path("data/Gift_Cards.jsonl"))
+    llm_parser.add_argument("--output_dir", type=Path, default=Path("results/nlp_ext/syllabus_upgrade"))
+    llm_parser.add_argument("--model_name", type=str, default="sentence-transformers/all-MiniLM-L6-v2")
+    llm_parser.add_argument("--logit_scale", type=float, default=8.0)
+    llm_parser.add_argument(
+        "--enable_abbrev_norm", action="store_true", help="Apply abbreviation normalization"
+    )
+    llm_parser.add_argument(
+        "--negation_window", type=int, default=DEFAULT_NEGATION_WINDOW
+    )
+    llm_parser.add_argument("--threshold_low", type=float, default=DEFAULT_THRESHOLDS[0])
+    llm_parser.add_argument("--threshold_high", type=float, default=DEFAULT_THRESHOLDS[1])
 
     rnn_parser = subparsers.add_parser(
         "rnn_lstm_baseline",
@@ -455,6 +520,14 @@ def main():
     full_parser.add_argument("--lstm_batch_size", type=int, default=128)
     full_parser.add_argument("--lstm_epochs", type=int, default=2)
     full_parser.add_argument("--lstm_lr", type=float, default=1e-3)
+    full_parser.add_argument("--include_mlm_probe", action="store_true")
+    full_parser.add_argument("--include_llm_prompt", action="store_true")
+    full_parser.add_argument("--mlm_model_name", type=str, default="distilroberta-base")
+    full_parser.add_argument("--mlm_top_k", type=int, default=10)
+    full_parser.add_argument(
+        "--llm_model_name", type=str, default="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    full_parser.add_argument("--logit_scale", type=float, default=8.0)
     full_parser.add_argument(
         "--enable_abbrev_norm", action="store_true", help="Apply abbreviation normalization"
     )
@@ -475,6 +548,10 @@ def main():
         run_classic_syllabus_bench(args)
     elif args.command == "ngram_language_model":
         run_ngram_language_model(args)
+    elif args.command == "mlm_probe":
+        run_mlm_probe(args)
+    elif args.command == "llm_prompt_baseline":
+        run_llm_prompt_baseline(args)
     elif args.command == "rnn_lstm_baseline":
         run_rnn_lstm_baseline(args)
     elif args.command == "course_fit_matrix":
@@ -483,6 +560,13 @@ def main():
         run_classic_syllabus_bench(args)
         run_ngram_language_model(args)
         run_rnn_lstm_baseline(args)
+        if args.include_mlm_probe:
+            args.model_name = args.mlm_model_name
+            args.top_k = args.mlm_top_k
+            run_mlm_probe(args)
+        if args.include_llm_prompt:
+            args.model_name = args.llm_model_name
+            run_llm_prompt_baseline(args)
         build_course_fit_matrix(args)
 
 

@@ -31,6 +31,8 @@ This file maps grading criteria to concrete, reproducible project evidence.
   - [`results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_metrics.csv`](/d:/Code/NLP_code/results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_metrics.csv)
   - [`results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_test_summary.csv`](/d:/Code/NLP_code/results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_test_summary.csv)
   - [`results/nlp_ext/syllabus_upgrade/nlp_rnn_lstm_metrics.csv`](/d:/Code/NLP_code/results/nlp_ext/syllabus_upgrade/nlp_rnn_lstm_metrics.csv)
+  - [`results/nlp_ext/syllabus_upgrade/nlp_mlm_probe.csv`](/d:/Code/NLP_code/results/nlp_ext/syllabus_upgrade/nlp_mlm_probe.csv)
+  - [`results/nlp_ext/syllabus_upgrade/nlp_llm_prompt_metrics.csv`](/d:/Code/NLP_code/results/nlp_ext/syllabus_upgrade/nlp_llm_prompt_metrics.csv)
 - Task-specific evaluations:
   - [`results/dm2_steps/`](/d:/Code/NLP_code/results/dm2_steps)
   - [`results/issue_steps/`](/d:/Code/NLP_code/results/issue_steps)

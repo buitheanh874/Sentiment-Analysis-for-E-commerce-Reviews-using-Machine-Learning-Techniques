@@ -11,5 +11,5 @@ Pytorch Basic,1.0,100.0
 Vector Semantics and Embeddings,0.8,80.0
 Recurrent Neural Networks,1.0,100.0
 Transformers and LLMs,1.0,100.0
-Masked Language Models,0.2,20.0
-Applications of LLMs,0.3,30.0
+Masked Language Models,1.0,100.0
+Applications of LLMs,0.9,90.0

@@ -42,15 +42,31 @@ python -m src.issue_steps train --labels_path data/issue_labels.csv --data_path 
 # 4) Transformer fine-tuning (optional)
 python -m src.nlp_ext transformer_finetune --data_path data/Gift_Cards.jsonl
 
-# 5) Syllabus upgrade benchmark package (optional)
+# 5) Transformer fast-mode for CPU (recommended on non-GPU machines)
+python -m src.nlp_ext transformer_finetune --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext_fast --fast_mode --skip_hard_cases --skip_model_save
+
+# 6) Syllabus upgrade benchmark package (optional)
 python -m src.nlp_ext full_syllabus_upgrade --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade
 
-# 6) RNN/LSTM baseline (optional)
+# 6b) Full package including MLM + LLM-prompt artifacts
+python -m src.nlp_ext full_syllabus_upgrade --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade --include_mlm_probe --include_llm_prompt
+
+# 7) RNN/LSTM baseline (optional)
 python -m src.nlp_ext rnn_lstm_baseline --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade --lstm_epochs 2
 
-# 7) Unified cross-task scoreboard
+# 8) MLM probe (masked language model topic)
+python -m src.nlp_ext mlm_probe --output_dir results/nlp_ext/syllabus_upgrade
+
+# 9) LLM application proxy (prompt-style semantic baseline)
+python -m src.nlp_ext llm_prompt_baseline --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade
+
+# 10) Unified cross-task scoreboard
 python scripts/build_scoreboard.py
 ```
+
+Runtime note:
+- On CPU-only environments, use `--fast_mode` for transformer training.
+- Full transformer fine-tuning can exceed 20 minutes depending on machine.
 
 ## Demo
 

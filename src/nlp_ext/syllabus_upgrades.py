@@ -1,5 +1,6 @@
 import math
 import random
+import re
 import time
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -49,6 +50,12 @@ def _metrics_from_labels(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, fl
         "recall_1": float(recall[1]),
         "f1_1": float(f1_vals[1]),
     }
+
+
+def _softmax_rows(mat: np.ndarray) -> np.ndarray:
+    stable = mat - mat.max(axis=1, keepdims=True)
+    exp = np.exp(stable)
+    return exp / exp.sum(axis=1, keepdims=True)
 
 
 def _subsample_train(X, y: np.ndarray, max_train_samples: int, seed: int):
@@ -560,6 +567,192 @@ def run_rnn_lstm_baseline(args) -> None:
     print(f"[NLP EXT] RNN/LSTM baseline outputs saved to {out_dir}")
 
 
+def run_mlm_probe(args) -> None:
+    try:
+        import torch
+        from transformers import AutoModelForMaskedLM, AutoTokenizer
+    except ImportError:
+        print("[NLP EXT] transformers/torch not installed. Install optional deps first.")
+        return
+
+    out_dir = args.output_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    model = AutoModelForMaskedLM.from_pretrained(args.model_name)
+    model.eval()
+
+    mask_token = tokenizer.mask_token
+    if mask_token is None:
+        raise SystemExit(f"Model {args.model_name} has no mask token, cannot run mlm_probe.")
+
+    probes = [
+        {
+            "probe_id": "p1_positive_quality",
+            "template": f"this gift card is {mask_token}.",
+            "expected_tokens": ["great", "good", "excellent", "useful"],
+        },
+        {
+            "probe_id": "p2_negative_delivery",
+            "template": f"the delivery was {mask_token} and frustrating.",
+            "expected_tokens": ["slow", "late", "bad", "terrible"],
+        },
+        {
+            "probe_id": "p3_customer_support",
+            "template": f"customer support was very {mask_token}.",
+            "expected_tokens": ["helpful", "responsive", "kind", "good"],
+        },
+        {
+            "probe_id": "p4_refund_problem",
+            "template": f"getting a refund was {mask_token}.",
+            "expected_tokens": ["hard", "difficult", "impossible", "slow"],
+        },
+        {
+            "probe_id": "p5_value",
+            "template": f"overall value for money is {mask_token}.",
+            "expected_tokens": ["good", "great", "poor", "bad"],
+        },
+    ]
+
+    rows = []
+    for probe in probes:
+        text = probe["template"]
+        enc = tokenizer(text, return_tensors="pt")
+        with torch.no_grad():
+            logits = model(**enc).logits
+
+        mask_positions = (enc["input_ids"][0] == tokenizer.mask_token_id).nonzero(as_tuple=False)
+        if len(mask_positions) == 0:
+            continue
+        mask_idx = int(mask_positions[0].item())
+        token_logits = logits[0, mask_idx]
+        top_ids = torch.topk(token_logits, k=args.top_k).indices.tolist()
+        top_tokens_raw = tokenizer.convert_ids_to_tokens(top_ids)
+        top_tokens = []
+        for tok in top_tokens_raw:
+            norm = tok.strip().lower().replace("##", "")
+            norm = re.sub(r"^[^a-z0-9]+", "", norm)
+            norm = re.sub(r"[^a-z0-9]+$", "", norm)
+            top_tokens.append(norm)
+        expected = [t.strip().lower() for t in probe["expected_tokens"]]
+        hit = int(any(tok in expected for tok in top_tokens))
+
+        rows.append(
+            {
+                "probe_id": probe["probe_id"],
+                "template": text,
+                "expected_tokens": "|".join(expected),
+                "top_tokens": "|".join(top_tokens),
+                "hit_at_k": hit,
+            }
+        )
+
+    if not rows:
+        raise SystemExit("mlm_probe produced no rows. Check tokenizer mask token handling.")
+
+    df = pd.DataFrame(rows)
+    csv_path = out_dir / "nlp_mlm_probe.csv"
+    df.to_csv(csv_path, index=False)
+
+    hit_rate = float(df["hit_at_k"].mean())
+    summary_lines = [
+        "# MLM Probe Summary",
+        "",
+        f"Model: {args.model_name}",
+        f"Top-k: {args.top_k}",
+        f"Probe count: {len(df)}",
+        f"Hit@k: {hit_rate:.3f}",
+        "",
+        "File:",
+        "nlp_mlm_probe.csv",
+    ]
+    (out_dir / "nlp_mlm_probe.md").write_text("\n".join(summary_lines), encoding="utf-8")
+    print(f"[NLP EXT] MLM probe outputs saved to {out_dir}")
+
+
+def run_llm_prompt_baseline(args) -> None:
+    try:
+        from sentence_transformers import SentenceTransformer
+    except ImportError:
+        print("[NLP EXT] sentence-transformers not installed. Install optional deps first.")
+        return
+
+    out_dir = args.output_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    df = load_data(args.data_path)
+    splits = make_splits(
+        df,
+        enable_abbrev_norm=args.enable_abbrev_norm,
+        enable_negation=False,
+        negation_window=args.negation_window,
+    )
+
+    model = SentenceTransformer(args.model_name)
+
+    prompt_negative = "Instruction: classify as NEGATIVE. The review expresses complaints, failures, delays, or poor quality."
+    prompt_positive = "Instruction: classify as POSITIVE. The review expresses satisfaction, quality, smooth delivery, or value."
+    prompt_emb = model.encode(
+        [prompt_negative, prompt_positive],
+        convert_to_numpy=True,
+        normalize_embeddings=True,
+    )
+
+    def _eval_split(split_df: pd.DataFrame, y_true: np.ndarray) -> Tuple[Dict[str, float], Dict[str, float]]:
+        texts = split_df["clean_text"].tolist()
+        text_emb = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)
+        sims = text_emb @ prompt_emb.T  # [n,2] : neg, pos
+        # Stretch similarity gap into a more separable probability signal.
+        diff = sims[:, 1] - sims[:, 0]
+        probs = 1.0 / (1.0 + np.exp(-args.logit_scale * diff))  # P(positive)
+        y_pred = (probs >= 0.5).astype(int)
+
+        base_metrics = _metrics_from_labels(y_true, y_pred)
+        decisions = _decision_from_probs(
+            probs,
+            texts,
+            args.threshold_low,
+            args.threshold_high,
+        )
+        sel_metrics = selective_metrics(y_true, decisions)
+        return base_metrics, sel_metrics
+
+    y_val = splits.val["label"].values
+    y_test = splits.test["label"].values
+
+    val_base, val_sel = _eval_split(splits.val, y_val)
+    test_base, test_sel = _eval_split(splits.test, y_test)
+
+    rows = [
+        {"model": "llm_prompt_semantic", "split": "val", **val_base},
+        {"model": "llm_prompt_semantic", "split": "test", **test_base},
+        {"model": "llm_prompt_semantic_selective", "split": "val", **val_sel},
+        {"model": "llm_prompt_semantic_selective", "split": "test", **test_sel},
+    ]
+    metrics_path = out_dir / "nlp_llm_prompt_metrics.csv"
+    pd.DataFrame(rows).to_csv(metrics_path, index=False)
+
+    summary_lines = [
+        "# LLM Prompt Baseline Summary",
+        "",
+        f"Embedding model: {args.model_name}",
+        "Method: prompt-style semantic similarity classification.",
+        f"Logit scale: {args.logit_scale:.2f}",
+        f"Threshold band: {args.threshold_low:.2f}/{args.threshold_high:.2f}",
+        "",
+        "Test metrics (hard decision):",
+        f"recall_0={test_base['recall_0']:.3f}, precision_0={test_base['precision_0']:.3f}, f2_0={test_base['f2_0']:.3f}",
+        "",
+        "Selective test metrics:",
+        f"coverage={test_sel.get('coverage', np.nan):.3f}, selective_recall_0={test_sel.get('selective_recall_0', np.nan):.3f}, selective_f2_0={test_sel.get('selective_f2_0', np.nan):.3f}",
+        "",
+        "File:",
+        "nlp_llm_prompt_metrics.csv",
+    ]
+    (out_dir / "nlp_llm_prompt_summary.md").write_text("\n".join(summary_lines), encoding="utf-8")
+    print(f"[NLP EXT] LLM prompt baseline outputs saved to {out_dir}")
+
+
 def _tokenize_for_lm(text: str) -> List[str]:
     tokens = [tok for tok in str(text).split() if tok]
     return ["<s>"] + tokens + ["</s>"]
@@ -734,12 +927,16 @@ def build_course_fit_matrix(args) -> None:
     bench_path = out_dir / "nlp_syllabus_bench_test_summary.csv"
     ngram_path = out_dir / "nlp_ngram_lm_metrics.csv"
     rnn_path = out_dir / "nlp_rnn_lstm_metrics.csv"
+    mlm_path = out_dir / "nlp_mlm_probe.csv"
+    llm_prompt_path = out_dir / "nlp_llm_prompt_metrics.csv"
     trans_path = Path("results/nlp_ext/nlp_metrics.csv")
     issue_path = Path("results/issue_steps_char_demo/02_metrics_overall.csv")
 
     has_bench = bench_path.exists()
     has_ngram = ngram_path.exists()
     has_rnn = rnn_path.exists()
+    has_mlm = mlm_path.exists()
+    has_llm_prompt = llm_prompt_path.exists()
     has_trans = trans_path.exists()
     has_issue = issue_path.exists()
 
@@ -753,12 +950,12 @@ def build_course_fit_matrix(args) -> None:
         ("Perceptron", 1.0 if has_bench else 0.2),
         ("Logistic Regression", 1.0),
         ("Feed-forward Neural Networks", 1.0 if has_bench else 0.3),
-        ("Pytorch Basic", 1.0 if has_rnn or has_trans else 0.2),
+        ("Pytorch Basic", 1.0 if has_rnn or has_trans or has_mlm else 0.2),
         ("Vector Semantics and Embeddings", 0.8 if has_bench else 0.4),
         ("Recurrent Neural Networks", 1.0 if has_rnn else 0.2),
-        ("Transformers and LLMs", 1.0 if has_trans else 0.3),
-        ("Masked Language Models", 0.2),
-        ("Applications of LLMs", 0.3),
+        ("Transformers and LLMs", 1.0 if has_trans or has_mlm or has_llm_prompt else 0.3),
+        ("Masked Language Models", 1.0 if has_mlm else 0.2),
+        ("Applications of LLMs", 0.9 if has_llm_prompt else 0.3),
     ]
     df = pd.DataFrame(topics, columns=["topic", "coverage_score"])
     df["coverage_percent"] = (df["coverage_score"] * 100).round(1)

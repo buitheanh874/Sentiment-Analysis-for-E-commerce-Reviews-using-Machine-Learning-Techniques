@@ -1,0 +1,6 @@
+probe_id,template,expected_tokens,top_tokens,hit_at_k
+p1_positive_quality,this gift card is <mask>.,great|good|excellent|useful,appreciated|awesome|free|yours|optional|mine|expired|valid|welcome|legit,0
+p2_negative_delivery,the delivery was <mask> and frustrating.,slow|late|bad|terrible,slow|delayed|confusing|lengthy|long|unpredictable|unexpected|tedious|abrupt|disappointing,1
+p3_customer_support,customer support was very <mask>.,helpful|responsive|kind|good,helpful|responsive|welcome|generous|good|strong|encouraging|useful|appreciated|nice,1
+p4_refund_problem,getting a refund was <mask>.,hard|difficult|impossible|slow,impossible|difficult|easy|unsuccessful|unlikely|easier|possible|straightforward|simple|recommended,1
+p5_value,overall value for money is <mask>.,good|great|poor|bad,priceless|zero|irrelevant|nil|negligible|staggering|meaningless|astronomical|unknown|astounding,0

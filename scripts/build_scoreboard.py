@@ -38,6 +38,7 @@ def _row(
     micro_f1: float | None = None,
     macro_f1: float | None = None,
     coverage: float | None = None,
+    aux_score: float | None = None,
 ) -> Dict:
     missed_negative_rate = None if recall_0 is None else 1.0 - recall_0
     return {
@@ -50,6 +51,7 @@ def _row(
         "micro_f1": micro_f1,
         "macro_f1": macro_f1,
         "coverage": coverage,
+        "aux_score": aux_score,
         "missed_negative_rate": missed_negative_rate,
         "source_file": source_file,
     }
@@ -148,6 +150,43 @@ def build_scoreboard() -> pd.DataFrame:
                 )
             )
 
+    llm_path = RESULTS_DIR / "nlp_ext" / "syllabus_upgrade" / "nlp_llm_prompt_metrics.csv"
+    llm_df = _safe_read_csv(llm_path)
+    if not llm_df.empty:
+        if "split" in llm_df.columns:
+            llm_test = llm_df[llm_df["split"] == "test"]
+        else:
+            llm_test = llm_df
+        if "model" in llm_test.columns:
+            sem_only = llm_test[llm_test["model"] == "llm_prompt_semantic"]
+            if not sem_only.empty:
+                llm_test = sem_only
+        for rec in llm_test.to_dict(orient="records"):
+            rows.append(
+                _row(
+                    task="llm_prompt_sentiment",
+                    model=str(rec.get("model", "llm_prompt_semantic")),
+                    split=str(rec.get("split", "test")),
+                    recall_0=_as_float(rec, "recall_0"),
+                    precision_0=_as_float(rec, "precision_0"),
+                    f2_0=_as_float(rec, "f2_0"),
+                    source_file=str(llm_path.relative_to(ROOT)),
+                )
+            )
+
+    mlm_path = RESULTS_DIR / "nlp_ext" / "syllabus_upgrade" / "nlp_mlm_probe.csv"
+    mlm_df = _safe_read_csv(mlm_path)
+    if not mlm_df.empty and "hit_at_k" in mlm_df.columns:
+        rows.append(
+            _row(
+                task="mlm_probe",
+                model="masked_lm_hit_at_k",
+                split="probe",
+                aux_score=float(mlm_df["hit_at_k"].mean()),
+                source_file=str(mlm_path.relative_to(ROOT)),
+            )
+        )
+
     df = pd.DataFrame(rows)
     if df.empty:
         return df
@@ -171,6 +210,7 @@ def _to_markdown_table(df: pd.DataFrame) -> str:
         "micro_f1",
         "macro_f1",
         "coverage",
+        "aux_score",
         "missed_negative_rate",
         "source_file",
     ]

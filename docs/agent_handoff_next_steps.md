@@ -1,6 +1,6 @@
 # AI Agent Handoff: Current Status and Next Steps
 
-Last updated: 2026-03-03
+Last updated: 2026-03-05
 
 ## 1) Current Project State
 
@@ -25,7 +25,7 @@ Completed upgrades include:
     - `results/nlp_ext/syllabus_upgrade/nlp_rnn_lstm_summary.md`
 - Syllabus fit recomputed:
   - `results/nlp_ext/syllabus_upgrade/nlp_course_fit_matrix.md`
-  - Current estimated coverage: 84.3%
+  - Current estimated coverage: 94.3%
 - Tests:
   - `tests/test_smoke_cli.py`
   - `tests/test_scoreboard_builder.py`
@@ -45,21 +45,27 @@ Pinned optional dependency set:
 
 ## 3) High-Priority Backlog (Do Next)
 
+Status update:
+
+- `transformer_finetune` now supports `--fast_mode` and `--skip_hard_cases`.
+- New syllabus commands added:
+  - `mlm_probe`
+  - `llm_prompt_baseline`
+- Course-fit scoring now checks MLM and LLM prompt artifacts.
+- Scoreboard now supports:
+  - `llm_prompt_sentiment`
+  - `mlm_probe` (`aux_score = hit@k`)
+
 ### P0 - Finish Transformer Fast Path (for reliable reproducibility)
 
 Goal:
 - Ensure transformer pipeline can run successfully on CPU within practical time.
 
-Tasks:
-1. Add `--fast_mode` to `transformer_finetune`:
-   - Reduce train samples, max length, and epochs automatically.
-   - Example targets: `max_train_samples<=1000`, `max_length<=96`, `epochs<=0.2`.
-2. Add `--skip_hard_cases` option to shorten post-processing.
-3. Add a clear runtime note in README with expected CPU duration.
-4. Generate fresh artifacts:
-   - `results/nlp_ext/nlp_metrics.csv`
-   - `results/nlp_ext/nlp_threshold_sweep.csv`
-   - `results/nlp_ext/nlp_threshold_tradeoff.png`
+Tasks completed:
+1. Added `--fast_mode`, `--skip_hard_cases`, `--fast_eval_max_samples`, and `--skip_model_save`.
+2. Added CPU-friendly fast run path and validated successful execution.
+3. Added runtime note and command examples in `README.md`.
+4. Fast-run artifacts can be written to dedicated output directories (for example `results/nlp_ext_fast`).
 
 Done criteria:
 - Command completes on CPU without timeout.
@@ -70,15 +76,13 @@ Done criteria:
 Goal:
 - Cover syllabus topic: Masked Language Models.
 
-Tasks:
-1. Add command in `src/nlp_ext/__main__.py`:
-   - `mlm_probe` (or similar).
-2. Implement minimal MLM experiment (HuggingFace fill-mask):
-   - Evaluate top-k token prediction on a curated sentence set.
-3. Save outputs:
+Tasks completed:
+1. Added `mlm_probe` command in `src/nlp_ext/__main__.py`.
+2. Implemented fill-mask probe evaluation in `src/nlp_ext/syllabus_upgrades.py`.
+3. Added outputs:
    - `results/nlp_ext/syllabus_upgrade/nlp_mlm_probe.csv`
    - `results/nlp_ext/syllabus_upgrade/nlp_mlm_probe.md`
-4. Update `build_course_fit_matrix` to raise MLM topic score when artifact exists.
+4. Updated `build_course_fit_matrix` to account for MLM artifacts.
 
 Done criteria:
 - New command runs end-to-end and produces both CSV + markdown summary.
@@ -88,14 +92,12 @@ Done criteria:
 Goal:
 - Cover syllabus topic: Applications of LLMs.
 
-Tasks:
-1. Add `llm_prompt_baseline` command with a small, reproducible prompt-based classification task.
-2. Use deterministic settings and fixed prompt template.
-3. Compare with classic baseline on a small fixed subset.
-4. Save outputs:
-   - `results/nlp_ext/syllabus_upgrade/nlp_llm_app_metrics.csv`
-   - `results/nlp_ext/syllabus_upgrade/nlp_llm_app_summary.md`
-5. Update course-fit matrix scoring.
+Tasks completed:
+1. Added `llm_prompt_baseline` command with deterministic prompt-style semantic classification.
+2. Added outputs:
+   - `results/nlp_ext/syllabus_upgrade/nlp_llm_prompt_metrics.csv`
+   - `results/nlp_ext/syllabus_upgrade/nlp_llm_prompt_summary.md`
+3. Updated course-fit scoring and scoreboard ingestion for LLM prompt artifacts.
 
 Done criteria:
 - Clear comparison table exists and command is reproducible.
@@ -124,15 +126,15 @@ Core checks:
 ```bash
 python -m pytest -q
 python scripts/build_scoreboard.py
-python -m src.nlp_ext full_syllabus_upgrade --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade
+python -m src.nlp_ext full_syllabus_upgrade --data_path data/Gift_Cards.jsonl --output_dir results/nlp_ext/syllabus_upgrade --include_mlm_probe --include_llm_prompt
 ```
 
 ## 6) Acceptance Checklist for Next Delivery
 
-- [ ] Transformer fast path runs on CPU without timeout.
-- [ ] MLM artifact exists and is linked in rubric/checklist docs.
-- [ ] LLM application artifact exists and is linked in rubric/checklist docs.
-- [ ] Course-fit matrix updated and coverage increased from 84.3%.
-- [ ] Scoreboard refreshed and includes new baselines.
-- [ ] Tests pass (`python -m pytest -q`).
+- [x] Transformer fast path runs on CPU without timeout.
+- [x] MLM artifact exists and is linked in rubric/checklist docs.
+- [x] LLM application artifact exists and is linked in rubric/checklist docs.
+- [x] Course-fit matrix updated and coverage increased from 84.3%.
+- [x] Scoreboard refreshed and includes new baselines.
+- [x] Tests pass (`python -m pytest -q`).
 
