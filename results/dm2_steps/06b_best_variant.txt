@@ -1,0 +1,1 @@
+variant=V6, k=10000, class_weight=w10, description=Word 1-2 + char 3-5 + negation, negation=True, clause_split=False, char=True

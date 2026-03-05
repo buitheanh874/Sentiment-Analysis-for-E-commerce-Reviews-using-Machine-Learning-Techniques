@@ -1,0 +1,2 @@
+variant,k,class_weight,threshold_low,threshold_high,fallback_rate,coverage,uncertain_rate,selective_precision_0,selective_recall_0,selective_f2_0,fnr_covered_0
+V6,10000,w10,0.4,0.6,0.08585892450046936,0.885376156631353,0.11462384336864695,0.7301315037164093,0.9558383233532934,0.9001832792894403,0.04416167664670659

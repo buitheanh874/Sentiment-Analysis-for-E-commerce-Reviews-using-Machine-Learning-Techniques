@@ -1,0 +1,10 @@
+text,baseline_p_pos,baseline_label,best_p_pos,best_label,fallback_reason
+not bad,0.011131274762580063,Negative,0.519662147598267,Uncertain,threshold_band
+not good,0.03284406891937037,Negative,0.0038379022993201657,Negative,
+good but late delivery,0.5198802156935907,Uncertain,0.7042854322895268,Positive,threshold_band
+great product but support is awful,0.3648991261999188,Negative,0.08751978254139471,Negative,
+idk,0.7652343012228257,Uncertain,0.7823842629406468,Uncertain,too_short
+gr8,0.7652343012228257,Uncertain,0.7823842629406468,Uncertain,too_short
+thx,0.7652343012228257,Uncertain,0.7823842629406468,Uncertain,too_short
+,0.7652343012228257,Uncertain,0.7823842629406468,Uncertain,too_short
+!!!,0.7652343012228257,Uncertain,0.7823842629406468,Uncertain,too_short
