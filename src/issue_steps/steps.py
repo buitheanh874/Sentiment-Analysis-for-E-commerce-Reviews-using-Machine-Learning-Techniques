@@ -211,7 +211,12 @@ def cmd_make_template(args) -> None:
     if args.sample_size is not None and args.sample_size > 0 and args.sample_size < len(df):
         df = df.sample(n=args.sample_size, random_state=args.seed).copy()
 
-    df = df.sort_values("id").reset_index(drop=True)
+    df["__id_sort_key"] = df["id"].map(_template_id_sort_key)
+    df = (
+        df.sort_values("__id_sort_key", kind="mergesort")
+        .drop(columns=["__id_sort_key"])
+        .reset_index(drop=True)
+    )
 
     for label in ISSUE_LABELS:
         df[label] = 0 if args.init_zero else ""
@@ -241,6 +246,16 @@ def _normalize_id(value) -> str:
     except Exception:
         pass
     return text
+
+
+def _template_id_sort_key(value) -> Tuple[int, int, str]:
+    normalized = _normalize_id(value)
+    if normalized == "":
+        return (2, 0, "")
+    try:
+        return (0, int(normalized), normalized)
+    except ValueError:
+        return (1, 0, normalized.casefold())
 
 
 def cmd_merge_batches(args) -> None:
