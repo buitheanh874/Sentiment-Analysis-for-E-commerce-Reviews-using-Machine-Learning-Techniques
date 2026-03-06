@@ -28,6 +28,9 @@ def test_issue_predict_cli_runs():
     assert proc.returncode == 0, proc.stderr
     out = proc.stdout.lower()
     assert "labels" in out or "prediction" in out
+    metadata_dir = ROOT / "results" / "issue_steps" / "_run_metadata"
+    assert metadata_dir.exists()
+    assert any(metadata_dir.glob("*.json"))
 
 
 def test_pipeline_help():

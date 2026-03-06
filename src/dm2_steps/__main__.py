@@ -1,5 +1,7 @@
-﻿import argparse
+import argparse
 from pathlib import Path
+
+from src.run_metadata import begin_run, end_run
 
 from . import (
     DM2Config,
@@ -129,25 +131,36 @@ def main():
     )
 
     args = parser.parse_args()
-    config = DM2Config(
-        data_path=args.data_path,
-        output_dir=args.output_dir,
-        enable_abbrev_norm=args.enable_abbrev_norm,
-        enable_negation_tagging=args.enable_negation_tagging,
-        enable_clause_split=args.enable_clause_split,
-        enable_char_ngrams=args.enable_char_ngrams,
-        negation_window=args.negation_window,
-        min_nnz=args.min_nnz,
-        thresholds=(args.threshold_low, args.threshold_high),
+    metadata_dir = Path(args.output_dir) / "_run_metadata"
+    record = begin_run(
+        command_name=f"src.dm2_steps.{args.step}",
+        args=args,
+        metadata_dir=metadata_dir,
     )
+    try:
+        config = DM2Config(
+            data_path=args.data_path,
+            output_dir=args.output_dir,
+            enable_abbrev_norm=args.enable_abbrev_norm,
+            enable_negation_tagging=args.enable_negation_tagging,
+            enable_clause_split=args.enable_clause_split,
+            enable_char_ngrams=args.enable_char_ngrams,
+            negation_window=args.negation_window,
+            min_nnz=args.min_nnz,
+            thresholds=(args.threshold_low, args.threshold_high),
+        )
 
-    func = STEP_MAP[args.step]
-    if func is step11_demo_one_review:
-        if not args.text:
-            raise SystemExit("Provide --text \"review\" for step11_demo_one_review.")
-        func(config, args.text)
-    else:
-        func(config)
+        func = STEP_MAP[args.step]
+        if func is step11_demo_one_review:
+            if not args.text:
+                raise SystemExit("Provide --text \"review\" for step11_demo_one_review.")
+            func(config, args.text)
+        else:
+            func(config)
+        end_run(record, status="success")
+    except Exception as exc:
+        end_run(record, status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
 
 
 if __name__ == "__main__":

@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      - name: lint
+        run: |
+          ruff check src tests scripts --select E9,F63,F7,F82
+
+      - name: run tests
+        run: |
+          python -m pytest -q
+
+      - name: build scoreboard
+        run: |
+          python scripts/build_scoreboard.py

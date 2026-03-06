@@ -22,6 +22,13 @@ pip uninstall -y torch
 pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
 ```
 
+Recommended for contributors:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ## Data
 
 - Main corpus: `data/Gift_Cards.jsonl` (requires `text`, `rating`).
@@ -105,9 +112,14 @@ Demo smoke inputs and expected behavior:
 - `results/nlp_ext/`: transformer and syllabus-upgrade outputs.
 - `results/reports/`: project reports (EN + VI).
 - `models/`: trained artifacts used by demos.
+- `*/_run_metadata/`: per-command run metadata JSON (args, git commit, status, duration).
 
 ## Testing
 
 ```bash
 python -m pytest -q
 ```
+
+## Level Upgrade Plan
+
+- Roadmap file: `docs/level_upgrade_roadmap.md`

@@ -1,12 +1,17 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 from typing import Dict, List
 
 import pandas as pd
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.run_metadata import begin_run, end_run
+
 RESULTS_DIR = ROOT / "results"
 OUT_DIR = RESULTS_DIR / "scoreboard"
 
@@ -220,27 +225,37 @@ def _to_markdown_table(df: pd.DataFrame) -> str:
 
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    df = build_scoreboard()
-    if df.empty:
-        raise SystemExit("No scoreboard rows were built. Check result artifact paths.")
+    record = begin_run(
+        command_name="scripts.build_scoreboard",
+        args={"output_dir": OUT_DIR},
+        metadata_dir=OUT_DIR / "_run_metadata",
+    )
+    try:
+        df = build_scoreboard()
+        if df.empty:
+            raise SystemExit("No scoreboard rows were built. Check result artifact paths.")
 
-    csv_path = OUT_DIR / "model_scoreboard.csv"
-    md_path = OUT_DIR / "model_scoreboard.md"
-    df.to_csv(csv_path, index=False)
-    md_lines = [
-        "# Model Scoreboard",
-        "",
-        "Generated from existing experiment artifacts.",
-        "",
-        _to_markdown_table(df),
-        "",
-        "Notes:",
-        "- `missed_negative_rate = 1 - recall_0`.",
-        "- Multi-label rows use micro/macro F1 when class-0 metrics are not defined.",
-    ]
-    md_path.write_text("\n".join(md_lines), encoding="utf-8")
-    print(f"Wrote: {csv_path}")
-    print(f"Wrote: {md_path}")
+        csv_path = OUT_DIR / "model_scoreboard.csv"
+        md_path = OUT_DIR / "model_scoreboard.md"
+        df.to_csv(csv_path, index=False)
+        md_lines = [
+            "# Model Scoreboard",
+            "",
+            "Generated from existing experiment artifacts.",
+            "",
+            _to_markdown_table(df),
+            "",
+            "Notes:",
+            "- `missed_negative_rate = 1 - recall_0`.",
+            "- Multi-label rows use micro/macro F1 when class-0 metrics are not defined.",
+        ]
+        md_path.write_text("\n".join(md_lines), encoding="utf-8")
+        print(f"Wrote: {csv_path}")
+        print(f"Wrote: {md_path}")
+        end_run(record, status="success", extra={"rows": len(df)})
+    except Exception as exc:
+        end_run(record, status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
 
 
 if __name__ == "__main__":

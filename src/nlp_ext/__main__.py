@@ -18,6 +18,7 @@ from src.dm2_steps.common import (
 )
 from src.dm2_steps.steps import _load_trained_artifacts, _train_best_lr
 from src.text_features import DEFAULT_NEGATION_WINDOW
+from src.run_metadata import begin_run, end_run
 from .syllabus_upgrades import (
     build_course_fit_matrix,
     run_llm_prompt_baseline,
@@ -366,6 +367,13 @@ def transformer_finetune(args):
     print(f"[NLP EXT] Metrics saved to {out_dir}")
 
 
+def _metadata_dir_for_command(args) -> Path:
+    output_dir = getattr(args, "output_dir", None)
+    if output_dir is not None:
+        return Path(output_dir) / "_run_metadata"
+    return Path("results/nlp_ext/_run_metadata")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Optional NLP extensions")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -541,33 +549,46 @@ def main():
     full_parser.add_argument("--threshold_high", type=float, default=DEFAULT_THRESHOLDS[1])
 
     args = parser.parse_args()
+    metadata_dir = _metadata_dir_for_command(args)
+    record = begin_run(
+        command_name=f"src.nlp_ext.{args.command}",
+        args=args,
+        metadata_dir=metadata_dir,
+    )
 
-    if args.command == "transformer_finetune":
-        transformer_finetune(args)
-    elif args.command == "classic_syllabus_bench":
-        run_classic_syllabus_bench(args)
-    elif args.command == "ngram_language_model":
-        run_ngram_language_model(args)
-    elif args.command == "mlm_probe":
-        run_mlm_probe(args)
-    elif args.command == "llm_prompt_baseline":
-        run_llm_prompt_baseline(args)
-    elif args.command == "rnn_lstm_baseline":
-        run_rnn_lstm_baseline(args)
-    elif args.command == "course_fit_matrix":
-        build_course_fit_matrix(args)
-    elif args.command == "full_syllabus_upgrade":
-        run_classic_syllabus_bench(args)
-        run_ngram_language_model(args)
-        run_rnn_lstm_baseline(args)
-        if args.include_mlm_probe:
-            args.model_name = args.mlm_model_name
-            args.top_k = args.mlm_top_k
+    try:
+        if args.command == "transformer_finetune":
+            transformer_finetune(args)
+        elif args.command == "classic_syllabus_bench":
+            run_classic_syllabus_bench(args)
+        elif args.command == "ngram_language_model":
+            run_ngram_language_model(args)
+        elif args.command == "mlm_probe":
             run_mlm_probe(args)
-        if args.include_llm_prompt:
-            args.model_name = args.llm_model_name
+        elif args.command == "llm_prompt_baseline":
             run_llm_prompt_baseline(args)
-        build_course_fit_matrix(args)
+        elif args.command == "rnn_lstm_baseline":
+            run_rnn_lstm_baseline(args)
+        elif args.command == "course_fit_matrix":
+            build_course_fit_matrix(args)
+        elif args.command == "full_syllabus_upgrade":
+            run_classic_syllabus_bench(args)
+            run_ngram_language_model(args)
+            run_rnn_lstm_baseline(args)
+            if args.include_mlm_probe:
+                args.model_name = args.mlm_model_name
+                args.top_k = args.mlm_top_k
+                run_mlm_probe(args)
+            if args.include_llm_prompt:
+                args.model_name = args.llm_model_name
+                run_llm_prompt_baseline(args)
+            build_course_fit_matrix(args)
+        else:
+            raise SystemExit(f"Unsupported command: {args.command}")
+        end_run(record, status="success")
+    except Exception as exc:
+        end_run(record, status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
 
 
 if __name__ == "__main__":

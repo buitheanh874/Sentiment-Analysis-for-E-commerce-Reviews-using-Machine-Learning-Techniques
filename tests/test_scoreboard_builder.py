@@ -25,3 +25,6 @@ def test_scoreboard_builder_outputs_files():
     assert "task" in df.columns
     assert "model" in df.columns
     assert "source_file" in df.columns
+    tasks = set(df["task"].astype(str))
+    assert "sentiment" in tasks
+    assert "issue_multilabel" in tasks

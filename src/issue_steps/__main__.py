@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+from src.run_metadata import begin_run, end_run
+
 from .common import (
     DEFAULT_DATA_PATH,
     DEFAULT_MODEL_DIR,
@@ -14,6 +16,12 @@ from .steps import (
     cmd_train,
     cmd_validate,
 )
+
+def _metadata_dir_for_command(args) -> Path:
+    output_dir = getattr(args, "output_dir", None)
+    if output_dir is not None:
+        return Path(output_dir) / "_run_metadata"
+    return Path("results/issue_steps/_run_metadata")
 
 
 def main() -> None:
@@ -208,22 +216,30 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    if args.command == "make_template":
-        cmd_make_template(args)
-        return
-    if args.command == "validate":
-        cmd_validate(args)
-        return
-    if args.command == "merge_batches":
-        cmd_merge_batches(args)
-        return
-    if args.command == "train":
-        cmd_train(args)
-        return
-    if args.command == "predict":
-        cmd_predict(args)
-        return
-    raise SystemExit(f"Unsupported command: {args.command}")
+    metadata_dir = _metadata_dir_for_command(args)
+    record = begin_run(
+        command_name=f"src.issue_steps.{args.command}",
+        args=args,
+        metadata_dir=metadata_dir,
+    )
+
+    try:
+        if args.command == "make_template":
+            cmd_make_template(args)
+        elif args.command == "validate":
+            cmd_validate(args)
+        elif args.command == "merge_batches":
+            cmd_merge_batches(args)
+        elif args.command == "train":
+            cmd_train(args)
+        elif args.command == "predict":
+            cmd_predict(args)
+        else:
+            raise SystemExit(f"Unsupported command: {args.command}")
+        end_run(record, status="success")
+    except Exception as exc:
+        end_run(record, status="failed", error=f"{type(exc).__name__}: {exc}")
+        raise
 
 
 if __name__ == "__main__":
