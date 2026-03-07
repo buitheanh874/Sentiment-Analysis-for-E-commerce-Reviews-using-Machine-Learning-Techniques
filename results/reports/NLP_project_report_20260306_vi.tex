@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{article}
+﻿\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T5]{fontenc}
 \usepackage{geometry}
@@ -15,24 +15,24 @@
 \setcounter{tocdepth}{3}
 \renewcommand{\arraystretch}{1.15}
 
-\title{Báo cáo dự án xử lý ngôn ngữ tự nhiên\\Phân tích tình cảm cho các bài đánh giá thương mại điện tử bằng Kỹ thuật học máy.}
+\title{BÃ¡o cÃ¡o dá»± Ã¡n xá»­ lÃ½ ngÃ´n ngá»¯ tá»± nhiÃªn\\PhÃ¢n tÃ­ch tÃ¬nh cáº£m cho cÃ¡c bÃ i Ä‘Ã¡nh giÃ¡ thÆ°Æ¡ng máº¡i Ä‘iá»‡n tá»­ báº±ng Ká»¹ thuáº­t há»c mÃ¡y.}
 \author{Team SkyDom+}
-\date{tháng 3 năm 2026}
+\date{thÃ¡ng 3 nÄƒm 2026}
 
 \begin{document}
 
 \begin{titlepage}
 \centering
 \vspace*{1.0cm}
-{\LARGE Phân tích tình cảm cho các bài đánh giá thương mại điện tử\par}
+{\LARGE PhÃ¢n tÃ­ch tÃ¬nh cáº£m cho cÃ¡c bÃ i Ä‘Ã¡nh giÃ¡ thÆ°Æ¡ng máº¡i Ä‘iá»‡n tá»­\par}
 \vspace{0.2cm}
-{\LARGE sử dụng Kỹ thuật học máy.\par}
+{\LARGE sá»­ dá»¥ng Ká»¹ thuáº­t há»c mÃ¡y.\par}
 \vspace{0.8cm}
-{\Large Báo cáo nghiên cứu điển hình\par}
+{\Large BÃ¡o cÃ¡o nghiÃªn cá»©u Ä‘iá»ƒn hÃ¬nh\par}
 \vspace{0.8cm}
-{\large Đội: Đội SkyDom+\par}
+{\large Äá»™i: Äá»™i SkyDom+\par}
 \vspace{0.3cm}
-{\large Thành viên nhóm:\par}
+{\large ThÃ nh viÃªn nhÃ³m:\par}
 \vspace{0.4cm}
 {\large
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{5.8cm} >{\raggedright\arraybackslash}p{2.7cm}@{}}
@@ -45,13 +45,13 @@ Pham Quang Tung & 22BA13320 \\
 Khuong Bao Duc & 22BA13077 \\
 \end{tabular}\par}
 \vfill
-{\large Ngày 6 tháng 3 năm 2026\par}
+{\large NgÃ y 6 thÃ¡ng 3 nÄƒm 2026\par}
 \end{titlepage}
 
 \pagenumbering{roman}
 
 \begin{abstract}
-Báo cáo này trình bày một dự án NLP toàn diện để xem xét hiểu biết về dữ liệu Thẻ quà tặng Amazon. Quy trình hiện tại có ba lớp vận hành: phân loại cảm tính với khả năng kiểm soát độ không chắc chắn, trích xuất vấn đề đa nhãn và mở rộng theo ngữ cảnh dựa trên máy biến áp. Tập dữ liệu nguồn có 152.410 bài đánh giá, trong khi chú thích vấn đề chứa 19.000 hàng được hợp nhất và xác thực. Biến thể cảm tính cổ điển đã chọn (V6: từ cộng với ký tự TF-IDF có gắn thẻ phủ định) đạt độ chính xác kiểm tra\_0 là 0,677, thu hồi\_0 là 0,932 và F2\_0 là 0,867. Phần mở rộng máy biến áp đạt độ chính xác kiểm tra\_0 là 0,822, thu hồi\_0 là 0,833 và F2\_0 là 0,831 với phạm vi bao phủ 0,910 ở ngưỡng 0,40/0,60. Trình trích xuất vấn đề đạt kiểm tra micro-F1 là 0,765 cho mô hình từ và 0,763 cho mô hình ký tự từ cộng, với macro-F1 tốt hơn trong thiết lập sau. Để phù hợp chặt chẽ với giáo trình NLP, dự án cũng bao gồm một bộ điểm chuẩn (Hồi quy logistic, các biến thể Naive Bayes, Perceptron, LinearSVM, mất log SGD, logistic ngữ nghĩa SVD, FFNN), khối mô hình ngôn ngữ N-gram, đường cơ sở RNN/LSTM, tạo phẩm thăm dò MLM và đường cơ sở kiểu nhắc nhở LLM. Ma trận phù hợp với khóa học được cập nhật được tính toán từ các tạo phẩm được tạo ra báo cáo mức độ bao phủ giáo trình ước tính là 94,3\%.
+BÃ¡o cÃ¡o nÃ y trÃ¬nh bÃ y má»™t dá»± Ã¡n NLP toÃ n diá»‡n Ä‘á»ƒ xem xÃ©t hiá»ƒu biáº¿t vá» dá»¯ liá»‡u Tháº» quÃ  táº·ng Amazon. Quy trÃ¬nh hiá»‡n táº¡i cÃ³ ba lá»›p váº­n hÃ nh: phÃ¢n loáº¡i cáº£m tÃ­nh vá»›i kháº£ nÄƒng kiá»ƒm soÃ¡t Ä‘á»™ khÃ´ng cháº¯c cháº¯n, trÃ­ch xuáº¥t váº¥n Ä‘á» Ä‘a nhÃ£n vÃ  má»Ÿ rá»™ng theo ngá»¯ cáº£nh dá»±a trÃªn mÃ¡y biáº¿n Ã¡p. Táº­p dá»¯ liá»‡u nguá»“n cÃ³ 152.410 bÃ i Ä‘Ã¡nh giÃ¡, trong khi chÃº thÃ­ch váº¥n Ä‘á» chá»©a 19.000 hÃ ng Ä‘Æ°á»£c há»£p nháº¥t vÃ  xÃ¡c thá»±c. Biáº¿n thá»ƒ cáº£m tÃ­nh cá»• Ä‘iá»ƒn Ä‘Ã£ chá»n (V6: tá»« cá»™ng vá»›i kÃ½ tá»± TF-IDF cÃ³ gáº¯n tháº» phá»§ Ä‘á»‹nh) Ä‘áº¡t Ä‘á»™ chÃ­nh xÃ¡c kiá»ƒm tra\_0 lÃ  0,677, thu há»“i\_0 lÃ  0,932 vÃ  F2\_0 lÃ  0,867. Pháº§n má»Ÿ rá»™ng mÃ¡y biáº¿n Ã¡p Ä‘áº¡t Ä‘á»™ chÃ­nh xÃ¡c kiá»ƒm tra\_0 lÃ  0,822, thu há»“i\_0 lÃ  0,833 vÃ  F2\_0 lÃ  0,831 vá»›i pháº¡m vi bao phá»§ 0,910 á»Ÿ ngÆ°á»¡ng 0,40/0,60. TrÃ¬nh trÃ­ch xuáº¥t váº¥n Ä‘á» Ä‘áº¡t kiá»ƒm tra micro-F1 lÃ  0,765 cho mÃ´ hÃ¬nh tá»« vÃ  0,763 cho mÃ´ hÃ¬nh kÃ½ tá»± tá»« cá»™ng, vá»›i macro-F1 tá»‘t hÆ¡n trong thiáº¿t láº­p sau. Äá»ƒ phÃ¹ há»£p cháº·t cháº½ vá»›i giÃ¡o trÃ¬nh NLP, dá»± Ã¡n cÅ©ng bao gá»“m má»™t bá»™ Ä‘iá»ƒm chuáº©n (Há»“i quy logistic, cÃ¡c biáº¿n thá»ƒ Naive Bayes, Perceptron, LinearSVM, máº¥t log SGD, logistic ngá»¯ nghÄ©a SVD, FFNN), khá»‘i mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram, Ä‘Æ°á»ng cÆ¡ sá»Ÿ RNN/LSTM, táº¡o pháº©m thÄƒm dÃ² MLM vÃ  Ä‘Æ°á»ng cÆ¡ sá»Ÿ kiá»ƒu nháº¯c nhá»Ÿ LLM. Ma tráº­n phÃ¹ há»£p vá»›i khÃ³a há»c Ä‘Æ°á»£c cáº­p nháº­t Ä‘Æ°á»£c tÃ­nh toÃ¡n tá»« cÃ¡c táº¡o pháº©m Ä‘Æ°á»£c táº¡o ra bÃ¡o cÃ¡o má»©c Ä‘á»™ bao phá»§ giÃ¡o trÃ¬nh Æ°á»›c tÃ­nh lÃ  94,3\%.
  B?n c?p nh?t Level 3 trong m? ngu?n hi?n t?i b? sung t?m class-weight theo t?ng label, calibration x?c su?t cho m? h?nh issue v? command ablation classic; ? l?n ch?y m?i nh?t, ablation ch?n V7 l? bi?n th? c? trade-off negative-first t?t nh?t.
 \end{abstract}
 
@@ -59,76 +59,76 @@ Báo cáo này trình bày một dự án NLP toàn diện để xem xét hiểu
 \newpage
 \pagenumbering{arabic}
 
-\section{Giới thiệu}
-\subsection{Bối cảnh}
-Ngôn ngữ tự nhiên trong đánh giá của người dùng khá ồn ào, ngắn gọn và hỗn tạp. Một đánh giá có thể bao gồm khen ngợi, phàn nàn, tiếng lóng, lỗi đánh máy và các từ miền trong cùng một câu. Điều này làm cho việc đánh giá hiểu được một vấn đề NLP thực tế trong đó cả phương pháp cổ điển và hiện đại đều hữu ích \cite{jurafsky2026,turney2002}.
+\section{Giá»›i thiá»‡u}
+\subsection{Bá»‘i cáº£nh}
+NgÃ´n ngá»¯ tá»± nhiÃªn trong Ä‘Ã¡nh giÃ¡ cá»§a ngÆ°á»i dÃ¹ng khÃ¡ á»“n Ã o, ngáº¯n gá»n vÃ  há»—n táº¡p. Má»™t Ä‘Ã¡nh giÃ¡ cÃ³ thá»ƒ bao gá»“m khen ngá»£i, phÃ n nÃ n, tiáº¿ng lÃ³ng, lá»—i Ä‘Ã¡nh mÃ¡y vÃ  cÃ¡c tá»« miá»n trong cÃ¹ng má»™t cÃ¢u. Äiá»u nÃ y lÃ m cho viá»‡c Ä‘Ã¡nh giÃ¡ hiá»ƒu Ä‘Æ°á»£c má»™t váº¥n Ä‘á» NLP thá»±c táº¿ trong Ä‘Ã³ cáº£ phÆ°Æ¡ng phÃ¡p cá»• Ä‘iá»ƒn vÃ  hiá»‡n Ä‘áº¡i Ä‘á»u há»¯u Ã­ch \cite{jurafsky2026,turney2002}.
 
-\subsection{Tuyên bố vấn đề}
-Nghiên cứu này tập trung vào các đánh giá về Thẻ quà tặng Amazon. Mục tiêu không chỉ giới hạn ở việc phân biệt cảm xúc tích cực và tiêu cực; đó là xây dựng một quy trình xem xét-hiểu biết để hỗ trợ các quyết định nhận thức được sự không chắc chắn và định tuyến ở cấp độ vấn đề cho các hoạt động dịch vụ hạ nguồn.
+\subsection{TuyÃªn bá»‘ váº¥n Ä‘á»}
+NghiÃªn cá»©u nÃ y táº­p trung vÃ o cÃ¡c Ä‘Ã¡nh giÃ¡ vá» Tháº» quÃ  táº·ng Amazon. Má»¥c tiÃªu khÃ´ng chá»‰ giá»›i háº¡n á»Ÿ viá»‡c phÃ¢n biá»‡t cáº£m xÃºc tÃ­ch cá»±c vÃ  tiÃªu cá»±c; Ä‘Ã³ lÃ  xÃ¢y dá»±ng má»™t quy trÃ¬nh xem xÃ©t-hiá»ƒu biáº¿t Ä‘á»ƒ há»— trá»£ cÃ¡c quyáº¿t Ä‘á»‹nh nháº­n thá»©c Ä‘Æ°á»£c sá»± khÃ´ng cháº¯c cháº¯n vÃ  Ä‘á»‹nh tuyáº¿n á»Ÿ cáº¥p Ä‘á»™ váº¥n Ä‘á» cho cÃ¡c hoáº¡t Ä‘á»™ng dá»‹ch vá»¥ háº¡ nguá»“n.
 
-\subsection{Mục tiêu và phạm vi}
-Mục tiêu của dự án là:
+\subsection{Má»¥c tiÃªu vÃ  pháº¡m vi}
+Má»¥c tiÃªu cá»§a dá»± Ã¡n lÃ :
 \begin{enumerate}
-\item Xây dựng bộ phân loại cảm tính có khả năng thu hồi cao, nhận thức rủi ro để phân loại phản hồi tiêu cực.
-\item Trích xuất các danh mục vấn đề cụ thể bằng cách sử dụng phân loại văn bản nhiều nhãn.
-\item So sánh các mô hình thưa thớt cổ điển với mô hình theo ngữ cảnh dựa trên máy biến áp.
-\item Mở rộng phạm vi bảo hiểm nhân tạo để phù hợp với các chủ đề khóa học NLP cốt lõi và nâng cao.
-\item Giữ tất cả các kết quả đầu ra có thể tái tạo từ các lệnh và tệp số liệu đã lưu.
+\item XÃ¢y dá»±ng bá»™ phÃ¢n loáº¡i cáº£m tÃ­nh cÃ³ kháº£ nÄƒng thu há»“i cao, nháº­n thá»©c rá»§i ro Ä‘á»ƒ phÃ¢n loáº¡i pháº£n há»“i tiÃªu cá»±c.
+\item TrÃ­ch xuáº¥t cÃ¡c danh má»¥c váº¥n Ä‘á» cá»¥ thá»ƒ báº±ng cÃ¡ch sá»­ dá»¥ng phÃ¢n loáº¡i vÄƒn báº£n nhiá»u nhÃ£n.
+\item So sÃ¡nh cÃ¡c mÃ´ hÃ¬nh thÆ°a thá»›t cá»• Ä‘iá»ƒn vá»›i mÃ´ hÃ¬nh theo ngá»¯ cáº£nh dá»±a trÃªn mÃ¡y biáº¿n Ã¡p.
+\item Má»Ÿ rá»™ng pháº¡m vi báº£o hiá»ƒm nhÃ¢n táº¡o Ä‘á»ƒ phÃ¹ há»£p vá»›i cÃ¡c chá»§ Ä‘á» khÃ³a há»c NLP cá»‘t lÃµi vÃ  nÃ¢ng cao.
+\item Giá»¯ táº¥t cáº£ cÃ¡c káº¿t quáº£ Ä‘áº§u ra cÃ³ thá»ƒ tÃ¡i táº¡o tá»« cÃ¡c lá»‡nh vÃ  tá»‡p sá»‘ liá»‡u Ä‘Ã£ lÆ°u.
 \end{enumerate}
 
-\subsection{Những gì chúng tôi đã làm trong dự án này}
-Việc triển khai được cấu trúc như một đường dẫn NLP từ đầu đến cuối. Nó bao gồm chuẩn hóa văn bản, mô hình hóa tính năng từ vựng và từ phụ, xử lý phủ định và tương phản, đào tạo có giám sát, kiểm soát độ không chắc chắn, trích xuất vấn đề, mở rộng biến áp, tổng hợp điểm chuẩn và tích hợp trình diễn.
+\subsection{Nhá»¯ng gÃ¬ chÃºng tÃ´i Ä‘Ã£ lÃ m trong dá»± Ã¡n nÃ y}
+Viá»‡c triá»ƒn khai Ä‘Æ°á»£c cáº¥u trÃºc nhÆ° má»™t Ä‘Æ°á»ng dáº«n NLP tá»« Ä‘áº§u Ä‘áº¿n cuá»‘i. NÃ³ bao gá»“m chuáº©n hÃ³a vÄƒn báº£n, mÃ´ hÃ¬nh hÃ³a tÃ­nh nÄƒng tá»« vá»±ng vÃ  tá»« phá»¥, xá»­ lÃ½ phá»§ Ä‘á»‹nh vÃ  tÆ°Æ¡ng pháº£n, Ä‘Ã o táº¡o cÃ³ giÃ¡m sÃ¡t, kiá»ƒm soÃ¡t Ä‘á»™ khÃ´ng cháº¯c cháº¯n, trÃ­ch xuáº¥t váº¥n Ä‘á», má»Ÿ rá»™ng biáº¿n Ã¡p, tá»•ng há»£p Ä‘iá»ƒm chuáº©n vÃ  tÃ­ch há»£p trÃ¬nh diá»…n.
 
-\subsection{Đóng góp chính}
-Những đóng góp chính của trạng thái kho lưu trữ hiện tại là:
+\subsection{ÄÃ³ng gÃ³p chÃ­nh}
+Nhá»¯ng Ä‘Ã³ng gÃ³p chÃ­nh cá»§a tráº¡ng thÃ¡i kho lÆ°u trá»¯ hiá»‡n táº¡i lÃ :
 \begin{enumerate}
-\item Một quy trình cảm tính có thể tái tạo với khả năng thu hồi cấp 0 cao và phân tích đánh đổi ngưỡng rõ ràng.
-\item Mô-đun trích xuất vấn đề đa nhãn với khả năng điều chỉnh ngưỡng trên mỗi nhãn và số liệu trên mỗi nhãn.
-\item Một phần mở rộng máy biến áp với các số liệu dự đoán có chọn lọc và đánh giá trường hợp khó.
-\item Gói nâng cấp giáo trình bao gồm NB, Perceptron, FFNN, N-gram LM, RNN/LSTM, đầu dò MLM và đường cơ sở nhắc nhở LLM.
-\item Một bộ tài liệu bao gồm ma trận đóng góp, mẫu cổng chất lượng, bảng điểm, bài kiểm tra và tập lệnh trình diễn.
+\item Má»™t quy trÃ¬nh cáº£m tÃ­nh cÃ³ thá»ƒ tÃ¡i táº¡o vá»›i kháº£ nÄƒng thu há»“i cáº¥p 0 cao vÃ  phÃ¢n tÃ­ch Ä‘Ã¡nh Ä‘á»•i ngÆ°á»¡ng rÃµ rÃ ng.
+\item MÃ´-Ä‘un trÃ­ch xuáº¥t váº¥n Ä‘á» Ä‘a nhÃ£n vá»›i kháº£ nÄƒng Ä‘iá»u chá»‰nh ngÆ°á»¡ng trÃªn má»—i nhÃ£n vÃ  sá»‘ liá»‡u trÃªn má»—i nhÃ£n.
+\item Má»™t pháº§n má»Ÿ rá»™ng mÃ¡y biáº¿n Ã¡p vá»›i cÃ¡c sá»‘ liá»‡u dá»± Ä‘oÃ¡n cÃ³ chá»n lá»c vÃ  Ä‘Ã¡nh giÃ¡ trÆ°á»ng há»£p khÃ³.
+\item GÃ³i nÃ¢ng cáº¥p giÃ¡o trÃ¬nh bao gá»“m NB, Perceptron, FFNN, N-gram LM, RNN/LSTM, Ä‘áº§u dÃ² MLM vÃ  Ä‘Æ°á»ng cÆ¡ sá»Ÿ nháº¯c nhá»Ÿ LLM.
+\item Má»™t bá»™ tÃ i liá»‡u bao gá»“m ma tráº­n Ä‘Ã³ng gÃ³p, máº«u cá»•ng cháº¥t lÆ°á»£ng, báº£ng Ä‘iá»ƒm, bÃ i kiá»ƒm tra vÃ  táº­p lá»‡nh trÃ¬nh diá»…n.
 \end{enumerate}
 
-\subsection{Triển khai thực tế}
-Dự án cung cấp cả đường dẫn thực thi CLI và giao diện người dùng nhẹ. Các lệnh cốt lõi được ghi lại trong \texttt{README.md}, kết quả đầu ra được lưu trữ trong \texttt{results/} và kiểm tra khói xác thực các đường dẫn thực thi quan trọng. Cấu hình này hỗ trợ khả năng tái tạo trong cả trình bày học thuật và cài đặt thực hiện lại thực tế.
+\subsection{Triá»ƒn khai thá»±c táº¿}
+Dá»± Ã¡n cung cáº¥p cáº£ Ä‘Æ°á»ng dáº«n thá»±c thi CLI vÃ  giao diá»‡n ngÆ°á»i dÃ¹ng nháº¹. CÃ¡c lá»‡nh cá»‘t lÃµi Ä‘Æ°á»£c ghi láº¡i trong \texttt{README.md}, káº¿t quáº£ Ä‘áº§u ra Ä‘Æ°á»£c lÆ°u trá»¯ trong \texttt{results/} vÃ  kiá»ƒm tra khÃ³i xÃ¡c thá»±c cÃ¡c Ä‘Æ°á»ng dáº«n thá»±c thi quan trá»ng. Cáº¥u hÃ¬nh nÃ y há»— trá»£ kháº£ nÄƒng tÃ¡i táº¡o trong cáº£ trÃ¬nh bÃ y há»c thuáº­t vÃ  cÃ i Ä‘áº·t thá»±c hiá»‡n láº¡i thá»±c táº¿.
 
-\subsection{Cấu trúc báo cáo}
-Báo cáo tuân theo cấu trúc cấp cao tương tự được sử dụng trong \texttt{GP.pdf}: khung vấn đề, phương pháp luận, thiết lập thử nghiệm, kết quả định lượng, bằng chứng quy trình làm việc, kế hoạch demo, những hạn chế và kết luận.
+\subsection{Cáº¥u trÃºc bÃ¡o cÃ¡o}
+BÃ¡o cÃ¡o tuÃ¢n theo cáº¥u trÃºc cáº¥p cao tÆ°Æ¡ng tá»± Ä‘Æ°á»£c sá»­ dá»¥ng trong \texttt{GP.pdf}: khung váº¥n Ä‘á», phÆ°Æ¡ng phÃ¡p luáº­n, thiáº¿t láº­p thá»­ nghiá»‡m, káº¿t quáº£ Ä‘á»‹nh lÆ°á»£ng, báº±ng chá»©ng quy trÃ¬nh lÃ m viá»‡c, káº¿ hoáº¡ch demo, nhá»¯ng háº¡n cháº¿ vÃ  káº¿t luáº­n.
 
-\section{Bối cảnh và các tác phẩm liên quan}
-\subsection{Đường cơ sở phân loại cảm xúc và văn bản}
-Các mô hình cảm tính cổ điển sử dụng các tính năng n-gram thưa thớt và bộ phân loại tuyến tính vẫn là các đường cơ sở được thiết lập tốt cho văn bản ồn ào do người dùng tạo \cite{wang2012,manning2008ir}. Chúng có hiệu quả về mặt tính toán, có thể giải thích được thông qua trọng số đặc trưng và phù hợp để kiểm soát rủi ro dựa trên ngưỡng.
+\section{Bá»‘i cáº£nh vÃ  cÃ¡c tÃ¡c pháº©m liÃªn quan}
+\subsection{ÄÆ°á»ng cÆ¡ sá»Ÿ phÃ¢n loáº¡i cáº£m xÃºc vÃ  vÄƒn báº£n}
+CÃ¡c mÃ´ hÃ¬nh cáº£m tÃ­nh cá»• Ä‘iá»ƒn sá»­ dá»¥ng cÃ¡c tÃ­nh nÄƒng n-gram thÆ°a thá»›t vÃ  bá»™ phÃ¢n loáº¡i tuyáº¿n tÃ­nh váº«n lÃ  cÃ¡c Ä‘Æ°á»ng cÆ¡ sá»Ÿ Ä‘Æ°á»£c thiáº¿t láº­p tá»‘t cho vÄƒn báº£n á»“n Ã o do ngÆ°á»i dÃ¹ng táº¡o \cite{wang2012,manning2008ir}. ChÃºng cÃ³ hiá»‡u quáº£ vá» máº·t tÃ­nh toÃ¡n, cÃ³ thá»ƒ giáº£i thÃ­ch Ä‘Æ°á»£c thÃ´ng qua trá»ng sá»‘ Ä‘áº·c trÆ°ng vÃ  phÃ¹ há»£p Ä‘á»ƒ kiá»ƒm soÃ¡t rá»§i ro dá»±a trÃªn ngÆ°á»¡ng.
 
-\subsection{Phủ định và tương phản trong tình cảm}
-Phạm vi phủ định là một thách thức đã biết trong phân tích cảm tính \cite{wiegand2010}. Trong văn bản đánh giá, các mẫu như \textit{không tệ} và các dạng tương phản như \textit{tốt nhưng giao hàng muộn} có thể lật ngược ranh giới quyết định. Điều này thúc đẩy việc gắn thẻ phủ định rõ ràng và thiết kế tính năng nhận biết mệnh đề.
+\subsection{Phá»§ Ä‘á»‹nh vÃ  tÆ°Æ¡ng pháº£n trong tÃ¬nh cáº£m}
+Pháº¡m vi phá»§ Ä‘á»‹nh lÃ  má»™t thÃ¡ch thá»©c Ä‘Ã£ biáº¿t trong phÃ¢n tÃ­ch cáº£m tÃ­nh \cite{wiegand2010}. Trong vÄƒn báº£n Ä‘Ã¡nh giÃ¡, cÃ¡c máº«u nhÆ° \textit{khÃ´ng tá»‡} vÃ  cÃ¡c dáº¡ng tÆ°Æ¡ng pháº£n nhÆ° \textit{tá»‘t nhÆ°ng giao hÃ ng muá»™n} cÃ³ thá»ƒ láº­t ngÆ°á»£c ranh giá»›i quyáº¿t Ä‘á»‹nh. Äiá»u nÃ y thÃºc Ä‘áº©y viá»‡c gáº¯n tháº» phá»§ Ä‘á»‹nh rÃµ rÃ ng vÃ  thiáº¿t káº¿ tÃ­nh nÄƒng nháº­n biáº¿t má»‡nh Ä‘á».
 
-\subsection{Học nhiều nhãn để gắn thẻ vấn đề}
-Trích xuất vấn đề là một vấn đề có nhiều nhãn vì một bài đánh giá có thể đề cập đến nhiều danh mục khiếu nại \cite{tsoumakas2011,zhang2014}. Thiết lập một so với phần còn lại với hiệu chuẩn ngưỡng trên mỗi nhãn rất thiết thực đối với việc phân phối nhãn không cân bằng.
+\subsection{Há»c nhiá»u nhÃ£n Ä‘á»ƒ gáº¯n tháº» váº¥n Ä‘á»}
+TrÃ­ch xuáº¥t váº¥n Ä‘á» lÃ  má»™t váº¥n Ä‘á» cÃ³ nhiá»u nhÃ£n vÃ¬ má»™t bÃ i Ä‘Ã¡nh giÃ¡ cÃ³ thá»ƒ Ä‘á» cáº­p Ä‘áº¿n nhiá»u danh má»¥c khiáº¿u náº¡i \cite{tsoumakas2011,zhang2014}. Thiáº¿t láº­p má»™t so vá»›i pháº§n cÃ²n láº¡i vá»›i hiá»‡u chuáº©n ngÆ°á»¡ng trÃªn má»—i nhÃ£n ráº¥t thiáº¿t thá»±c Ä‘á»‘i vá»›i viá»‡c phÃ¢n phá»‘i nhÃ£n khÃ´ng cÃ¢n báº±ng.
 
-\subsection{Mô hình hóa theo ngữ cảnh và phần mở rộng biến áp}
-Bộ mã hóa dựa trên máy biến áp nắm bắt ngữ nghĩa theo ngữ cảnh và có thể cải thiện độ ổn định của văn bản ngắn thành ngữ \cite{vaswani2017,devlin2019}. Tuy nhiên, trong môi trường nhận thức được rủi ro, các ngưỡng chọn lọc và sự đánh đổi mục tiêu cụ thể của doanh nghiệp vẫn rất cần thiết.
+\subsection{MÃ´ hÃ¬nh hÃ³a theo ngá»¯ cáº£nh vÃ  pháº§n má»Ÿ rá»™ng biáº¿n Ã¡p}
+Bá»™ mÃ£ hÃ³a dá»±a trÃªn mÃ¡y biáº¿n Ã¡p náº¯m báº¯t ngá»¯ nghÄ©a theo ngá»¯ cáº£nh vÃ  cÃ³ thá»ƒ cáº£i thiá»‡n Ä‘á»™ á»•n Ä‘á»‹nh cá»§a vÄƒn báº£n ngáº¯n thÃ nh ngá»¯ \cite{vaswani2017,devlin2019}. Tuy nhiÃªn, trong mÃ´i trÆ°á»ng nháº­n thá»©c Ä‘Æ°á»£c rá»§i ro, cÃ¡c ngÆ°á»¡ng chá»n lá»c vÃ  sá»± Ä‘Ã¡nh Ä‘á»•i má»¥c tiÃªu cá»¥ thá»ƒ cá»§a doanh nghiá»‡p váº«n ráº¥t cáº§n thiáº¿t.
 
-\section{Định nghĩa vấn đề NLP}
-\subsection{Nhiệm vụ A: Hiểu biết về tình cảm}
-Nhiệm vụ A là phân loại cảm xúc nhị phân từ văn bản đánh giá. Xếp hạng 1 và 2 được ánh xạ tới lớp phủ định. Xếp hạng 4 và 5 được ánh xạ tới lớp tích cực. Xếp hạng có giá trị 3 được sử dụng để phân tích độ không chắc chắn và không nằm trong chương trình đào tạo được giám sát chặt chẽ \cite{turney2002,wang2012}.
+\section{Äá»‹nh nghÄ©a váº¥n Ä‘á» NLP}
+\subsection{Nhiá»‡m vá»¥ A: Hiá»ƒu biáº¿t vá» tÃ¬nh cáº£m}
+Nhiá»‡m vá»¥ A lÃ  phÃ¢n loáº¡i cáº£m xÃºc nhá»‹ phÃ¢n tá»« vÄƒn báº£n Ä‘Ã¡nh giÃ¡. Xáº¿p háº¡ng 1 vÃ  2 Ä‘Æ°á»£c Ã¡nh xáº¡ tá»›i lá»›p phá»§ Ä‘á»‹nh. Xáº¿p háº¡ng 4 vÃ  5 Ä‘Æ°á»£c Ã¡nh xáº¡ tá»›i lá»›p tÃ­ch cá»±c. Xáº¿p háº¡ng cÃ³ giÃ¡ trá»‹ 3 Ä‘Æ°á»£c sá»­ dá»¥ng Ä‘á»ƒ phÃ¢n tÃ­ch Ä‘á»™ khÃ´ng cháº¯c cháº¯n vÃ  khÃ´ng náº±m trong chÆ°Æ¡ng trÃ¬nh Ä‘Ã o táº¡o Ä‘Æ°á»£c giÃ¡m sÃ¡t cháº·t cháº½ \cite{turney2002,wang2012}.
 
-Chính sách quyết định không đặt tính chính xác lên hàng đầu. Trong quá trình phân loại, kết quả âm tính giả trên các đánh giá tiêu cực rất tốn kém. Do đó, việc lựa chọn mô hình tuân theo phương pháp phỏng đoán phủ định đầu tiên: ưu tiên thu hồi cho lớp 0, sau đó là F2 cho lớp 0, sau đó là độ chính xác cho lớp 0.
+ChÃ­nh sÃ¡ch quyáº¿t Ä‘á»‹nh khÃ´ng Ä‘áº·t tÃ­nh chÃ­nh xÃ¡c lÃªn hÃ ng Ä‘áº§u. Trong quÃ¡ trÃ¬nh phÃ¢n loáº¡i, káº¿t quáº£ Ã¢m tÃ­nh giáº£ trÃªn cÃ¡c Ä‘Ã¡nh giÃ¡ tiÃªu cá»±c ráº¥t tá»‘n kÃ©m. Do Ä‘Ã³, viá»‡c lá»±a chá»n mÃ´ hÃ¬nh tuÃ¢n theo phÆ°Æ¡ng phÃ¡p phá»ng Ä‘oÃ¡n phá»§ Ä‘á»‹nh Ä‘áº§u tiÃªn: Æ°u tiÃªn thu há»“i cho lá»›p 0, sau Ä‘Ã³ lÃ  F2 cho lá»›p 0, sau Ä‘Ã³ lÃ  Ä‘á»™ chÃ­nh xÃ¡c cho lá»›p 0.
 
-\subsection{Nhiệm vụ B: Trích xuất vấn đề}
-Nhiệm vụ B là trích xuất vấn đề đa nhãn. Một bài đánh giá có thể chứa nhiều vấn đề nên việc gắn thẻ một nhãn là không đủ \cite{tsoumakas2011,zhang2014}. Bộ nhãn đầu ra trong dự án này có chín loại vấn đề và cho phép gán nhiều nhãn trên mỗi hàng.
+\subsection{Nhiá»‡m vá»¥ B: TrÃ­ch xuáº¥t váº¥n Ä‘á»}
+Nhiá»‡m vá»¥ B lÃ  trÃ­ch xuáº¥t váº¥n Ä‘á» Ä‘a nhÃ£n. Má»™t bÃ i Ä‘Ã¡nh giÃ¡ cÃ³ thá»ƒ chá»©a nhiá»u váº¥n Ä‘á» nÃªn viá»‡c gáº¯n tháº» má»™t nhÃ£n lÃ  khÃ´ng Ä‘á»§ \cite{tsoumakas2011,zhang2014}. Bá»™ nhÃ£n Ä‘áº§u ra trong dá»± Ã¡n nÃ y cÃ³ chÃ­n loáº¡i váº¥n Ä‘á» vÃ  cho phÃ©p gÃ¡n nhiá»u nhÃ£n trÃªn má»—i hÃ ng.
 
-Nhiệm vụ này ánh xạ văn bản đánh giá phi cấu trúc tới các tín hiệu vấn đề có cấu trúc. Nó cho phép chuyển đổi từ kết quả đầu ra tình cảm chung sang các danh mục hành động vận hành.
+Nhiá»‡m vá»¥ nÃ y Ã¡nh xáº¡ vÄƒn báº£n Ä‘Ã¡nh giÃ¡ phi cáº¥u trÃºc tá»›i cÃ¡c tÃ­n hiá»‡u váº¥n Ä‘á» cÃ³ cáº¥u trÃºc. NÃ³ cho phÃ©p chuyá»ƒn Ä‘á»•i tá»« káº¿t quáº£ Ä‘áº§u ra tÃ¬nh cáº£m chung sang cÃ¡c danh má»¥c hÃ nh Ä‘á»™ng váº­n hÃ nh.
 
-\subsection{Nhiệm vụ C: Mở rộng bối cảnh sâu}
-Nhiệm vụ C là tinh chỉnh máy biến áp dưới dạng phần mở rộng NLP. Phần mở rộng này nhằm mục đích kiểm tra mô hình hóa ngôn ngữ theo ngữ cảnh sâu sắc đối với các cụm từ ngắn và mẫu phủ định khó. Nó cũng cung cấp sự so sánh trực tiếp với các biểu diễn thưa thớt cổ điển \cite{vaswani2017,devlin2019}.
+\subsection{Nhiá»‡m vá»¥ C: Má»Ÿ rá»™ng bá»‘i cáº£nh sÃ¢u}
+Nhiá»‡m vá»¥ C lÃ  tinh chá»‰nh mÃ¡y biáº¿n Ã¡p dÆ°á»›i dáº¡ng pháº§n má»Ÿ rá»™ng NLP. Pháº§n má»Ÿ rá»™ng nÃ y nháº±m má»¥c Ä‘Ã­ch kiá»ƒm tra mÃ´ hÃ¬nh hÃ³a ngÃ´n ngá»¯ theo ngá»¯ cáº£nh sÃ¢u sáº¯c Ä‘á»‘i vá»›i cÃ¡c cá»¥m tá»« ngáº¯n vÃ  máº«u phá»§ Ä‘á»‹nh khÃ³. NÃ³ cÅ©ng cung cáº¥p sá»± so sÃ¡nh trá»±c tiáº¿p vá»›i cÃ¡c biá»ƒu diá»…n thÆ°a thá»›t cá»• Ä‘iá»ƒn \cite{vaswani2017,devlin2019}.
 
-\section{Đặc điểm dữ liệu và ngôn ngữ}
-\subsection{Nguồn dữ liệu và quy mô}
-Tệp nguồn chứa 152.410 đánh giá với các trường văn bản và xếp hạng. Bảng \ref{tab:nlp_rating_distribution} hiển thị phân bổ xếp hạng đầy đủ.
+\section{Äáº·c Ä‘iá»ƒm dá»¯ liá»‡u vÃ  ngÃ´n ngá»¯}
+\subsection{Nguá»“n dá»¯ liá»‡u vÃ  quy mÃ´}
+Tá»‡p nguá»“n chá»©a 152.410 Ä‘Ã¡nh giÃ¡ vá»›i cÃ¡c trÆ°á»ng vÄƒn báº£n vÃ  xáº¿p háº¡ng. Báº£ng \ref{tab:nlp_rating_distribution} hiá»ƒn thá»‹ phÃ¢n bá»• xáº¿p háº¡ng Ä‘áº§y Ä‘á»§.
 
 \begin{table}[H]
 \centering
-\caption{Phân phối xếp hạng trong dữ liệu nguồn}
+\caption{PhÃ¢n phá»‘i xáº¿p háº¡ng trong dá»¯ liá»‡u nguá»“n}
 \label{tab:nlp_rating_distribution}
 \begin{tabular}{lr}
 \toprule
@@ -143,19 +143,19 @@ Rating & Number of reviews \\
 \end{tabular}
 \end{table}
 
-Nhãn tình cảm mạnh mẽ bao gồm xếp hạng 1, 2, 4 và 5. Điều này mang lại 149.139 hàng. Lớp phủ định có 14.199 hàng và lớp tích cực có 134.940 hàng. Tỷ lệ lớp là khoảng 9,5 đến 1. Sự mất cân bằng này rất quan trọng đối với các lựa chọn lập mô hình NLP và đánh giá tập trung vào thu hồi chính xác \cite{saito2015}.
+NhÃ£n tÃ¬nh cáº£m máº¡nh máº½ bao gá»“m xáº¿p háº¡ng 1, 2, 4 vÃ  5. Äiá»u nÃ y mang láº¡i 149.139 hÃ ng. Lá»›p phá»§ Ä‘á»‹nh cÃ³ 14.199 hÃ ng vÃ  lá»›p tÃ­ch cá»±c cÃ³ 134.940 hÃ ng. Tá»· lá»‡ lá»›p lÃ  khoáº£ng 9,5 Ä‘áº¿n 1. Sá»± máº¥t cÃ¢n báº±ng nÃ y ráº¥t quan trá»ng Ä‘á»‘i vá»›i cÃ¡c lá»±a chá»n láº­p mÃ´ hÃ¬nh NLP vÃ  Ä‘Ã¡nh giÃ¡ táº­p trung vÃ o thu há»“i chÃ­nh xÃ¡c \cite{saito2015}.
 
-\subsection{Tiếng ồn ngôn ngữ được quan sát}
-Ngôn ngữ đánh giá chứa các dạng nhiễu NLP phổ biến. Tập dữ liệu bao gồm các dạng ngắn như gr8, thx, idk và các cụm từ không chính thức. Nó bao gồm nhiều thái cực khác nhau trong một câu, chẳng hạn như giao hàng tốt nhưng trễ. Nó bao gồm các cụm từ phủ định rõ ràng như không tệ và không tốt.
+\subsection{Tiáº¿ng á»“n ngÃ´n ngá»¯ Ä‘Æ°á»£c quan sÃ¡t}
+NgÃ´n ngá»¯ Ä‘Ã¡nh giÃ¡ chá»©a cÃ¡c dáº¡ng nhiá»…u NLP phá»• biáº¿n. Táº­p dá»¯ liá»‡u bao gá»“m cÃ¡c dáº¡ng ngáº¯n nhÆ° gr8, thx, idk vÃ  cÃ¡c cá»¥m tá»« khÃ´ng chÃ­nh thá»©c. NÃ³ bao gá»“m nhiá»u thÃ¡i cá»±c khÃ¡c nhau trong má»™t cÃ¢u, cháº³ng háº¡n nhÆ° giao hÃ ng tá»‘t nhÆ°ng trá»…. NÃ³ bao gá»“m cÃ¡c cá»¥m tá»« phá»§ Ä‘á»‹nh rÃµ rÃ ng nhÆ° khÃ´ng tá»‡ vÃ  khÃ´ng tá»‘t.
 
-Tập dữ liệu cũng có các từ dành riêng cho tên miền dành cho thẻ quà tặng, đổi mã, kích hoạt, giao hàng, hỗ trợ và hoàn tiền. Những mô hình này thúc đẩy cả việc lập bản đồ từ vựng và học tập dựa trên dữ liệu.
+Táº­p dá»¯ liá»‡u cÅ©ng cÃ³ cÃ¡c tá»« dÃ nh riÃªng cho tÃªn miá»n dÃ nh cho tháº» quÃ  táº·ng, Ä‘á»•i mÃ£, kÃ­ch hoáº¡t, giao hÃ ng, há»— trá»£ vÃ  hoÃ n tiá»n. Nhá»¯ng mÃ´ hÃ¬nh nÃ y thÃºc Ä‘áº©y cáº£ viá»‡c láº­p báº£n Ä‘á»“ tá»« vá»±ng vÃ  há»c táº­p dá»±a trÃªn dá»¯ liá»‡u.
 
-\subsection{Dữ liệu nhãn vấn đề}
-Để trích xuất vấn đề, tập dữ liệu được gắn nhãn thủ công có 19.000 hàng. Bảng \ref{tab:nlp_issue_frequency} hiển thị tần suất nhãn.
+\subsection{Dá»¯ liá»‡u nhÃ£n váº¥n Ä‘á»}
+Äá»ƒ trÃ­ch xuáº¥t váº¥n Ä‘á», táº­p dá»¯ liá»‡u Ä‘Æ°á»£c gáº¯n nhÃ£n thá»§ cÃ´ng cÃ³ 19.000 hÃ ng. Báº£ng \ref{tab:nlp_issue_frequency} hiá»ƒn thá»‹ táº§n suáº¥t nhÃ£n.
 
 \begin{table}[H]
 \centering
-\caption{Tần suất nhãn phát hành trong bộ chú thích NLP thủ công}
+\caption{Táº§n suáº¥t nhÃ£n phÃ¡t hÃ nh trong bá»™ chÃº thÃ­ch NLP thá»§ cÃ´ng}
 \label{tab:nlp_issue_frequency}
 \begin{tabular}{lrr}
 \toprule
@@ -174,40 +174,40 @@ other & 15,960 & 0.8400 \\
 \end{tabular}
 \end{table}
 
-Nhãn trung bình cho mỗi bài đánh giá là 1,069. Điều này hỗ trợ lập mô hình nhiều nhãn vì nhiều hàng không phải là văn bản một khái niệm.
+NhÃ£n trung bÃ¬nh cho má»—i bÃ i Ä‘Ã¡nh giÃ¡ lÃ  1,069. Äiá»u nÃ y há»— trá»£ láº­p mÃ´ hÃ¬nh nhiá»u nhÃ£n vÃ¬ nhiá»u hÃ ng khÃ´ng pháº£i lÃ  vÄƒn báº£n má»™t khÃ¡i niá»‡m.
 
-\section{Thiết kế xử lý văn bản}
-\subsection{Chuẩn hóa}
-Quy trình chuẩn hóa cốt lõi sử dụng chuyển đổi chữ thường, xóa URL, dọn dẹp dấu câu và chuẩn hóa khoảng trắng. Điều này làm giảm sự thưa thớt của mã thông báo trong khi vẫn giữ được các từ cảm xúc cốt lõi.
+\section{Thiáº¿t káº¿ xá»­ lÃ½ vÄƒn báº£n}
+\subsection{Chuáº©n hÃ³a}
+Quy trÃ¬nh chuáº©n hÃ³a cá»‘t lÃµi sá»­ dá»¥ng chuyá»ƒn Ä‘á»•i chá»¯ thÆ°á»ng, xÃ³a URL, dá»n dáº¹p dáº¥u cÃ¢u vÃ  chuáº©n hÃ³a khoáº£ng tráº¯ng. Äiá»u nÃ y lÃ m giáº£m sá»± thÆ°a thá»›t cá»§a mÃ£ thÃ´ng bÃ¡o trong khi váº«n giá»¯ Ä‘Æ°á»£c cÃ¡c tá»« cáº£m xÃºc cá»‘t lÃµi.
 
-Chuẩn hóa chữ viết tắt tùy chọn ánh xạ các dạng ngắn phổ biến thành dạng đầy đủ. Điều này bao gồm các ánh xạ như gr8 thành tuyệt vời, thx thành cảm ơn, u tới bạn và idk tới tôi không biết.
+Chuáº©n hÃ³a chá»¯ viáº¿t táº¯t tÃ¹y chá»n Ã¡nh xáº¡ cÃ¡c dáº¡ng ngáº¯n phá»• biáº¿n thÃ nh dáº¡ng Ä‘áº§y Ä‘á»§. Äiá»u nÃ y bao gá»“m cÃ¡c Ã¡nh xáº¡ nhÆ° gr8 thÃ nh tuyá»‡t vá»i, thx thÃ nh cáº£m Æ¡n, u tá»›i báº¡n vÃ  idk tá»›i tÃ´i khÃ´ng biáº¿t.
 
-\subsection{Xử lý phủ định}
-Phủ định là một thách thức quan trọng của NLP trong các bài đánh giá ngắn. Dự án sử dụng phương pháp gắn thẻ phủ định. Sau tín hiệu phủ định, một số mã thông báo tiếp theo sẽ nhận được tiền tố NOT\_. Kích thước cửa sổ theo mặc định là ba mã thông báo \cite{wiegand2010}.
+\subsection{Xá»­ lÃ½ phá»§ Ä‘á»‹nh}
+Phá»§ Ä‘á»‹nh lÃ  má»™t thÃ¡ch thá»©c quan trá»ng cá»§a NLP trong cÃ¡c bÃ i Ä‘Ã¡nh giÃ¡ ngáº¯n. Dá»± Ã¡n sá»­ dá»¥ng phÆ°Æ¡ng phÃ¡p gáº¯n tháº» phá»§ Ä‘á»‹nh. Sau tÃ­n hiá»‡u phá»§ Ä‘á»‹nh, má»™t sá»‘ mÃ£ thÃ´ng bÃ¡o tiáº¿p theo sáº½ nháº­n Ä‘Æ°á»£c tiá»n tá»‘ NOT\_. KÃ­ch thÆ°á»›c cá»­a sá»• theo máº·c Ä‘á»‹nh lÃ  ba mÃ£ thÃ´ng bÃ¡o \cite{wiegand2010}.
 
-Phương pháp này nhẹ về mặt tính toán và hiệu quả đối với các mô hình thưa thớt. Nó giúp tách biệt tốt khỏi NOT\_good và xấu khỏi NOT\_bad trong không gian tính năng.
+PhÆ°Æ¡ng phÃ¡p nÃ y nháº¹ vá» máº·t tÃ­nh toÃ¡n vÃ  hiá»‡u quáº£ Ä‘á»‘i vá»›i cÃ¡c mÃ´ hÃ¬nh thÆ°a thá»›t. NÃ³ giÃºp tÃ¡ch biá»‡t tá»‘t khá»i NOT\_good vÃ  xáº¥u khá»i NOT\_bad trong khÃ´ng gian tÃ­nh nÄƒng.
 
-\subsection{Xử lý độ tương phản}
-Đường dẫn cũng mô hình hóa độ tương phản diễn ngôn đơn giản. Khi các dấu hiệu như but, tuy nhiên, mặc dù, tuy nhiên, và chưa xuất hiện, văn bản có thể được chia thành các mệnh đề trái và phải. Sau đó, các tính năng mệnh đề riêng biệt và cờ đánh dấu sẽ được thêm vào.
+\subsection{Xá»­ lÃ½ Ä‘á»™ tÆ°Æ¡ng pháº£n}
+ÄÆ°á»ng dáº«n cÅ©ng mÃ´ hÃ¬nh hÃ³a Ä‘á»™ tÆ°Æ¡ng pháº£n diá»…n ngÃ´n Ä‘Æ¡n giáº£n. Khi cÃ¡c dáº¥u hiá»‡u nhÆ° but, tuy nhiÃªn, máº·c dÃ¹, tuy nhiÃªn, vÃ  chÆ°a xuáº¥t hiá»‡n, vÄƒn báº£n cÃ³ thá»ƒ Ä‘Æ°á»£c chia thÃ nh cÃ¡c má»‡nh Ä‘á» trÃ¡i vÃ  pháº£i. Sau Ä‘Ã³, cÃ¡c tÃ­nh nÄƒng má»‡nh Ä‘á» riÃªng biá»‡t vÃ  cá» Ä‘Ã¡nh dáº¥u sáº½ Ä‘Æ°á»£c thÃªm vÃ o.
 
-Thiết kế này nắm bắt một mẫu đánh giá chung trong đó mệnh đề thứ hai mang ý kiến cuối cùng của người dùng.
+Thiáº¿t káº¿ nÃ y náº¯m báº¯t má»™t máº«u Ä‘Ã¡nh giÃ¡ chung trong Ä‘Ã³ má»‡nh Ä‘á» thá»© hai mang Ã½ kiáº¿n cuá»‘i cÃ¹ng cá»§a ngÆ°á»i dÃ¹ng.
 
-\subsection{Mô hình cấp độ ký tự}
-Các đặc điểm ký tự từ 3 đến 5 gam được sử dụng làm sự kết hợp tùy chọn với các đặc điểm của từ. Điều này giúp khắc phục lỗi đánh máy, tiếng lóng ngắn và các biến thể chính tả nhỏ. Trong các tác vụ NLP trên văn bản của người dùng, điều này thường cải thiện độ mạnh mẽ \cite{joulin2017}.
+\subsection{MÃ´ hÃ¬nh cáº¥p Ä‘á»™ kÃ½ tá»±}
+CÃ¡c Ä‘áº·c Ä‘iá»ƒm kÃ½ tá»± tá»« 3 Ä‘áº¿n 5 gam Ä‘Æ°á»£c sá»­ dá»¥ng lÃ m sá»± káº¿t há»£p tÃ¹y chá»n vá»›i cÃ¡c Ä‘áº·c Ä‘iá»ƒm cá»§a tá»«. Äiá»u nÃ y giÃºp kháº¯c phá»¥c lá»—i Ä‘Ã¡nh mÃ¡y, tiáº¿ng lÃ³ng ngáº¯n vÃ  cÃ¡c biáº¿n thá»ƒ chÃ­nh táº£ nhá». Trong cÃ¡c tÃ¡c vá»¥ NLP trÃªn vÄƒn báº£n cá»§a ngÆ°á»i dÃ¹ng, Ä‘iá»u nÃ y thÆ°á»ng cáº£i thiá»‡n Ä‘á»™ máº¡nh máº½ \cite{joulin2017}.
 
-\section{Kỹ thuật tính năng cho NLP}
-\subsection{Biểu diễn thưa thớt cổ điển}
-Biểu diễn chính là TF-IDF với từ n-gram. Đường cơ sở sử dụng 1 đến 2 gam. Các biến thể khác kiểm tra từ 1 đến 3 gam, thẻ phủ định, mệnh đề tương phản, gam ký tự và đặc điểm từ vựng \cite{manning2008ir,wang2012}.
+\section{Ká»¹ thuáº­t tÃ­nh nÄƒng cho NLP}
+\subsection{Biá»ƒu diá»…n thÆ°a thá»›t cá»• Ä‘iá»ƒn}
+Biá»ƒu diá»…n chÃ­nh lÃ  TF-IDF vá»›i tá»« n-gram. ÄÆ°á»ng cÆ¡ sá»Ÿ sá»­ dá»¥ng 1 Ä‘áº¿n 2 gam. CÃ¡c biáº¿n thá»ƒ khÃ¡c kiá»ƒm tra tá»« 1 Ä‘áº¿n 3 gam, tháº» phá»§ Ä‘á»‹nh, má»‡nh Ä‘á» tÆ°Æ¡ng pháº£n, gam kÃ½ tá»± vÃ  Ä‘áº·c Ä‘iá»ƒm tá»« vá»±ng \cite{manning2008ir,wang2012}.
 
-Bảng \ref{tab:nlp_variant_design} tóm tắt các biến thể ngữ cảnh được thử nghiệm.
+Báº£ng \ref{tab:nlp_variant_design} tÃ³m táº¯t cÃ¡c biáº¿n thá»ƒ ngá»¯ cáº£nh Ä‘Æ°á»£c thá»­ nghiá»‡m.
 
 \begin{table}[H]
 \centering
-\caption{Các biến thể của tính năng ngữ cảnh NLP}
+\caption{CÃ¡c biáº¿n thá»ƒ cá»§a tÃ­nh nÄƒng ngá»¯ cáº£nh NLP}
 \label{tab:nlp_variant_design}
 \begin{tabular}{>{\raggedright\arraybackslash}p{1.2cm} >{\raggedright\arraybackslash}p{12cm}}
 \toprule
-Biến thể & Thiết kế đặc trưng \\
+Biáº¿n thá»ƒ & Thiáº¿t káº¿ Ä‘áº·c trÆ°ng \\
 \midrule
 V0 & Baseline word TF-IDF with n-gram range 1 to 2 \\
 V1 & Word TF-IDF with n-gram range 1 to 3 \\
@@ -221,50 +221,50 @@ V7 & Word 1 to 2 plus negation tagging plus sentiment lexicon block \\
 \end{tabular}
 \end{table}
 
-\subsection{Khối đặc trưng từ vựng}
-Dự án bao gồm khối từ vựng cảm tính dựa trên AFINN trong một biến thể. Nó tính điểm thô, điểm nhận biết phủ định, điểm nhận biết cường độ và điểm có trọng số tương phản. Điều này bổ sung thêm từ vựng rõ ràng trước biểu diễn thưa thớt \cite{nielsen2011}.
+\subsection{Khá»‘i Ä‘áº·c trÆ°ng tá»« vá»±ng}
+Dá»± Ã¡n bao gá»“m khá»‘i tá»« vá»±ng cáº£m tÃ­nh dá»±a trÃªn AFINN trong má»™t biáº¿n thá»ƒ. NÃ³ tÃ­nh Ä‘iá»ƒm thÃ´, Ä‘iá»ƒm nháº­n biáº¿t phá»§ Ä‘á»‹nh, Ä‘iá»ƒm nháº­n biáº¿t cÆ°á»ng Ä‘á»™ vÃ  Ä‘iá»ƒm cÃ³ trá»ng sá»‘ tÆ°Æ¡ng pháº£n. Äiá»u nÃ y bá»• sung thÃªm tá»« vá»±ng rÃµ rÃ ng trÆ°á»›c biá»ƒu diá»…n thÆ°a thá»›t \cite{nielsen2011}.
 
-Phần này hữu ích cho việc học khóa học NLP vì nó kết nối các phương pháp từ vựng cổ điển với việc học có giám sát hiện đại trong một quy trình.
+Pháº§n nÃ y há»¯u Ã­ch cho viá»‡c há»c khÃ³a há»c NLP vÃ¬ nÃ³ káº¿t ná»‘i cÃ¡c phÆ°Æ¡ng phÃ¡p tá»« vá»±ng cá»• Ä‘iá»ƒn vá»›i viá»‡c há»c cÃ³ giÃ¡m sÃ¡t hiá»‡n Ä‘áº¡i trong má»™t quy trÃ¬nh.
 
-\section{Phương pháp mô hình hóa}
-\subsection{Bộ phân loại tình cảm}
-Công cụ phân loại tình cảm chính là Hồi quy logistic. Lựa chọn tính năng Chi bình phương được áp dụng với các giá trị K cao nhất từ 1.000 đến 10.000. Cài đặt trọng lượng lớp không bao gồm các biến thể không có, cân bằng và có trọng số \cite{forman2003}.
+\section{PhÆ°Æ¡ng phÃ¡p mÃ´ hÃ¬nh hÃ³a}
+\subsection{Bá»™ phÃ¢n loáº¡i tÃ¬nh cáº£m}
+CÃ´ng cá»¥ phÃ¢n loáº¡i tÃ¬nh cáº£m chÃ­nh lÃ  Há»“i quy logistic. Lá»±a chá»n tÃ­nh nÄƒng Chi bÃ¬nh phÆ°Æ¡ng Ä‘Æ°á»£c Ã¡p dá»¥ng vá»›i cÃ¡c giÃ¡ trá»‹ K cao nháº¥t tá»« 1.000 Ä‘áº¿n 10.000. CÃ i Ä‘áº·t trá»ng lÆ°á»£ng lá»›p khÃ´ng bao gá»“m cÃ¡c biáº¿n thá»ƒ khÃ´ng cÃ³, cÃ¢n báº±ng vÃ  cÃ³ trá»ng sá»‘ \cite{forman2003}.
 
-Các mô hình cảm tính bổ sung bao gồm Hồi quy logistic L1 cho hành vi nhúng thưa thớt, Cây quyết định và Rừng ngẫu nhiên.
+CÃ¡c mÃ´ hÃ¬nh cáº£m tÃ­nh bá»• sung bao gá»“m Há»“i quy logistic L1 cho hÃ nh vi nhÃºng thÆ°a thá»›t, CÃ¢y quyáº¿t Ä‘á»‹nh vÃ  Rá»«ng ngáº«u nhiÃªn.
 
-\subsection{Mô hình trích xuất vấn đề}
-Trích xuất vấn đề sử dụng đào tạo một so với phần còn lại trên chín nhãn. Mô hình mặc định là Hồi quy logistic với trọng số lớp cân bằng. Đường cơ sở LinearSVM cũng có sẵn \cite{rifkin2004}.
+\subsection{MÃ´ hÃ¬nh trÃ­ch xuáº¥t váº¥n Ä‘á»}
+TrÃ­ch xuáº¥t váº¥n Ä‘á» sá»­ dá»¥ng Ä‘Ã o táº¡o má»™t so vá»›i pháº§n cÃ²n láº¡i trÃªn chÃ­n nhÃ£n. MÃ´ hÃ¬nh máº·c Ä‘á»‹nh lÃ  Há»“i quy logistic vá»›i trá»ng sá»‘ lá»›p cÃ¢n báº±ng. ÄÆ°á»ng cÆ¡ sá»Ÿ LinearSVM cÅ©ng cÃ³ sáºµn \cite{rifkin2004}.
 
-Việc điều chỉnh ngưỡng được thực hiện trên mỗi nhãn trên dữ liệu xác thực. Điều này rất quan trọng trong NLP nhiều nhãn vì một ngưỡng chung thường không đủ cho tất cả các nhãn.
+Viá»‡c Ä‘iá»u chá»‰nh ngÆ°á»¡ng Ä‘Æ°á»£c thá»±c hiá»‡n trÃªn má»—i nhÃ£n trÃªn dá»¯ liá»‡u xÃ¡c thá»±c. Äiá»u nÃ y ráº¥t quan trá»ng trong NLP nhiá»u nhÃ£n vÃ¬ má»™t ngÆ°á»¡ng chung thÆ°á»ng khÃ´ng Ä‘á»§ cho táº¥t cáº£ cÃ¡c nhÃ£n.
 
-\subsection{Máy biến áp mở rộng}
-Phần mở rộng máy biến áp tinh chỉnh bộ phân loại trình tự với tổn thất theo trọng số lớp. Nó sử dụng văn bản rõ ràng và đánh giá với cùng một khung ngưỡng và độ không chắc chắn để so sánh trực tiếp \cite{devlin2019}.
+\subsection{MÃ¡y biáº¿n Ã¡p má»Ÿ rá»™ng}
+Pháº§n má»Ÿ rá»™ng mÃ¡y biáº¿n Ã¡p tinh chá»‰nh bá»™ phÃ¢n loáº¡i trÃ¬nh tá»± vá»›i tá»•n tháº¥t theo trá»ng sá»‘ lá»›p. NÃ³ sá»­ dá»¥ng vÄƒn báº£n rÃµ rÃ ng vÃ  Ä‘Ã¡nh giÃ¡ vá»›i cÃ¹ng má»™t khung ngÆ°á»¡ng vÃ  Ä‘á»™ khÃ´ng cháº¯c cháº¯n Ä‘á»ƒ so sÃ¡nh trá»±c tiáº¿p \cite{devlin2019}.
 
-Tiện ích mở rộng này cung cấp ngữ nghĩa theo ngữ cảnh sâu hơn và giúp phân tích các cụm từ ngắn khó hiểu trong đó các mô hình thưa thớt có thể thất bại.
+Tiá»‡n Ã­ch má»Ÿ rá»™ng nÃ y cung cáº¥p ngá»¯ nghÄ©a theo ngá»¯ cáº£nh sÃ¢u hÆ¡n vÃ  giÃºp phÃ¢n tÃ­ch cÃ¡c cá»¥m tá»« ngáº¯n khÃ³ hiá»ƒu trong Ä‘Ã³ cÃ¡c mÃ´ hÃ¬nh thÆ°a thá»›t cÃ³ thá»ƒ tháº¥t báº¡i.
 
-\section{Thiết lập thử nghiệm}
-\subsection{Phân chia và giao thức}
-Tất cả các thử nghiệm đều sử dụng hạt giống 42. Các nhãn tình cảm mạnh mẽ được phân chia theo tỷ lệ đào tạo, xác thực và kiểm tra 70, 10 và 20. Đánh giá ba sao được giữ để phân tích độ không chắc chắn.
+\section{Thiáº¿t láº­p thá»­ nghiá»‡m}
+\subsection{PhÃ¢n chia vÃ  giao thá»©c}
+Táº¥t cáº£ cÃ¡c thá»­ nghiá»‡m Ä‘á»u sá»­ dá»¥ng háº¡t giá»‘ng 42. CÃ¡c nhÃ£n tÃ¬nh cáº£m máº¡nh máº½ Ä‘Æ°á»£c phÃ¢n chia theo tá»· lá»‡ Ä‘Ã o táº¡o, xÃ¡c thá»±c vÃ  kiá»ƒm tra 70, 10 vÃ  20. ÄÃ¡nh giÃ¡ ba sao Ä‘Æ°á»£c giá»¯ Ä‘á»ƒ phÃ¢n tÃ­ch Ä‘á»™ khÃ´ng cháº¯c cháº¯n.
 
-Việc trích xuất vấn đề sử dụng 19.000 hàng được gắn nhãn với kích thước phân chia là 13.300 cho tập huấn, 1.900 cho xác thực và 3.800 cho kiểm tra trong các lần chạy đã lưu.
+Viá»‡c trÃ­ch xuáº¥t váº¥n Ä‘á» sá»­ dá»¥ng 19.000 hÃ ng Ä‘Æ°á»£c gáº¯n nhÃ£n vá»›i kÃ­ch thÆ°á»›c phÃ¢n chia lÃ  13.300 cho táº­p huáº¥n, 1.900 cho xÃ¡c thá»±c vÃ  3.800 cho kiá»ƒm tra trong cÃ¡c láº§n cháº¡y Ä‘Ã£ lÆ°u.
 
-\subsection{Số liệu chính}
-Đối với cảm tính, các chỉ số chính là độ chính xác\_0, mức thu hồi\_0, F1\_0 và F2\_0, cùng với độ chính xác đầy đủ và F1. Do bộ nhãn mạnh bị mất cân bằng nên sự đánh đổi mô hình được diễn giải chủ yếu thông qua hành vi thu hồi chính xác thay vì các chế độ xem chỉ ROC \cite{saito2015}. Các số liệu chọn lọc trong điều kiện không chắc chắn bao gồm phạm vi bao phủ, tỷ lệ không chắc chắn, độ chính xác có chọn lọc\_0, thu hồi có chọn lọc\_0, F2\_0 chọn lọc và tỷ lệ âm tính giả trên các mẫu được bao phủ.
+\subsection{Sá»‘ liá»‡u chÃ­nh}
+Äá»‘i vá»›i cáº£m tÃ­nh, cÃ¡c chá»‰ sá»‘ chÃ­nh lÃ  Ä‘á»™ chÃ­nh xÃ¡c\_0, má»©c thu há»“i\_0, F1\_0 vÃ  F2\_0, cÃ¹ng vá»›i Ä‘á»™ chÃ­nh xÃ¡c Ä‘áº§y Ä‘á»§ vÃ  F1. Do bá»™ nhÃ£n máº¡nh bá»‹ máº¥t cÃ¢n báº±ng nÃªn sá»± Ä‘Ã¡nh Ä‘á»•i mÃ´ hÃ¬nh Ä‘Æ°á»£c diá»…n giáº£i chá»§ yáº¿u thÃ´ng qua hÃ nh vi thu há»“i chÃ­nh xÃ¡c thay vÃ¬ cÃ¡c cháº¿ Ä‘á»™ xem chá»‰ ROC \cite{saito2015}. CÃ¡c sá»‘ liá»‡u chá»n lá»c trong Ä‘iá»u kiá»‡n khÃ´ng cháº¯c cháº¯n bao gá»“m pháº¡m vi bao phá»§, tá»· lá»‡ khÃ´ng cháº¯c cháº¯n, Ä‘á»™ chÃ­nh xÃ¡c cÃ³ chá»n lá»c\_0, thu há»“i cÃ³ chá»n lá»c\_0, F2\_0 chá»n lá»c vÃ  tá»· lá»‡ Ã¢m tÃ­nh giáº£ trÃªn cÃ¡c máº«u Ä‘Æ°á»£c bao phá»§.
 
-Để trích xuất vấn đề, các số liệu chính là micro-F1, macro-F1, độ chính xác của tập hợp con, tổn thất hamming và độ chính xác trên mỗi nhãn, thu hồi và F1.
+Äá»ƒ trÃ­ch xuáº¥t váº¥n Ä‘á», cÃ¡c sá»‘ liá»‡u chÃ­nh lÃ  micro-F1, macro-F1, Ä‘á»™ chÃ­nh xÃ¡c cá»§a táº­p há»£p con, tá»•n tháº¥t hamming vÃ  Ä‘á»™ chÃ­nh xÃ¡c trÃªn má»—i nhÃ£n, thu há»“i vÃ  F1.
 
-\subsection{Quy tắc bất định}
-Chính sách không chắc chắn sử dụng ngưỡng thấp và ngưỡng cao đối với xác suất dương. Nó tuân theo thiết lập bỏ qua phân loại có chọn lọc và có thể trả về mức độ không chắc chắn ở phạm vi trung bình \cite{geifman2017}. Chúng tôi áp dụng phương pháp phỏng đoán bổ sung trong quy trình cổ điển để trả về kết quả không chắc chắn đối với các trường hợp văn bản quá ngắn hoặc thưa thớt.
+\subsection{Quy táº¯c báº¥t Ä‘á»‹nh}
+ChÃ­nh sÃ¡ch khÃ´ng cháº¯c cháº¯n sá»­ dá»¥ng ngÆ°á»¡ng tháº¥p vÃ  ngÆ°á»¡ng cao Ä‘á»‘i vá»›i xÃ¡c suáº¥t dÆ°Æ¡ng. NÃ³ tuÃ¢n theo thiáº¿t láº­p bá» qua phÃ¢n loáº¡i cÃ³ chá»n lá»c vÃ  cÃ³ thá»ƒ tráº£ vá» má»©c Ä‘á»™ khÃ´ng cháº¯c cháº¯n á»Ÿ pháº¡m vi trung bÃ¬nh \cite{geifman2017}. ChÃºng tÃ´i Ã¡p dá»¥ng phÆ°Æ¡ng phÃ¡p phá»ng Ä‘oÃ¡n bá»• sung trong quy trÃ¬nh cá»• Ä‘iá»ƒn Ä‘á»ƒ tráº£ vá» káº¿t quáº£ khÃ´ng cháº¯c cháº¯n Ä‘á»‘i vá»›i cÃ¡c trÆ°á»ng há»£p vÄƒn báº£n quÃ¡ ngáº¯n hoáº·c thÆ°a thá»›t.
 
-Chính sách này cải thiện độ tin cậy triển khai vì văn bản có ít thông tin không bị buộc phải đưa ra quyết định khó khăn.
+ChÃ­nh sÃ¡ch nÃ y cáº£i thiá»‡n Ä‘á»™ tin cáº­y triá»ƒn khai vÃ¬ vÄƒn báº£n cÃ³ Ã­t thÃ´ng tin khÃ´ng bá»‹ buá»™c pháº£i Ä‘Æ°a ra quyáº¿t Ä‘á»‹nh khÃ³ khÄƒn.
 
-\section{Quy trình làm việc nhóm và đảm bảo chất lượng}
-\subsection{Phân rã mô-đun và trách nhiệm}
-Để duy trì khả năng mở rộng cho một nhóm gồm bảy thành viên, việc triển khai được phân chia thành các mô-đun kỹ thuật với các yêu cầu về quyền sở hữu và kiểm tra chéo rõ ràng. Bảng \ref{tab:nlp_team_modules} tóm tắt cấu trúc được sử dụng trong quá trình phát triển và chuẩn bị trình bày cuối cùng.
+\section{Quy trÃ¬nh lÃ m viá»‡c nhÃ³m vÃ  Ä‘áº£m báº£o cháº¥t lÆ°á»£ng}
+\subsection{PhÃ¢n rÃ£ mÃ´-Ä‘un vÃ  trÃ¡ch nhiá»‡m}
+Äá»ƒ duy trÃ¬ kháº£ nÄƒng má»Ÿ rá»™ng cho má»™t nhÃ³m gá»“m báº£y thÃ nh viÃªn, viá»‡c triá»ƒn khai Ä‘Æ°á»£c phÃ¢n chia thÃ nh cÃ¡c mÃ´-Ä‘un ká»¹ thuáº­t vá»›i cÃ¡c yÃªu cáº§u vá» quyá»n sá»Ÿ há»¯u vÃ  kiá»ƒm tra chÃ©o rÃµ rÃ ng. Báº£ng \ref{tab:nlp_team_modules} tÃ³m táº¯t cáº¥u trÃºc Ä‘Æ°á»£c sá»­ dá»¥ng trong quÃ¡ trÃ¬nh phÃ¡t triá»ƒn vÃ  chuáº©n bá»‹ trÃ¬nh bÃ y cuá»‘i cÃ¹ng.
 
 \begin{table}[H]
 \centering
-\caption{Phân chia mô-đun nhóm và chịu trách nhiệm về chất lượng}
+\caption{PhÃ¢n chia mÃ´-Ä‘un nhÃ³m vÃ  chá»‹u trÃ¡ch nhiá»‡m vá» cháº¥t lÆ°á»£ng}
 \label{tab:nlp_team_modules}
 \begin{tabular}{>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}p{4.8cm} >{\raggedright\arraybackslash}p{3.8cm} >{\raggedright\arraybackslash}p{2.6cm}}
 \toprule
@@ -278,36 +278,36 @@ Reporting and demonstration & report writing, figure integration, demonstration 
 \end{tabular}
 \end{table}
 
-\subsection{Hiểu biết chéo, đánh giá và tái tạo}
-Quy trình công việc được thiết kế sao cho mỗi mô-đun quan trọng có thể được thực thi bởi ít nhất một thành viên không phải là tác giả gốc. Đối với mỗi lần chuyển giao mô-đun, thành viên nhận sẽ chạy lại quy trình từ các lệnh đã lưu và kiểm tra ba cổng: không có rò rỉ kiểm tra huấn luyện, hành vi hạt giống ngẫu nhiên cố định và tính nhất quán giữa các giá trị bảng và tệp CSV đã xuất.
+\subsection{Hiá»ƒu biáº¿t chÃ©o, Ä‘Ã¡nh giÃ¡ vÃ  tÃ¡i táº¡o}
+Quy trÃ¬nh cÃ´ng viá»‡c Ä‘Æ°á»£c thiáº¿t káº¿ sao cho má»—i mÃ´-Ä‘un quan trá»ng cÃ³ thá»ƒ Ä‘Æ°á»£c thá»±c thi bá»Ÿi Ã­t nháº¥t má»™t thÃ nh viÃªn khÃ´ng pháº£i lÃ  tÃ¡c giáº£ gá»‘c. Äá»‘i vá»›i má»—i láº§n chuyá»ƒn giao mÃ´-Ä‘un, thÃ nh viÃªn nháº­n sáº½ cháº¡y láº¡i quy trÃ¬nh tá»« cÃ¡c lá»‡nh Ä‘Ã£ lÆ°u vÃ  kiá»ƒm tra ba cá»•ng: khÃ´ng cÃ³ rÃ² rá»‰ kiá»ƒm tra huáº¥n luyá»‡n, hÃ nh vi háº¡t giá»‘ng ngáº«u nhiÃªn cá»‘ Ä‘á»‹nh vÃ  tÃ­nh nháº¥t quÃ¡n giá»¯a cÃ¡c giÃ¡ trá»‹ báº£ng vÃ  tá»‡p CSV Ä‘Ã£ xuáº¥t.
 
-Để kiểm soát chất lượng mã, chúng tôi sử dụng chính sách phân nhánh và đánh giá với một đánh giá không phải của tác giả cho mỗi thay đổi đáng kể. Danh sách kiểm tra đánh giá tập trung vào độ chính xác của số liệu, tính toàn vẹn phân tách và khả năng tái tạo. Quá trình này phù hợp với các yêu cầu của khóa học về phân chia mô-đun, chia sẻ hiểu biết và thực hành đánh giá chéo. Bản cập nhật mới nhất ở mô-đun issue cũng bổ sung cơ chế sắp xếp ID tự nhiên cho template gán nhãn và khóa hành vi này bằng test hồi quy chuyên biệt.
+Äá»ƒ kiá»ƒm soÃ¡t cháº¥t lÆ°á»£ng mÃ£, chÃºng tÃ´i sá»­ dá»¥ng chÃ­nh sÃ¡ch phÃ¢n nhÃ¡nh vÃ  Ä‘Ã¡nh giÃ¡ vá»›i má»™t Ä‘Ã¡nh giÃ¡ khÃ´ng pháº£i cá»§a tÃ¡c giáº£ cho má»—i thay Ä‘á»•i Ä‘Ã¡ng ká»ƒ. Danh sÃ¡ch kiá»ƒm tra Ä‘Ã¡nh giÃ¡ táº­p trung vÃ o Ä‘á»™ chÃ­nh xÃ¡c cá»§a sá»‘ liá»‡u, tÃ­nh toÃ n váº¹n phÃ¢n tÃ¡ch vÃ  kháº£ nÄƒng tÃ¡i táº¡o. QuÃ¡ trÃ¬nh nÃ y phÃ¹ há»£p vá»›i cÃ¡c yÃªu cáº§u cá»§a khÃ³a há»c vá» phÃ¢n chia mÃ´-Ä‘un, chia sáº» hiá»ƒu biáº¿t vÃ  thá»±c hÃ nh Ä‘Ã¡nh giÃ¡ chÃ©o. Báº£n cáº­p nháº­t má»›i nháº¥t á»Ÿ mÃ´-Ä‘un issue cÅ©ng bá»• sung cÆ¡ cháº¿ sáº¯p xáº¿p ID tá»± nhiÃªn cho template gÃ¡n nhÃ£n vÃ  khÃ³a hÃ nh vi nÃ y báº±ng test há»“i quy chuyÃªn biá»‡t.
 
-\subsection{Gói tài liệu bằng chứng}
-Để làm cho bằng chứng làm việc nhóm có thể được kiểm tra trong bản trình bày cuối cùng, gói bằng chứng bao gồm: ma trận vai trò/mô-đun, nhật ký lệnh để chạy lại, tạo phẩm CSV đầu ra của mô hình và ghi chú đánh giá được liên kết với các mô-đun đã thay đổi. Tài liệu này bổ sung cho các kết quả mô hình định lượng và chứng minh chất lượng quy trình bên cạnh điểm số cuối cùng.
+\subsection{GÃ³i tÃ i liá»‡u báº±ng chá»©ng}
+Äá»ƒ lÃ m cho báº±ng chá»©ng lÃ m viá»‡c nhÃ³m cÃ³ thá»ƒ Ä‘Æ°á»£c kiá»ƒm tra trong báº£n trÃ¬nh bÃ y cuá»‘i cÃ¹ng, gÃ³i báº±ng chá»©ng bao gá»“m: ma tráº­n vai trÃ²/mÃ´-Ä‘un, nháº­t kÃ½ lá»‡nh Ä‘á»ƒ cháº¡y láº¡i, táº¡o pháº©m CSV Ä‘áº§u ra cá»§a mÃ´ hÃ¬nh vÃ  ghi chÃº Ä‘Ã¡nh giÃ¡ Ä‘Æ°á»£c liÃªn káº¿t vá»›i cÃ¡c mÃ´-Ä‘un Ä‘Ã£ thay Ä‘á»•i. TÃ i liá»‡u nÃ y bá»• sung cho cÃ¡c káº¿t quáº£ mÃ´ hÃ¬nh Ä‘á»‹nh lÆ°á»£ng vÃ  chá»©ng minh cháº¥t lÆ°á»£ng quy trÃ¬nh bÃªn cáº¡nh Ä‘iá»ƒm sá»‘ cuá»‘i cÃ¹ng.
 
-\section{Gói nâng cấp giáo trình không có dữ liệu mới}
-Dự án hiện bao gồm một gói bổ sung giúp cải thiện sự liên kết với các chủ đề khóa học NLP mà không cần thêm bất kỳ dữ liệu được gắn nhãn mới nào. Gói này sử dụng lại cùng một chuỗi phân tách, xác thực và kiểm tra, đồng thời giữ nguyên chính sách dọn dẹp văn bản.
+\section{GÃ³i nÃ¢ng cáº¥p giÃ¡o trÃ¬nh khÃ´ng cÃ³ dá»¯ liá»‡u má»›i}
+Dá»± Ã¡n hiá»‡n bao gá»“m má»™t gÃ³i bá»• sung giÃºp cáº£i thiá»‡n sá»± liÃªn káº¿t vá»›i cÃ¡c chá»§ Ä‘á» khÃ³a há»c NLP mÃ  khÃ´ng cáº§n thÃªm báº¥t ká»³ dá»¯ liá»‡u Ä‘Æ°á»£c gáº¯n nhÃ£n má»›i nÃ o. GÃ³i nÃ y sá»­ dá»¥ng láº¡i cÃ¹ng má»™t chuá»—i phÃ¢n tÃ¡ch, xÃ¡c thá»±c vÃ  kiá»ƒm tra, Ä‘á»“ng thá»i giá»¯ nguyÃªn chÃ­nh sÃ¡ch dá»n dáº¹p vÄƒn báº£n.
 
-Khối nâng cấp đầu tiên là bộ điểm chuẩn cổ điển toàn diện. Nó bao gồm Hồi quy logistic, Bayes Naive đa thức, Bayes Naive bổ sung, Perceptron, LinearSVM, SGD với tính năng mất log, Hồi quy logistic ngữ nghĩa trên vectơ SVD và MLP chuyển tiếp nguồn cấp dữ liệu trên cùng vectơ SVD. Kích thước đào tạo được giới hạn ở 60.000 hàng trong khối này để kiểm soát thời gian chạy trong khi vẫn duy trì tỷ lệ lớp.
+Khá»‘i nÃ¢ng cáº¥p Ä‘áº§u tiÃªn lÃ  bá»™ Ä‘iá»ƒm chuáº©n cá»• Ä‘iá»ƒn toÃ n diá»‡n. NÃ³ bao gá»“m Há»“i quy logistic, Bayes Naive Ä‘a thá»©c, Bayes Naive bá»• sung, Perceptron, LinearSVM, SGD vá»›i tÃ­nh nÄƒng máº¥t log, Há»“i quy logistic ngá»¯ nghÄ©a trÃªn vectÆ¡ SVD vÃ  MLP chuyá»ƒn tiáº¿p nguá»“n cáº¥p dá»¯ liá»‡u trÃªn cÃ¹ng vectÆ¡ SVD. KÃ­ch thÆ°á»›c Ä‘Ã o táº¡o Ä‘Æ°á»£c giá»›i háº¡n á»Ÿ 60.000 hÃ ng trong khá»‘i nÃ y Ä‘á»ƒ kiá»ƒm soÃ¡t thá»i gian cháº¡y trong khi váº«n duy trÃ¬ tá»· lá»‡ lá»›p.
 
-Khối nâng cấp thứ hai là khối mô hình ngôn ngữ. Nó đào tạo các mô hình ngôn ngữ unigram và bigram với khả năng làm mịn add-k và báo cáo sự phức tạp trong quá trình phân tách xác thực và kiểm tra. Điều này cung cấp bằng chứng trực tiếp cho chủ đề mô hình ngôn ngữ N-gram trong khóa học \cite{jurafsky2026,manning2008ir}.
+Khá»‘i nÃ¢ng cáº¥p thá»© hai lÃ  khá»‘i mÃ´ hÃ¬nh ngÃ´n ngá»¯. NÃ³ Ä‘Ã o táº¡o cÃ¡c mÃ´ hÃ¬nh ngÃ´n ngá»¯ unigram vÃ  bigram vá»›i kháº£ nÄƒng lÃ m má»‹n add-k vÃ  bÃ¡o cÃ¡o sá»± phá»©c táº¡p trong quÃ¡ trÃ¬nh phÃ¢n tÃ¡ch xÃ¡c thá»±c vÃ  kiá»ƒm tra. Äiá»u nÃ y cung cáº¥p báº±ng chá»©ng trá»±c tiáº¿p cho chá»§ Ä‘á» mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram trong khÃ³a há»c \cite{jurafsky2026,manning2008ir}.
 
-Khối nâng cấp thứ ba bổ sung thêm các tạo phẩm theo trình tự và mô hình ngôn ngữ hiện đại, bao gồm đường cơ sở cảm tính RNN/LSTM, báo cáo thăm dò MLM và đường cơ sở ngữ nghĩa kiểu lời nhắc LLM trên cùng một phân chia cảm tính.
+Khá»‘i nÃ¢ng cáº¥p thá»© ba bá»• sung thÃªm cÃ¡c táº¡o pháº©m theo trÃ¬nh tá»± vÃ  mÃ´ hÃ¬nh ngÃ´n ngá»¯ hiá»‡n Ä‘áº¡i, bao gá»“m Ä‘Æ°á»ng cÆ¡ sá»Ÿ cáº£m tÃ­nh RNN/LSTM, bÃ¡o cÃ¡o thÄƒm dÃ² MLM vÃ  Ä‘Æ°á»ng cÆ¡ sá»Ÿ ngá»¯ nghÄ©a kiá»ƒu lá»i nháº¯c LLM trÃªn cÃ¹ng má»™t phÃ¢n chia cáº£m tÃ­nh.
 
-Khối cuối cùng xây dựng ma trận bao phủ chủ đề từ các tạo phẩm của dự án. Ma trận sử dụng điểm số chủ đề rõ ràng và báo cáo điểm tổng thể về nội dung giáo trình để thảo luận bào chữa.
+Khá»‘i cuá»‘i cÃ¹ng xÃ¢y dá»±ng ma tráº­n bao phá»§ chá»§ Ä‘á» tá»« cÃ¡c táº¡o pháº©m cá»§a dá»± Ã¡n. Ma tráº­n sá»­ dá»¥ng Ä‘iá»ƒm sá»‘ chá»§ Ä‘á» rÃµ rÃ ng vÃ  bÃ¡o cÃ¡o Ä‘iá»ƒm tá»•ng thá»ƒ vá» ná»™i dung giÃ¡o trÃ¬nh Ä‘á»ƒ tháº£o luáº­n bÃ o chá»¯a.
 
-\section{Kết quả cho Mô hình tình cảm NLP cổ điển}
-\subsection{Lựa chọn đường cơ sở bởi K}
-Quét đường cơ sở trên V0 hiển thị cài đặt tốt nhất cho mỗi K theo quy tắc phủ định đầu tiên. Bảng \ref{tab:nlp_chi2_best_per_k} báo cáo các hàng đã chọn từ quá trình xác thực.
+\section{Káº¿t quáº£ cho MÃ´ hÃ¬nh tÃ¬nh cáº£m NLP cá»• Ä‘iá»ƒn}
+\subsection{Lá»±a chá»n Ä‘Æ°á»ng cÆ¡ sá»Ÿ bá»Ÿi K}
+QuÃ©t Ä‘Æ°á»ng cÆ¡ sá»Ÿ trÃªn V0 hiá»ƒn thá»‹ cÃ i Ä‘áº·t tá»‘t nháº¥t cho má»—i K theo quy táº¯c phá»§ Ä‘á»‹nh Ä‘áº§u tiÃªn. Báº£ng \ref{tab:nlp_chi2_best_per_k} bÃ¡o cÃ¡o cÃ¡c hÃ ng Ä‘Ã£ chá»n tá»« quÃ¡ trÃ¬nh xÃ¡c thá»±c.
 
 \begin{table}[H]
 \centering
-\caption{Kết quả tình cảm cơ bản tốt nhất trên mỗi K khi xác thực}
+\caption{Káº¿t quáº£ tÃ¬nh cáº£m cÆ¡ báº£n tá»‘t nháº¥t trÃªn má»—i K khi xÃ¡c thá»±c}
 \label{tab:nlp_chi2_best_per_k}
 \begin{tabular}{lcccccc}
 \toprule
-K & Trọng số lớp & Precision\_0 & Recall\_0 & F2\_0 & Accuracy & F1 \\
+K & Trá»ng sá»‘ lá»›p & Precision\_0 & Recall\_0 & F2\_0 & Accuracy & F1 \\
 \midrule
 1,000 & w10 & 0.555 & 0.910 & 0.806 & 0.922 & 0.955 \\
 2,000 & w10 & 0.584 & 0.920 & 0.825 & 0.930 & 0.960 \\
@@ -317,16 +317,16 @@ K & Trọng số lớp & Precision\_0 & Recall\_0 & F2\_0 & Accuracy & F1 \\
 \end{tabular}
 \end{table}
 
-\subsection{So sánh biến thể}
-Sau khi quét toàn bộ biến thể, cài đặt cổ điển được chọn là V6 với K bằng 10.000 và trọng lượng hạng w10. Bảng \ref{tab:nlp_variant_test} hiển thị so sánh thử nghiệm giữa các biến thể.
+\subsection{So sÃ¡nh biáº¿n thá»ƒ}
+Sau khi quÃ©t toÃ n bá»™ biáº¿n thá»ƒ, cÃ i Ä‘áº·t cá»• Ä‘iá»ƒn Ä‘Æ°á»£c chá»n lÃ  V6 vá»›i K báº±ng 10.000 vÃ  trá»ng lÆ°á»£ng háº¡ng w10. Báº£ng \ref{tab:nlp_variant_test} hiá»ƒn thá»‹ so sÃ¡nh thá»­ nghiá»‡m giá»¯a cÃ¡c biáº¿n thá»ƒ.
 
 \begin{table}[H]
 \centering
-\caption{Các biến thể tình cảm NLP cổ điển trên dữ liệu thử nghiệm}
+\caption{CÃ¡c biáº¿n thá»ƒ tÃ¬nh cáº£m NLP cá»• Ä‘iá»ƒn trÃªn dá»¯ liá»‡u thá»­ nghiá»‡m}
 \label{tab:nlp_variant_test}
 \begin{tabular}{lcccccc}
 \toprule
-Biến thể & K & Trọng số & Precision\_0 & Recall\_0 & F2\_0 & Coverage \\
+Biáº¿n thá»ƒ & K & Trá»ng sá»‘ & Precision\_0 & Recall\_0 & F2\_0 & Coverage \\
 \midrule
 V0 & 10,000 & balanced & 0.638 & 0.937 & 0.856 & 0.870 \\
 V1 & 10,000 & balanced & 0.643 & 0.932 & 0.855 & 0.871 \\
@@ -340,18 +340,18 @@ V7 & 5,000 & w10 & 0.657 & 0.927 & 0.857 & 0.880 \\
 \end{tabular}
 \end{table}
 
-V6 mang lại sự cân bằng thuận lợi cho mục tiêu của dự án. Nó duy trì khả năng thu hồi âm bản cao đồng thời cải thiện độ chính xác âm tính so với hầu hết các biến thể thay thế.
+V6 mang láº¡i sá»± cÃ¢n báº±ng thuáº­n lá»£i cho má»¥c tiÃªu cá»§a dá»± Ã¡n. NÃ³ duy trÃ¬ kháº£ nÄƒng thu há»“i Ã¢m báº£n cao Ä‘á»“ng thá»i cáº£i thiá»‡n Ä‘á»™ chÃ­nh xÃ¡c Ã¢m tÃ­nh so vá»›i háº§u háº¿t cÃ¡c biáº¿n thá»ƒ thay tháº¿.
 
-\subsection{Ngưỡng và hành vi không chắc chắn}
-Đối với mẫu cổ điển V6 đã chọn, ngưỡng mặc định 0,40 và 0,60 mang lại phạm vi bao phủ 0,885 và thu hồi có chọn lọc\_0 0,956. Bảng \ref{tab:nlp_classic_threshold} hiển thị mức quét ngưỡng.
+\subsection{NgÆ°á»¡ng vÃ  hÃ nh vi khÃ´ng cháº¯c cháº¯n}
+Äá»‘i vá»›i máº«u cá»• Ä‘iá»ƒn V6 Ä‘Ã£ chá»n, ngÆ°á»¡ng máº·c Ä‘á»‹nh 0,40 vÃ  0,60 mang láº¡i pháº¡m vi bao phá»§ 0,885 vÃ  thu há»“i cÃ³ chá»n lá»c\_0 0,956. Báº£ng \ref{tab:nlp_classic_threshold} hiá»ƒn thá»‹ má»©c quÃ©t ngÆ°á»¡ng.
 
 \begin{table}[H]
 \centering
-\caption{Quét ngưỡng cho mô hình tình cảm NLP cổ điển đã chọn}
+\caption{QuÃ©t ngÆ°á»¡ng cho mÃ´ hÃ¬nh tÃ¬nh cáº£m NLP cá»• Ä‘iá»ƒn Ä‘Ã£ chá»n}
 \label{tab:nlp_classic_threshold}
 \begin{tabular}{lcccc}
 \toprule
-Cặp ngưỡng & Coverage & Selective precision\_0 & Selective recall\_0 & Selective F2\_0 \\
+Cáº·p ngÆ°á»¡ng & Coverage & Selective precision\_0 & Selective recall\_0 & Selective F2\_0 \\
 \midrule
 0.40 / 0.60 & 0.885 & 0.730 & 0.956 & 0.900 \\
 0.45 / 0.60 & 0.891 & 0.708 & 0.956 & 0.894 \\
@@ -361,17 +361,17 @@ Cặp ngưỡng & Coverage & Selective precision\_0 & Selective recall\_0 & Sele
 \end{tabular}
 \end{table}
 
-\section{Kết quả cho phần mở rộng Transformer NLP}
-\subsection{Số liệu máy biến áp}
-Kết quả tinh chỉnh máy biến áp được lưu trong đầu ra mở rộng NLP. Bảng \ref{tab:nlp_transformer_metrics} tóm tắt các giá trị xác thực và kiểm tra.
+\section{Káº¿t quáº£ cho pháº§n má»Ÿ rá»™ng Transformer NLP}
+\subsection{Sá»‘ liá»‡u mÃ¡y biáº¿n Ã¡p}
+Káº¿t quáº£ tinh chá»‰nh mÃ¡y biáº¿n Ã¡p Ä‘Æ°á»£c lÆ°u trong Ä‘áº§u ra má»Ÿ rá»™ng NLP. Báº£ng \ref{tab:nlp_transformer_metrics} tÃ³m táº¯t cÃ¡c giÃ¡ trá»‹ xÃ¡c thá»±c vÃ  kiá»ƒm tra.
 
 \begin{table}[H]
 \centering
-\caption{Số liệu mở rộng Transformer NLP}
+\caption{Sá»‘ liá»‡u má»Ÿ rá»™ng Transformer NLP}
 \label{tab:nlp_transformer_metrics}
 \begin{tabular}{lcccccc}
 \toprule
-Tập dữ liệu & Accuracy & F1 & Precision\_0 & Recall\_0 & Coverage & Selective recall\_0 \\
+Táº­p dá»¯ liá»‡u & Accuracy & F1 & Precision\_0 & Recall\_0 & Coverage & Selective recall\_0 \\
 \midrule
 Validation & 0.968 & 0.982 & 0.821 & 0.854 & 0.908 & 0.862 \\
 Test & 0.967 & 0.982 & 0.822 & 0.833 & 0.910 & 0.846 \\
@@ -379,18 +379,18 @@ Test & 0.967 & 0.982 & 0.822 & 0.833 & 0.910 & 0.846 \\
 \end{tabular}
 \end{table}
 
-So với động cơ V6 cổ điển, máy biến áp cho độ chính xác tổng thể cao hơn và độ chính xác âm cao hơn ở ngưỡng cơ sở. Động cơ V6 cổ điển vẫn giữ mức thu hồi âm thô cao hơn nhiều.
+So vá»›i Ä‘á»™ng cÆ¡ V6 cá»• Ä‘iá»ƒn, mÃ¡y biáº¿n Ã¡p cho Ä‘á»™ chÃ­nh xÃ¡c tá»•ng thá»ƒ cao hÆ¡n vÃ  Ä‘á»™ chÃ­nh xÃ¡c Ã¢m cao hÆ¡n á»Ÿ ngÆ°á»¡ng cÆ¡ sá»Ÿ. Äá»™ng cÆ¡ V6 cá»• Ä‘iá»ƒn váº«n giá»¯ má»©c thu há»“i Ã¢m thÃ´ cao hÆ¡n nhiá»u.
 
-\subsection{Quét ngưỡng máy biến áp}
-Bảng \ref{tab:nlp_transformer_threshold} hiển thị hành vi chọn lọc của máy biến áp khi quét ngưỡng.
+\subsection{QuÃ©t ngÆ°á»¡ng mÃ¡y biáº¿n Ã¡p}
+Báº£ng \ref{tab:nlp_transformer_threshold} hiá»ƒn thá»‹ hÃ nh vi chá»n lá»c cá»§a mÃ¡y biáº¿n Ã¡p khi quÃ©t ngÆ°á»¡ng.
 
 \begin{table}[H]
 \centering
-\caption{Quét ngưỡng máy biến áp trên dữ liệu thử nghiệm}
+\caption{QuÃ©t ngÆ°á»¡ng mÃ¡y biáº¿n Ã¡p trÃªn dá»¯ liá»‡u thá»­ nghiá»‡m}
 \label{tab:nlp_transformer_threshold}
 \begin{tabular}{lcccc}
 \toprule
-Cặp ngưỡng & Coverage & Selective precision\_0 & Selective recall\_0 & Selective F2\_0 \\
+Cáº·p ngÆ°á»¡ng & Coverage & Selective precision\_0 & Selective recall\_0 & Selective F2\_0 \\
 \midrule
 0.40 / 0.60 & 0.910 & 0.831 & 0.846 & 0.843 \\
 0.45 / 0.60 & 0.911 & 0.827 & 0.847 & 0.843 \\
@@ -400,40 +400,40 @@ Cặp ngưỡng & Coverage & Selective precision\_0 & Selective recall\_0 & Sele
 \end{tabular}
 \end{table}
 
-Đường cong máy biến áp ổn định, có phạm vi bao phủ gần 0,91 và mức tăng vừa phải trong thu hồi có chọn lọc khi cặp ngưỡng di chuyển đến 0,55 và 0,70.
+ÄÆ°á»ng cong mÃ¡y biáº¿n Ã¡p á»•n Ä‘á»‹nh, cÃ³ pháº¡m vi bao phá»§ gáº§n 0,91 vÃ  má»©c tÄƒng vá»«a pháº£i trong thu há»“i cÃ³ chá»n lá»c khi cáº·p ngÆ°á»¡ng di chuyá»ƒn Ä‘áº¿n 0,55 vÃ  0,70.
 
-\subsection{So sánh trường hợp cứng}
-Kết quả trường hợp cứng trong Bảng \ref{tab:nlp_hard_cases} so sánh các quyết định về đường cơ sở và máy biến áp cổ điển.
+\subsection{So sÃ¡nh trÆ°á»ng há»£p cá»©ng}
+Káº¿t quáº£ trÆ°á»ng há»£p cá»©ng trong Báº£ng \ref{tab:nlp_hard_cases} so sÃ¡nh cÃ¡c quyáº¿t Ä‘á»‹nh vá» Ä‘Æ°á»ng cÆ¡ sá»Ÿ vÃ  mÃ¡y biáº¿n Ã¡p cá»• Ä‘iá»ƒn.
 
 \begin{table}[H]
 \centering
-\caption{So sánh trường hợp khó giữa mô hình tình cảm cổ điển và biến đổi}
+\caption{So sÃ¡nh trÆ°á»ng há»£p khÃ³ giá»¯a mÃ´ hÃ¬nh tÃ¬nh cáº£m cá»• Ä‘iá»ƒn vÃ  biáº¿n Ä‘á»•i}
 \label{tab:nlp_hard_cases}
 \begin{tabular}{>{\raggedright\arraybackslash}p{4.1cm} >{\centering\arraybackslash}p{2.3cm} >{\centering\arraybackslash}p{2.3cm} >{\raggedright\arraybackslash}p{4.3cm}}
 \toprule
-Văn bản & Quyết định baseline & Quyết định transformer & Nhận xét chính \\
+VÄƒn báº£n & Quyáº¿t Ä‘á»‹nh baseline & Quyáº¿t Ä‘á»‹nh transformer & Nháº­n xÃ©t chÃ­nh \\
 \midrule
-not bad & Tiêu cực & Tích cực & Transformer diễn giải cụm thành ngữ theo hướng tích cực \\
-not good & Tiêu cực & Tiêu cực & Hai mô hình cùng dự đoán theo hướng tiêu cực \\
-good but late delivery & Tiêu cực & Tích cực & Transformer đặt trọng số cao hơn cho mệnh đề tích cực ở đầu câu \\
-gr8 & Không chắc chắn & Không chắc chắn & Cả hai mô hình đều trả về không chắc chắn cho văn bản quá ngắn \\
-thx & Không chắc chắn & Không chắc chắn & Cả hai mô hình đều trả về không chắc chắn cho văn bản quá ngắn \\
-idk & Không chắc chắn & Không chắc chắn & Cả hai mô hình đều trả về không chắc chắn cho văn bản quá ngắn \\
+not bad & TiÃªu cá»±c & TÃ­ch cá»±c & Transformer diá»…n giáº£i cá»¥m thÃ nh ngá»¯ theo hÆ°á»›ng tÃ­ch cá»±c \\
+not good & TiÃªu cá»±c & TiÃªu cá»±c & Hai mÃ´ hÃ¬nh cÃ¹ng dá»± Ä‘oÃ¡n theo hÆ°á»›ng tiÃªu cá»±c \\
+good but late delivery & TiÃªu cá»±c & TÃ­ch cá»±c & Transformer Ä‘áº·t trá»ng sá»‘ cao hÆ¡n cho má»‡nh Ä‘á» tÃ­ch cá»±c á»Ÿ Ä‘áº§u cÃ¢u \\
+gr8 & KhÃ´ng cháº¯c cháº¯n & KhÃ´ng cháº¯c cháº¯n & Cáº£ hai mÃ´ hÃ¬nh Ä‘á»u tráº£ vá» khÃ´ng cháº¯c cháº¯n cho vÄƒn báº£n quÃ¡ ngáº¯n \\
+thx & KhÃ´ng cháº¯c cháº¯n & KhÃ´ng cháº¯c cháº¯n & Cáº£ hai mÃ´ hÃ¬nh Ä‘á»u tráº£ vá» khÃ´ng cháº¯c cháº¯n cho vÄƒn báº£n quÃ¡ ngáº¯n \\
+idk & KhÃ´ng cháº¯c cháº¯n & KhÃ´ng cháº¯c cháº¯n & Cáº£ hai mÃ´ hÃ¬nh Ä‘á»u tráº£ vá» khÃ´ng cháº¯c cháº¯n cho vÄƒn báº£n quÃ¡ ngáº¯n \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Sự so sánh này chỉ ra rằng mô hình Transformer giải quyết một số mẫu thành ngữ (ví dụ \textit{not bad}) hiệu quả hơn, trong khi đôi khi lại đánh giá quá cao các mệnh đề tích cực trong những lời phàn nàn có nhiều phân cực.
+Sá»± so sÃ¡nh nÃ y chá»‰ ra ráº±ng mÃ´ hÃ¬nh Transformer giáº£i quyáº¿t má»™t sá»‘ máº«u thÃ nh ngá»¯ (vÃ­ dá»¥ \textit{not bad}) hiá»‡u quáº£ hÆ¡n, trong khi Ä‘Ã´i khi láº¡i Ä‘Ã¡nh giÃ¡ quÃ¡ cao cÃ¡c má»‡nh Ä‘á» tÃ­ch cá»±c trong nhá»¯ng lá»i phÃ n nÃ n cÃ³ nhiá»u phÃ¢n cá»±c.
 
-\section{Kết quả trích xuất vấn đề NLP}
-\subsection{Kết quả đa nhãn tổng thể}
-Bảng \ref{tab:nlp_issue_overall} so sánh hai thiết lập trích xuất vấn đề có thể tái tạo trong kho lưu trữ hiện tại.
+\section{Káº¿t quáº£ trÃ­ch xuáº¥t váº¥n Ä‘á» NLP}
+\subsection{Káº¿t quáº£ Ä‘a nhÃ£n tá»•ng thá»ƒ}
+Báº£ng \ref{tab:nlp_issue_overall} so sÃ¡nh hai thiáº¿t láº­p trÃ­ch xuáº¥t váº¥n Ä‘á» cÃ³ thá»ƒ tÃ¡i táº¡o trong kho lÆ°u trá»¯ hiá»‡n táº¡i.
 
 \begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\caption{Số liệu tổng thể về trích xuất vấn đề NLP}
+\caption{Sá»‘ liá»‡u tá»•ng thá»ƒ vá» trÃ­ch xuáº¥t váº¥n Ä‘á» NLP}
 \label{tab:nlp_issue_overall}
 \begin{tabularx}{\textwidth}{
 >{\raggedright\arraybackslash}X
@@ -450,14 +450,14 @@ Word plus Char TF-IDF plus OVR Logistic & 0.764 & 0.763 & 0.408 & 0.603 \\
 \end{tabularx}
 \end{table}
 
-Việc biểu diễn từ cộng với ký tự mang lại macro-F1 cao hơn, trong khi thiết lập chỉ từ giữ độ chính xác của micro-F1 và tập hợp con cao hơn một chút trong lần chạy này.
+Viá»‡c biá»ƒu diá»…n tá»« cá»™ng vá»›i kÃ½ tá»± mang láº¡i macro-F1 cao hÆ¡n, trong khi thiáº¿t láº­p chá»‰ tá»« giá»¯ Ä‘á»™ chÃ­nh xÃ¡c cá»§a micro-F1 vÃ  táº­p há»£p con cao hÆ¡n má»™t chÃºt trong láº§n cháº¡y nÃ y.
 
-\subsection{Cải thiện trên mỗi nhãn}
-Bảng \ref{tab:nlp_issue_per_label_delta} hiển thị sự thay đổi F1 của thử nghiệm mỗi nhãn từ từ này sang từ khác cộng với thiết lập ký tự.
+\subsection{Cáº£i thiá»‡n trÃªn má»—i nhÃ£n}
+Báº£ng \ref{tab:nlp_issue_per_label_delta} hiá»ƒn thá»‹ sá»± thay Ä‘á»•i F1 cá»§a thá»­ nghiá»‡m má»—i nhÃ£n tá»« tá»« nÃ y sang tá»« khÃ¡c cá»™ng vá»›i thiáº¿t láº­p kÃ½ tá»±.
 
 \begin{table}[H]
 \centering
-\caption{Thay đổi F1 kiểm tra trên mỗi nhãn trong trích xuất vấn đề}
+\caption{Thay Ä‘á»•i F1 kiá»ƒm tra trÃªn má»—i nhÃ£n trong trÃ­ch xuáº¥t váº¥n Ä‘á»}
 \label{tab:nlp_issue_per_label_delta}
 \begin{tabular}{lccc}
 \toprule
@@ -476,19 +476,19 @@ other & 0.911 & 0.910 & -0.001 \\
 \end{tabular}
 \end{table}
 
-Các tính năng ký tự giúp một số nhãn thưa thớt như hoàn tiền\_return và lừa đảo\_scam, nhưng có thể giảm F1 trên một số nhãn. Điều này cho thấy sự đánh đổi về việc thu hồi độ chính xác theo nhãn.
+CÃ¡c tÃ­nh nÄƒng kÃ½ tá»± giÃºp má»™t sá»‘ nhÃ£n thÆ°a thá»›t nhÆ° hoÃ n tiá»n\_return vÃ  lá»«a Ä‘áº£o\_scam, nhÆ°ng cÃ³ thá»ƒ giáº£m F1 trÃªn má»™t sá»‘ nhÃ£n. Äiá»u nÃ y cho tháº¥y sá»± Ä‘Ã¡nh Ä‘á»•i vá» viá»‡c thu há»“i Ä‘á»™ chÃ­nh xÃ¡c theo nhÃ£n.
 
-\subsection{Chiến lược ngưỡng trong cài đặt nhiều nhãn}
-Trích xuất vấn đề sử dụng ngưỡng điều chỉnh cho mỗi nhãn. Cấu hình ngưỡng khác nhau giữa thiết lập chỉ từ và thiết lập từ+char vì phân phối điểm thay đổi theo nhãn.
+\subsection{Chiáº¿n lÆ°á»£c ngÆ°á»¡ng trong cÃ i Ä‘áº·t nhiá»u nhÃ£n}
+TrÃ­ch xuáº¥t váº¥n Ä‘á» sá»­ dá»¥ng ngÆ°á»¡ng Ä‘iá»u chá»‰nh cho má»—i nhÃ£n. Cáº¥u hÃ¬nh ngÆ°á»¡ng khÃ¡c nhau giá»¯a thiáº¿t láº­p chá»‰ tá»« vÃ  thiáº¿t láº­p tá»«+char vÃ¬ phÃ¢n phá»‘i Ä‘iá»ƒm thay Ä‘á»•i theo nhÃ£n.
 
-Hành vi này được mong đợi trong các tác vụ nhiều nhãn NLP trong đó mỗi nhãn có tần số trước và cường độ tín hiệu văn bản khác nhau.
+HÃ nh vi nÃ y Ä‘Æ°á»£c mong Ä‘á»£i trong cÃ¡c tÃ¡c vá»¥ nhiá»u nhÃ£n NLP trong Ä‘Ã³ má»—i nhÃ£n cÃ³ táº§n sá»‘ trÆ°á»›c vÃ  cÆ°á»ng Ä‘á»™ tÃ­n hiá»‡u vÄƒn báº£n khÃ¡c nhau.
 
-\subsection{Tính tái lập của bước tạo template}
-Bước tạo template gán nhãn issue hiện áp dụng cơ chế sắp xếp ID tự nhiên trước khi xuất CSV. Khóa sắp xếp được triển khai theo thứ tự: ID dạng số được sắp theo giá trị số nguyên, tiếp theo là ID không thuần số theo thứ tự từ vựng không phân biệt hoa thường, và cuối cùng là ID rỗng. Cách này loại bỏ lỗi thứ tự kiểu từ điển như \texttt{10} đứng trước \texttt{2}.
+\subsection{TÃ­nh tÃ¡i láº­p cá»§a bÆ°á»›c táº¡o template}
+BÆ°á»›c táº¡o template gÃ¡n nhÃ£n issue hiá»‡n Ã¡p dá»¥ng cÆ¡ cháº¿ sáº¯p xáº¿p ID tá»± nhiÃªn trÆ°á»›c khi xuáº¥t CSV. KhÃ³a sáº¯p xáº¿p Ä‘Æ°á»£c triá»ƒn khai theo thá»© tá»±: ID dáº¡ng sá»‘ Ä‘Æ°á»£c sáº¯p theo giÃ¡ trá»‹ sá»‘ nguyÃªn, tiáº¿p theo lÃ  ID khÃ´ng thuáº§n sá»‘ theo thá»© tá»± tá»« vá»±ng khÃ´ng phÃ¢n biá»‡t hoa thÆ°á»ng, vÃ  cuá»‘i cÃ¹ng lÃ  ID rá»—ng. CÃ¡ch nÃ y loáº¡i bá» lá»—i thá»© tá»± kiá»ƒu tá»« Ä‘iá»ƒn nhÆ° \texttt{10} Ä‘á»©ng trÆ°á»›c \texttt{2}.
 
-Hai test hồi quy được thêm tại \texttt{tests/test\_issue\_template\_sort.py}: một test đơn vị cho khóa sắp xếp và một test đầu-cuối xác nhận thứ tự output từ \texttt{cmd\_make\_template} trong \texttt{src/issue\_steps/steps.py}.
+Hai test há»“i quy Ä‘Æ°á»£c thÃªm táº¡i \texttt{tests/test\_issue\_template\_sort.py}: má»™t test Ä‘Æ¡n vá»‹ cho khÃ³a sáº¯p xáº¿p vÃ  má»™t test Ä‘áº§u-cuá»‘i xÃ¡c nháº­n thá»© tá»± output tá»« \texttt{cmd\_make\_template} trong \texttt{src/issue\_steps/steps.py}.
 
-Cập nhật này cải thiện tính tái lập của dữ liệu chú thích và độ tin cậy khi bàn giao giữa các thành viên, đồng thời không làm thay đổi các chỉ số đánh giá mô hình đã báo cáo ở trên.
+Cáº­p nháº­t nÃ y cáº£i thiá»‡n tÃ­nh tÃ¡i láº­p cá»§a dá»¯ liá»‡u chÃº thÃ­ch vÃ  Ä‘á»™ tin cáº­y khi bÃ n giao giá»¯a cÃ¡c thÃ nh viÃªn, Ä‘á»“ng thá»i khÃ´ng lÃ m thay Ä‘á»•i cÃ¡c chá»‰ sá»‘ Ä‘Ã¡nh giÃ¡ mÃ´ hÃ¬nh Ä‘Ã£ bÃ¡o cÃ¡o á»Ÿ trÃªn.
 
 
 \subsection{C?p nh?t Level 3 cho classic pipeline}
@@ -515,14 +515,36 @@ Artefact & Ghi nh?n \\
 \bottomrule
 \end{tabular}
 \end{table}
+\subsection{Cap nhat Level 4 cho issue transformer multi-label}
+Trang thai code hien tai da bo sung lenh Level 4 cho bai toan issue extraction da nhan:
+\texttt{python -m src.nlp\_ext issue\_transformer\_multilabel --labels\_path data/issue\_labels.csv --data\_path data/Gift\_Cards.jsonl}.
 
-\section{Kết quả cho Gói nâng cấp giáo trình}
-\subsection{Đường cơ sở cổ điển cho các thuật toán khóa học cốt lõi}
-Bảng \ref{tab:nlp_syllabus_bench} báo cáo số liệu kiểm tra cho khối cơ sở được thêm vào. Khối này sử dụng cùng một cách phân chia dữ liệu và không thêm nhãn mới.
+Lan chay moi nhat dung 10,000 mau gan nhan, voi train=3,000, val=1,000, test=2,000 sau khi cap mau. Nguong transformer giu co dinh 0.50 cho tung label. Co che hybrid routing route cac mau margin thap tren model classic (\texttt{hybrid\_margin=0.08}) va gioi han ti le route bang \texttt{hybrid\_max\_route\_rate=0.25}. So mau route sang transformer trong test la 527/2,000.
 
 \begin{table}[H]
 \centering
-\caption{Kết quả kiểm tra các cơ sở giáo trình NLP bổ sung}
+\caption{So sanh ket qua Level 4 tren test split}
+\label{tab:nlp_level4_issue_transformer_vi}
+\begin{tabular}{lcccc}
+\toprule
+Model & Micro-F1 & Macro-F1 & Subset accuracy & Hamming loss \\
+\midrule
+Classic issue model (OVR Logistic) & 0.792 & 0.528 & 0.656 & 0.055 \\
+Transformer multi-label & 0.646 & 0.188 & 0.551 & 0.101 \\
+Hybrid route (classic + transformer) & 0.730 & 0.338 & 0.615 & 0.074 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ket qua nay cho thay cau hinh transformer hien tai chua vuot duoc classic model da tune tren bo nhan nay. Tuy nhien, hybrid routing da thu hep dang ke khoang cach hieu nang, dong thoi van giu huong nang cap theo deep contextual modeling trong muc runtime va do phuc tap trien khai chap nhan duoc.
+
+\section{Káº¿t quáº£ cho GÃ³i nÃ¢ng cáº¥p giÃ¡o trÃ¬nh}
+\subsection{ÄÆ°á»ng cÆ¡ sá»Ÿ cá»• Ä‘iá»ƒn cho cÃ¡c thuáº­t toÃ¡n khÃ³a há»c cá»‘t lÃµi}
+Báº£ng \ref{tab:nlp_syllabus_bench} bÃ¡o cÃ¡o sá»‘ liá»‡u kiá»ƒm tra cho khá»‘i cÆ¡ sá»Ÿ Ä‘Æ°á»£c thÃªm vÃ o. Khá»‘i nÃ y sá»­ dá»¥ng cÃ¹ng má»™t cÃ¡ch phÃ¢n chia dá»¯ liá»‡u vÃ  khÃ´ng thÃªm nhÃ£n má»›i.
+
+\begin{table}[H]
+\centering
+\caption{Káº¿t quáº£ kiá»ƒm tra cÃ¡c cÆ¡ sá»Ÿ giÃ¡o trÃ¬nh NLP bá»• sung}
 \label{tab:nlp_syllabus_bench}
 \begin{tabular}{lccc}
 \toprule
@@ -540,17 +562,17 @@ FFNN MLP on SVD vectors & 0.799 & 0.730 & 0.742 \\
 \end{tabular}
 \end{table}
 
-Những kết quả này cho thấy sự khác biệt rõ ràng về hành vi. Complement Naive Bayes có mức thu hồi âm cao nhất là 0,952, nhưng độ chính xác thấp ở mức 0,510. Hồi quy logistic cho F2\_0 tốt nhất ở mức 0,862 với độ chính xác cao hơn. LinearSVM có độ chính xác cao nhất\_0 trong số các mô hình thu hồi mạnh mẽ, trong khi tính năng ghi nhật ký SGD mang lại khả năng thu hồi cao với độ chính xác thấp hơn. Điều này hỗ trợ một cuộc thảo luận đánh đổi mạnh mẽ giữa các thuật toán khóa học cốt lõi.
+Nhá»¯ng káº¿t quáº£ nÃ y cho tháº¥y sá»± khÃ¡c biá»‡t rÃµ rÃ ng vá» hÃ nh vi. Complement Naive Bayes cÃ³ má»©c thu há»“i Ã¢m cao nháº¥t lÃ  0,952, nhÆ°ng Ä‘á»™ chÃ­nh xÃ¡c tháº¥p á»Ÿ má»©c 0,510. Há»“i quy logistic cho F2\_0 tá»‘t nháº¥t á»Ÿ má»©c 0,862 vá»›i Ä‘á»™ chÃ­nh xÃ¡c cao hÆ¡n. LinearSVM cÃ³ Ä‘á»™ chÃ­nh xÃ¡c cao nháº¥t\_0 trong sá»‘ cÃ¡c mÃ´ hÃ¬nh thu há»“i máº¡nh máº½, trong khi tÃ­nh nÄƒng ghi nháº­t kÃ½ SGD mang láº¡i kháº£ nÄƒng thu há»“i cao vá»›i Ä‘á»™ chÃ­nh xÃ¡c tháº¥p hÆ¡n. Äiá»u nÃ y há»— trá»£ má»™t cuá»™c tháº£o luáº­n Ä‘Ã¡nh Ä‘á»•i máº¡nh máº½ giá»¯a cÃ¡c thuáº­t toÃ¡n khÃ³a há»c cá»‘t lÃµi.
 
-\subsection{Hành vi chọn lọc trong các đường cơ sở bổ sung}
-Đối với các mô hình xác suất trong khối được thêm vào, áp dụng cùng một dải không chắc chắn 0,40 và 0,60. Hồi quy logistic cho phạm vi kiểm tra 0,887, độ chính xác chọn lọc\_0 0,763 và thu hồi có chọn lọc\_0 0,946. Phần bổ sung Naive Bayes cho phạm vi kiểm tra 0,900 và thu hồi có chọn lọc\_0 0,963, nhưng độ chính xác chọn lọc\_0 chỉ là 0,545. Điều này xác nhận rằng khối được thêm vào phù hợp với chính sách của dự án và duy trì sự kiểm soát cân bằng minh bạch.
+\subsection{HÃ nh vi chá»n lá»c trong cÃ¡c Ä‘Æ°á»ng cÆ¡ sá»Ÿ bá»• sung}
+Äá»‘i vá»›i cÃ¡c mÃ´ hÃ¬nh xÃ¡c suáº¥t trong khá»‘i Ä‘Æ°á»£c thÃªm vÃ o, Ã¡p dá»¥ng cÃ¹ng má»™t dáº£i khÃ´ng cháº¯c cháº¯n 0,40 vÃ  0,60. Há»“i quy logistic cho pháº¡m vi kiá»ƒm tra 0,887, Ä‘á»™ chÃ­nh xÃ¡c chá»n lá»c\_0 0,763 vÃ  thu há»“i cÃ³ chá»n lá»c\_0 0,946. Pháº§n bá»• sung Naive Bayes cho pháº¡m vi kiá»ƒm tra 0,900 vÃ  thu há»“i cÃ³ chá»n lá»c\_0 0,963, nhÆ°ng Ä‘á»™ chÃ­nh xÃ¡c chá»n lá»c\_0 chá»‰ lÃ  0,545. Äiá»u nÃ y xÃ¡c nháº­n ráº±ng khá»‘i Ä‘Æ°á»£c thÃªm vÃ o phÃ¹ há»£p vá»›i chÃ­nh sÃ¡ch cá»§a dá»± Ã¡n vÃ  duy trÃ¬ sá»± kiá»ƒm soÃ¡t cÃ¢n báº±ng minh báº¡ch.
 
-\subsection{Kết quả mô hình ngôn ngữ N-Gram}
-Bảng \ref{tab:nlp_ngram_results} báo cáo mức độ phức tạp của các mô hình unigram và bigram với add-k bằng 1,0.
+\subsection{Káº¿t quáº£ mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-Gram}
+Báº£ng \ref{tab:nlp_ngram_results} bÃ¡o cÃ¡o má»©c Ä‘á»™ phá»©c táº¡p cá»§a cÃ¡c mÃ´ hÃ¬nh unigram vÃ  bigram vá»›i add-k báº±ng 1,0.
 
 \begin{table}[H]
 \centering
-\caption{Sự bối rối của khối mô hình ngôn ngữ N-gram}
+\caption{Sá»± bá»‘i rá»‘i cá»§a khá»‘i mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram}
 \label{tab:nlp_ngram_results}
 \begin{tabular}{lcc}
 \toprule
@@ -562,100 +584,100 @@ Bigram add-k & 358.59 & 363.08 \\
 \end{tabular}
 \end{table}
 
-Bigram mang lại độ phức tạp thấp hơn unigram trên cả hai phần tách. Điều này được mong đợi vì bigram sử dụng ngữ cảnh cục bộ từ mã thông báo trước đó. Khoảng cách không lớn vì văn bản ôn tập ngắn và ồn ào nhưng ổn định và có ý nghĩa đối với chủ đề mô hình ngôn ngữ.
+Bigram mang láº¡i Ä‘á»™ phá»©c táº¡p tháº¥p hÆ¡n unigram trÃªn cáº£ hai pháº§n tÃ¡ch. Äiá»u nÃ y Ä‘Æ°á»£c mong Ä‘á»£i vÃ¬ bigram sá»­ dá»¥ng ngá»¯ cáº£nh cá»¥c bá»™ tá»« mÃ£ thÃ´ng bÃ¡o trÆ°á»›c Ä‘Ã³. Khoáº£ng cÃ¡ch khÃ´ng lá»›n vÃ¬ vÄƒn báº£n Ã´n táº­p ngáº¯n vÃ  á»“n Ã o nhÆ°ng á»•n Ä‘á»‹nh vÃ  cÃ³ Ã½ nghÄ©a Ä‘á»‘i vá»›i chá»§ Ä‘á» mÃ´ hÃ¬nh ngÃ´n ngá»¯.
 
-\subsection{Các tạo tác RNN, MLM và LLM}
-Bảng \ref{tab:nlp_extra_artifacts} tóm tắt các tạo phẩm giáo trình bổ sung hiện đang được triển khai và có thể tái tạo ở trạng thái kho lưu trữ này.
+\subsection{CÃ¡c táº¡o tÃ¡c RNN, MLM vÃ  LLM}
+Báº£ng \ref{tab:nlp_extra_artifacts} tÃ³m táº¯t cÃ¡c táº¡o pháº©m giÃ¡o trÃ¬nh bá»• sung hiá»‡n Ä‘ang Ä‘Æ°á»£c triá»ƒn khai vÃ  cÃ³ thá»ƒ tÃ¡i táº¡o á»Ÿ tráº¡ng thÃ¡i kho lÆ°u trá»¯ nÃ y.
 
 \begin{table}[H]
 \centering
-\caption{Các tạo phẩm giáo trình NLP bổ sung}
+\caption{CÃ¡c táº¡o pháº©m giÃ¡o trÃ¬nh NLP bá»• sung}
 \label{tab:nlp_extra_artifacts}
 \begin{tabular}{lccc}
 \toprule
-Tạo tác & Chỉ số & Giá trị & Ghi chú \\
+Táº¡o tÃ¡c & Chá»‰ sá»‘ & GiÃ¡ trá»‹ & Ghi chÃº \\
 \midrule
-RNN/LSTM baseline & recall\_0 (test) & 0.911 & recall cao, precision còn hạn chế \\
-RNN/LSTM baseline & F2\_0 (test) & 0.615 & hỗ trợ bao phủ chủ đề mô hình chuỗi \\
-MLM probe & hit@10 & 0.600 & 3/5 mẫu probe khớp với tập token kỳ vọng \\
-LLM prompt baseline & recall\_0 (test) & 0.513 & đường cơ sở proxy theo prompt với đầu ra xác định \\
-LLM prompt baseline & F2\_0 (test) & 0.499 & thấp hơn các baseline phân loại, giữ lại để thể hiện độ bao phủ học phần \\
+RNN/LSTM baseline & recall\_0 (test) & 0.911 & recall cao, precision cÃ²n háº¡n cháº¿ \\
+RNN/LSTM baseline & F2\_0 (test) & 0.615 & há»— trá»£ bao phá»§ chá»§ Ä‘á» mÃ´ hÃ¬nh chuá»—i \\
+MLM probe & hit@10 & 0.600 & 3/5 máº«u probe khá»›p vá»›i táº­p token ká»³ vá»ng \\
+LLM prompt baseline & recall\_0 (test) & 0.513 & Ä‘Æ°á»ng cÆ¡ sá»Ÿ proxy theo prompt vá»›i Ä‘áº§u ra xÃ¡c Ä‘á»‹nh \\
+LLM prompt baseline & F2\_0 (test) & 0.499 & tháº¥p hÆ¡n cÃ¡c baseline phÃ¢n loáº¡i, giá»¯ láº¡i Ä‘á»ƒ thá»ƒ hiá»‡n Ä‘á»™ bao phá»§ há»c pháº§n \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Ma trận phù hợp với khóa học được cập nhật}
-Bảng \ref{tab:nlp_course_fit} hiển thị ma trận phạm vi chủ đề được cập nhật sau khối nâng cấp mới.
+\subsection{Ma tráº­n phÃ¹ há»£p vá»›i khÃ³a há»c Ä‘Æ°á»£c cáº­p nháº­t}
+Báº£ng \ref{tab:nlp_course_fit} hiá»ƒn thá»‹ ma tráº­n pháº¡m vi chá»§ Ä‘á» Ä‘Æ°á»£c cáº­p nháº­t sau khá»‘i nÃ¢ng cáº¥p má»›i.
 
 \begin{table}[H]
 \centering
-\caption{Phạm vi chủ đề được cập nhật sau khi nâng cấp không có dữ liệu mới}
+\caption{Pháº¡m vi chá»§ Ä‘á» Ä‘Æ°á»£c cáº­p nháº­t sau khi nÃ¢ng cáº¥p khÃ´ng cÃ³ dá»¯ liá»‡u má»›i}
 \label{tab:nlp_course_fit}
 \begin{tabular}{lcc}
 \toprule
-Nhóm chủ đề & Tỷ lệ bao phủ & Mức độ \\
+NhÃ³m chá»§ Ä‘á» & Tá»· lá»‡ bao phá»§ & Má»©c Ä‘á»™ \\
 \midrule
-Xác suất & 100 & Cao \\
-Biểu thức chính quy & 50 & Một phần \\
-Các thước đo đánh giá & 100 & Cao \\
-Mô hình ngôn ngữ N-gram & 100 & Cao \\
+XÃ¡c suáº¥t & 100 & Cao \\
+Biá»ƒu thá»©c chÃ­nh quy & 50 & Má»™t pháº§n \\
+CÃ¡c thÆ°á»›c Ä‘o Ä‘Ã¡nh giÃ¡ & 100 & Cao \\
+MÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram & 100 & Cao \\
 Naive Bayes & 100 & Cao \\
 Perceptron & 100 & Cao \\
-Hồi quy logistic & 100 & Cao \\
-Mạng nơ-ron truyền thẳng & 100 & Cao \\
-PyTorch cơ bản & 100 & Cao \\
-Ngữ nghĩa vector và embedding & 80 & Trung bình-cao \\
-Mạng nơ-ron hồi tiếp & 100 & Cao \\
-Transformer và LLM & 100 & Cao \\
-Mô hình ngôn ngữ che khuyết & 100 & Cao \\
-Ứng dụng của LLM & 90 & Cao \\
+Há»“i quy logistic & 100 & Cao \\
+Máº¡ng nÆ¡-ron truyá»n tháº³ng & 100 & Cao \\
+PyTorch cÆ¡ báº£n & 100 & Cao \\
+Ngá»¯ nghÄ©a vector vÃ  embedding & 80 & Trung bÃ¬nh-cao \\
+Máº¡ng nÆ¡-ron há»“i tiáº¿p & 100 & Cao \\
+Transformer vÃ  LLM & 100 & Cao \\
+MÃ´ hÃ¬nh ngÃ´n ngá»¯ che khuyáº¿t & 100 & Cao \\
+á»¨ng dá»¥ng cá»§a LLM & 90 & Cao \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Điểm bao quát tổng thể ước tính là 94,3\%, được tính trực tiếp từ các tạo phẩm được tạo trong thư mục đầu ra nâng cấp giáo trình.
+Äiá»ƒm bao quÃ¡t tá»•ng thá»ƒ Æ°á»›c tÃ­nh lÃ  94,3\%, Ä‘Æ°á»£c tÃ­nh trá»±c tiáº¿p tá»« cÃ¡c táº¡o pháº©m Ä‘Æ°á»£c táº¡o trong thÆ° má»¥c Ä‘áº§u ra nÃ¢ng cáº¥p giÃ¡o trÃ¬nh.
 
-\section{Thảo luận về máy biến áp cổ điển và máy biến áp}
-NLP thưa thớt cổ điển và NLP dựa trên máy biến áp thể hiện các cấu hình hiệu suất khác biệt. Trong cài đặt này, động cơ V6 cổ điển duy trì khả năng thu hồi âm cao và thu hồi có chọn lọc cao, trong khi mẫu máy biến áp cung cấp độ chính xác tổng thể cao hơn và độ chính xác âm cao hơn.
+\section{Tháº£o luáº­n vá» mÃ¡y biáº¿n Ã¡p cá»• Ä‘iá»ƒn vÃ  mÃ¡y biáº¿n Ã¡p}
+NLP thÆ°a thá»›t cá»• Ä‘iá»ƒn vÃ  NLP dá»±a trÃªn mÃ¡y biáº¿n Ã¡p thá»ƒ hiá»‡n cÃ¡c cáº¥u hÃ¬nh hiá»‡u suáº¥t khÃ¡c biá»‡t. Trong cÃ i Ä‘áº·t nÃ y, Ä‘á»™ng cÆ¡ V6 cá»• Ä‘iá»ƒn duy trÃ¬ kháº£ nÄƒng thu há»“i Ã¢m cao vÃ  thu há»“i cÃ³ chá»n lá»c cao, trong khi máº«u mÃ¡y biáº¿n Ã¡p cung cáº¥p Ä‘á»™ chÃ­nh xÃ¡c tá»•ng thá»ƒ cao hÆ¡n vÃ  Ä‘á»™ chÃ­nh xÃ¡c Ã¢m cao hÆ¡n.
 
-Đối với các kịch bản phân loại ưu tiên phát hiện các đánh giá bất lợi, V6 cổ điển phù hợp chặt chẽ hơn với chính sách quyết định. Đối với sắc thái ngữ nghĩa và cách diễn đạt thành ngữ, đầu ra máy biến áp cung cấp giá trị bổ sung khi kết hợp với điều khiển ngưỡng.
+Äá»‘i vá»›i cÃ¡c ká»‹ch báº£n phÃ¢n loáº¡i Æ°u tiÃªn phÃ¡t hiá»‡n cÃ¡c Ä‘Ã¡nh giÃ¡ báº¥t lá»£i, V6 cá»• Ä‘iá»ƒn phÃ¹ há»£p cháº·t cháº½ hÆ¡n vá»›i chÃ­nh sÃ¡ch quyáº¿t Ä‘á»‹nh. Äá»‘i vá»›i sáº¯c thÃ¡i ngá»¯ nghÄ©a vÃ  cÃ¡ch diá»…n Ä‘áº¡t thÃ nh ngá»¯, Ä‘áº§u ra mÃ¡y biáº¿n Ã¡p cung cáº¥p giÃ¡ trá»‹ bá»• sung khi káº¿t há»£p vá»›i Ä‘iá»u khiá»ƒn ngÆ°á»¡ng.
 
-Do đó, chiến lược kết hợp là hợp lý: sử dụng mô hình cổ điển làm lớp phân loại chính và áp dụng tính điểm biến áp làm bước phân tích phụ cho các trường hợp không rõ ràng.
+Do Ä‘Ã³, chiáº¿n lÆ°á»£c káº¿t há»£p lÃ  há»£p lÃ½: sá»­ dá»¥ng mÃ´ hÃ¬nh cá»• Ä‘iá»ƒn lÃ m lá»›p phÃ¢n loáº¡i chÃ­nh vÃ  Ã¡p dá»¥ng tÃ­nh Ä‘iá»ƒm biáº¿n Ã¡p lÃ m bÆ°á»›c phÃ¢n tÃ­ch phá»¥ cho cÃ¡c trÆ°á»ng há»£p khÃ´ng rÃµ rÃ ng.
 
-\section{Phân tích lỗi và các chế độ sai hỏng}
-Bảng \ref{tab:nlp_error_cases} trình bày các trường hợp lỗi hoặc rủi ro cụ thể kèm theo giải thích cụ thể cho từng mô hình. Điều này mở rộng việc đánh giá ra ngoài các số liệu tổng hợp.
+\section{PhÃ¢n tÃ­ch lá»—i vÃ  cÃ¡c cháº¿ Ä‘á»™ sai há»ng}
+Báº£ng \ref{tab:nlp_error_cases} trÃ¬nh bÃ y cÃ¡c trÆ°á»ng há»£p lá»—i hoáº·c rá»§i ro cá»¥ thá»ƒ kÃ¨m theo giáº£i thÃ­ch cá»¥ thá»ƒ cho tá»«ng mÃ´ hÃ¬nh. Äiá»u nÃ y má»Ÿ rá»™ng viá»‡c Ä‘Ã¡nh giÃ¡ ra ngoÃ i cÃ¡c sá»‘ liá»‡u tá»•ng há»£p.
 
 \begin{table}[H]
 \centering
-\caption{Các trường hợp lỗi và rủi ro cụ thể kèm theo lời giải thích}
+\caption{CÃ¡c trÆ°á»ng há»£p lá»—i vÃ  rá»§i ro cá»¥ thá»ƒ kÃ¨m theo lá»i giáº£i thÃ­ch}
 \label{tab:nlp_error_cases}
 \begin{tabular}{>{\raggedright\arraybackslash}p{2.9cm} >{\centering\arraybackslash}p{2.0cm} >{\raggedright\arraybackslash}p{2.7cm} >{\raggedright\arraybackslash}p{4.4cm} >{\raggedright\arraybackslash}p{2.6cm}}
 \toprule
-Văn bản & Kỳ vọng & Đầu ra mô hình & Nguyên nhân sai/rủi ro & Biện pháp khắc phục trong dự án \\
+VÄƒn báº£n & Ká»³ vá»ng & Äáº§u ra mÃ´ hÃ¬nh & NguyÃªn nhÃ¢n sai/rá»§i ro & Biá»‡n phÃ¡p kháº¯c phá»¥c trong dá»± Ã¡n \\
 \midrule
-not bad & Tích cực & classic: Tiêu cực & Biểu diễn thưa đặt trọng số quá cao cho token bad và chưa mô hình hóa tốt phủ định thành ngữ & Duy trì so sánh với transformer và cơ chế phân xử theo dải không chắc chắn khi độ tin cậy thấp \\
-good but late delivery & Tiêu cực hoặc cần gắn cờ vấn đề & transformer: Tích cực & Chấm điểm theo ngữ cảnh đặt trọng số cao ở mệnh đề tích cực đầu câu và thiếu nhấn mạnh phần phàn nàn cuối câu & Giữ mô hình classic theo chính sách negative-first để định tuyến và dùng mô-đun issue extraction để gắn nhãn khiếu nại \\
-gr8 / thx / idk & Không chắc chắn & both: Không chắc chắn & Văn bản quá ngắn mang tín hiệu cảm xúc yếu và độ mơ hồ cao & Duy trì luật fallback too\_short để tránh gán nhãn cứng cưỡng bức \\
-refund\_return (nhãn hiếm) & Cần phát hiện đúng vấn đề hiếm & recall của mô hình issue dao động & Số mẫu hỗ trợ thấp làm biên quyết định kém ổn định và nhạy với ngưỡng & Áp dụng biến thể char n-gram và tinh chỉnh ngưỡng theo nhãn; ưu tiên bổ sung gán nhãn cho nhóm hiếm \\
+not bad & TÃ­ch cá»±c & classic: TiÃªu cá»±c & Biá»ƒu diá»…n thÆ°a Ä‘áº·t trá»ng sá»‘ quÃ¡ cao cho token bad vÃ  chÆ°a mÃ´ hÃ¬nh hÃ³a tá»‘t phá»§ Ä‘á»‹nh thÃ nh ngá»¯ & Duy trÃ¬ so sÃ¡nh vá»›i transformer vÃ  cÆ¡ cháº¿ phÃ¢n xá»­ theo dáº£i khÃ´ng cháº¯c cháº¯n khi Ä‘á»™ tin cáº­y tháº¥p \\
+good but late delivery & TiÃªu cá»±c hoáº·c cáº§n gáº¯n cá» váº¥n Ä‘á» & transformer: TÃ­ch cá»±c & Cháº¥m Ä‘iá»ƒm theo ngá»¯ cáº£nh Ä‘áº·t trá»ng sá»‘ cao á»Ÿ má»‡nh Ä‘á» tÃ­ch cá»±c Ä‘áº§u cÃ¢u vÃ  thiáº¿u nháº¥n máº¡nh pháº§n phÃ n nÃ n cuá»‘i cÃ¢u & Giá»¯ mÃ´ hÃ¬nh classic theo chÃ­nh sÃ¡ch negative-first Ä‘á»ƒ Ä‘á»‹nh tuyáº¿n vÃ  dÃ¹ng mÃ´-Ä‘un issue extraction Ä‘á»ƒ gáº¯n nhÃ£n khiáº¿u náº¡i \\
+gr8 / thx / idk & KhÃ´ng cháº¯c cháº¯n & both: KhÃ´ng cháº¯c cháº¯n & VÄƒn báº£n quÃ¡ ngáº¯n mang tÃ­n hiá»‡u cáº£m xÃºc yáº¿u vÃ  Ä‘á»™ mÆ¡ há»“ cao & Duy trÃ¬ luáº­t fallback too\_short Ä‘á»ƒ trÃ¡nh gÃ¡n nhÃ£n cá»©ng cÆ°á»¡ng bá»©c \\
+refund\_return (nhÃ£n hiáº¿m) & Cáº§n phÃ¡t hiá»‡n Ä‘Ãºng váº¥n Ä‘á» hiáº¿m & recall cá»§a mÃ´ hÃ¬nh issue dao Ä‘á»™ng & Sá»‘ máº«u há»— trá»£ tháº¥p lÃ m biÃªn quyáº¿t Ä‘á»‹nh kÃ©m á»•n Ä‘á»‹nh vÃ  nháº¡y vá»›i ngÆ°á»¡ng & Ãp dá»¥ng biáº¿n thá»ƒ char n-gram vÃ  tinh chá»‰nh ngÆ°á»¡ng theo nhÃ£n; Æ°u tiÃªn bá»• sung gÃ¡n nhÃ£n cho nhÃ³m hiáº¿m \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Các kiểu lỗi phổ biến là phân cực hỗn hợp với các điểm đánh dấu tương phản, văn bản có ít thông tin rất ngắn và tính không ổn định của nhãn thưa trong quá trình trích xuất nhiều nhãn. Các mẫu này được theo dõi và giải quyết rõ ràng thông qua các biện pháp kiểm soát phiếu trắng và theo từng nhãn.
+CÃ¡c kiá»ƒu lá»—i phá»• biáº¿n lÃ  phÃ¢n cá»±c há»—n há»£p vá»›i cÃ¡c Ä‘iá»ƒm Ä‘Ã¡nh dáº¥u tÆ°Æ¡ng pháº£n, vÄƒn báº£n cÃ³ Ã­t thÃ´ng tin ráº¥t ngáº¯n vÃ  tÃ­nh khÃ´ng á»•n Ä‘á»‹nh cá»§a nhÃ£n thÆ°a trong quÃ¡ trÃ¬nh trÃ­ch xuáº¥t nhiá»u nhÃ£n. CÃ¡c máº«u nÃ y Ä‘Æ°á»£c theo dÃµi vÃ  giáº£i quyáº¿t rÃµ rÃ ng thÃ´ng qua cÃ¡c biá»‡n phÃ¡p kiá»ƒm soÃ¡t phiáº¿u tráº¯ng vÃ  theo tá»«ng nhÃ£n.
 
-\section{Giao thức trình diễn}
-Giao thức trình diễn trực tiếp được thiết kế cho cửa sổ trình bày kéo dài 10 phút với hoạt động ổn định và có thể kiểm tra được.
+\section{Giao thá»©c trÃ¬nh diá»…n}
+Giao thá»©c trÃ¬nh diá»…n trá»±c tiáº¿p Ä‘Æ°á»£c thiáº¿t káº¿ cho cá»­a sá»• trÃ¬nh bÃ y kÃ©o dÃ i 10 phÃºt vá»›i hoáº¡t Ä‘á»™ng á»•n Ä‘á»‹nh vÃ  cÃ³ thá»ƒ kiá»ƒm tra Ä‘Æ°á»£c.
 
-\subsection{Luồng trình diễn (10 phút bao gồm cả phần hỏi đáp)}
+\subsection{Luá»“ng trÃ¬nh diá»…n (10 phÃºt bao gá»“m cáº£ pháº§n há»i Ä‘Ã¡p)}
 \begin{enumerate}
-\item Kiểm tra độ tái lập: chạy \texttt{python -m pytest -q} và hiển thị đã vượt qua các bài kiểm tra khói.
-\item Chạy bản demo CLI cảm tính với đầu vào tích cực, tiêu cực và kiểu không chắc chắn.
-\item Chạy dự đoán trích xuất vấn đề cho văn bản giống như khiếu nại.
-\item Chạy bản demo máy biến áp cho một cụm từ ngắn mơ hồ.
-\item Hiển thị bảng điểm thống nhất và giải thích sự cân bằng giữa các mô hình.
+\item Kiá»ƒm tra Ä‘á»™ tÃ¡i láº­p: cháº¡y \texttt{python -m pytest -q} vÃ  hiá»ƒn thá»‹ Ä‘Ã£ vÆ°á»£t qua cÃ¡c bÃ i kiá»ƒm tra khÃ³i.
+\item Cháº¡y báº£n demo CLI cáº£m tÃ­nh vá»›i Ä‘áº§u vÃ o tÃ­ch cá»±c, tiÃªu cá»±c vÃ  kiá»ƒu khÃ´ng cháº¯c cháº¯n.
+\item Cháº¡y dá»± Ä‘oÃ¡n trÃ­ch xuáº¥t váº¥n Ä‘á» cho vÄƒn báº£n giá»‘ng nhÆ° khiáº¿u náº¡i.
+\item Cháº¡y báº£n demo mÃ¡y biáº¿n Ã¡p cho má»™t cá»¥m tá»« ngáº¯n mÆ¡ há»“.
+\item Hiá»ƒn thá»‹ báº£ng Ä‘iá»ƒm thá»‘ng nháº¥t vÃ  giáº£i thÃ­ch sá»± cÃ¢n báº±ng giá»¯a cÃ¡c mÃ´ hÃ¬nh.
 \end{enumerate}
 
-\subsection{Các lệnh được đề xuất}
+\subsection{CÃ¡c lá»‡nh Ä‘Æ°á»£c Ä‘á» xuáº¥t}
 \begin{verbatim}
 python -m pytest -q
 python demo.py "great product and fast delivery" "terrible quality, broke after two days" "idk if this is worth the price"
@@ -664,49 +686,49 @@ python demo_transformer.py "not bad at all"
 python scripts/build_scoreboard.py
 \end{verbatim}
 
-\subsection{Hành vi demo dự kiến}
-Hành vi dự kiến được chỉ định trong \texttt{docs/expected\_outputs.md}. Các đánh giá tích cực và tiêu cực rõ ràng phải chính xác theo hướng, trong khi thông tin thấp hoặc tín hiệu hỗn hợp có thể trả về \texttt{Không chắc chắn}. Giao thức này hỗ trợ khả năng diễn giải và ổn định hoạt động.
+\subsection{HÃ nh vi demo dá»± kiáº¿n}
+HÃ nh vi dá»± kiáº¿n Ä‘Æ°á»£c chá»‰ Ä‘á»‹nh trong \texttt{docs/expected\_outputs.md}. CÃ¡c Ä‘Ã¡nh giÃ¡ tÃ­ch cá»±c vÃ  tiÃªu cá»±c rÃµ rÃ ng pháº£i chÃ­nh xÃ¡c theo hÆ°á»›ng, trong khi thÃ´ng tin tháº¥p hoáº·c tÃ­n hiá»‡u há»—n há»£p cÃ³ thá»ƒ tráº£ vá» \texttt{KhÃ´ng cháº¯c cháº¯n}. Giao thá»©c nÃ y há»— trá»£ kháº£ nÄƒng diá»…n giáº£i vÃ  á»•n Ä‘á»‹nh hoáº¡t Ä‘á»™ng.
 
-\section{Ma trận truy vết tạo tác}
-Bảng \ref{tab:nlp_project_evidence} ánh xạ từng khía cạnh dự án tới bằng chứng cụ thể trong kho lưu trữ này.
+\section{Ma tráº­n truy váº¿t táº¡o tÃ¡c}
+Báº£ng \ref{tab:nlp_project_evidence} Ã¡nh xáº¡ tá»«ng khÃ­a cáº¡nh dá»± Ã¡n tá»›i báº±ng chá»©ng cá»¥ thá»ƒ trong kho lÆ°u trá»¯ nÃ y.
 
 \begin{table}[H]
 \centering
-\caption{Kích thước dự án và truy xuất nguồn gốc tạo tác}
+\caption{KÃ­ch thÆ°á»›c dá»± Ã¡n vÃ  truy xuáº¥t nguá»“n gá»‘c táº¡o tÃ¡c}
 \label{tab:nlp_project_evidence}
 \begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{5.2cm} >{\raggedright\arraybackslash}p{4.7cm}}
 \toprule
-Tiêu chí & Nội dung đã triển khai & Bằng chứng trong kho mã \\
+TiÃªu chÃ­ & Ná»™i dung Ä‘Ã£ triá»ƒn khai & Báº±ng chá»©ng trong kho mÃ£ \\
 \midrule
-Nội dung trình bày & Mô tả pipeline rõ ràng, lệnh chạy có thể tái lập, luồng demo có thể kiểm chứng & Các lệnh trong README, \texttt{src/run\_all.py}, \texttt{demo.py}, \texttt{demo\_transformer.py}, \texttt{demo\_app.py} \\
-Ý nghĩa dự án & Bài toán thực tế theo ngữ cảnh triage hỗ trợ, chính sách negative-first và nhãn hành động mức issue & \texttt{src/dm2\_steps/common.py}, các tạo tác uncertainty, CSV so sánh ca khó \\
-Quy trình làm việc & Phân công module rõ ràng, quy tắc review chéo, cổng kiểm soát chất lượng và kiểm tra thứ tự template issue theo tính xác định & \texttt{docs/contribution\_matrix.md}, \texttt{.github/pull\_request\_template.md}, smoke tests, \texttt{tests/test\_issue\_template\_sort.py} \\
-Chất lượng kết quả & So sánh nhiều mô hình, chỉ số selective, phân tích theo nhãn và giải thích ca lỗi & \texttt{results/scoreboard/*}, \texttt{results/nlp\_ext/syllabus\_upgrade/*}, phần phân tích lỗi \\
-Chất lượng demo & Có cả đường chạy CLI và UI, đầu vào kiểm thử xác định, tiêu chí hành vi kỳ vọng rõ ràng & \texttt{docs/demo\_inputs.txt}, \texttt{docs/expected\_outputs.md}, demo Streamlit và CLI \\
+Ná»™i dung trÃ¬nh bÃ y & MÃ´ táº£ pipeline rÃµ rÃ ng, lá»‡nh cháº¡y cÃ³ thá»ƒ tÃ¡i láº­p, luá»“ng demo cÃ³ thá»ƒ kiá»ƒm chá»©ng & CÃ¡c lá»‡nh trong README, \texttt{src/run\_all.py}, \texttt{demo.py}, \texttt{demo\_transformer.py}, \texttt{demo\_app.py} \\
+Ã nghÄ©a dá»± Ã¡n & BÃ i toÃ¡n thá»±c táº¿ theo ngá»¯ cáº£nh triage há»— trá»£, chÃ­nh sÃ¡ch negative-first vÃ  nhÃ£n hÃ nh Ä‘á»™ng má»©c issue & \texttt{src/dm2\_steps/common.py}, cÃ¡c táº¡o tÃ¡c uncertainty, CSV so sÃ¡nh ca khÃ³ \\
+Quy trÃ¬nh lÃ m viá»‡c & PhÃ¢n cÃ´ng module rÃµ rÃ ng, quy táº¯c review chÃ©o, cá»•ng kiá»ƒm soÃ¡t cháº¥t lÆ°á»£ng vÃ  kiá»ƒm tra thá»© tá»± template issue theo tÃ­nh xÃ¡c Ä‘á»‹nh & \texttt{docs/contribution\_matrix.md}, \texttt{.github/pull\_request\_template.md}, smoke tests, \texttt{tests/test\_issue\_template\_sort.py} \\
+Cháº¥t lÆ°á»£ng káº¿t quáº£ & So sÃ¡nh nhiá»u mÃ´ hÃ¬nh, chá»‰ sá»‘ selective, phÃ¢n tÃ­ch theo nhÃ£n vÃ  giáº£i thÃ­ch ca lá»—i & \texttt{results/scoreboard/*}, \texttt{results/nlp\_ext/syllabus\_upgrade/*}, pháº§n phÃ¢n tÃ­ch lá»—i \\
+Cháº¥t lÆ°á»£ng demo & CÃ³ cáº£ Ä‘Æ°á»ng cháº¡y CLI vÃ  UI, Ä‘áº§u vÃ o kiá»ƒm thá»­ xÃ¡c Ä‘á»‹nh, tiÃªu chÃ­ hÃ nh vi ká»³ vá»ng rÃµ rÃ ng & \texttt{docs/demo\_inputs.txt}, \texttt{docs/expected\_outputs.md}, demo Streamlit vÃ  CLI \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Mức độ phù hợp học thuật với học phần NLP}
-Dự án này hiện hiển thị nhiều ý tưởng NLP trong một hệ thống. Nó bao gồm chuẩn hóa văn bản, ánh xạ từ vựng, mã hóa thưa thớt n-gram, xử lý phạm vi phủ định, tín hiệu cấp mệnh đề, phân loại văn bản nhiều nhãn, hiệu chỉnh ngưỡng và tinh chỉnh biến áp. Nó cũng bao gồm Naive Bayes, Perceptron, đường cơ sở ngữ nghĩa chuyển tiếp nguồn cấp dữ liệu rõ ràng, tạo phẩm mô hình ngôn ngữ N-gram, đường cơ sở RNN/LSTM, thăm dò MLM và tạo phẩm ứng dụng kiểu lời nhắc LLM.
+\section{Má»©c Ä‘á»™ phÃ¹ há»£p há»c thuáº­t vá»›i há»c pháº§n NLP}
+Dá»± Ã¡n nÃ y hiá»‡n hiá»ƒn thá»‹ nhiá»u Ã½ tÆ°á»Ÿng NLP trong má»™t há»‡ thá»‘ng. NÃ³ bao gá»“m chuáº©n hÃ³a vÄƒn báº£n, Ã¡nh xáº¡ tá»« vá»±ng, mÃ£ hÃ³a thÆ°a thá»›t n-gram, xá»­ lÃ½ pháº¡m vi phá»§ Ä‘á»‹nh, tÃ­n hiá»‡u cáº¥p má»‡nh Ä‘á», phÃ¢n loáº¡i vÄƒn báº£n nhiá»u nhÃ£n, hiá»‡u chá»‰nh ngÆ°á»¡ng vÃ  tinh chá»‰nh biáº¿n Ã¡p. NÃ³ cÅ©ng bao gá»“m Naive Bayes, Perceptron, Ä‘Æ°á»ng cÆ¡ sá»Ÿ ngá»¯ nghÄ©a chuyá»ƒn tiáº¿p nguá»“n cáº¥p dá»¯ liá»‡u rÃµ rÃ ng, táº¡o pháº©m mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram, Ä‘Æ°á»ng cÆ¡ sá»Ÿ RNN/LSTM, thÄƒm dÃ² MLM vÃ  táº¡o pháº©m á»©ng dá»¥ng kiá»ƒu lá»i nháº¯c LLM.
 
-Dự án vẫn có thể sử dụng trực tiếp cho thử nghiệm dựa trên khóa học. Nó cung cấp các tạo phẩm đã lưu, số liệu có thể tái tạo, bản ghi quy trình làm việc chú thích và tập lệnh suy luận có thể triển khai. Nó cũng bao gồm một ma trận bao phủ chủ đề phù hợp cho việc bảo vệ miệng.
+Dá»± Ã¡n váº«n cÃ³ thá»ƒ sá»­ dá»¥ng trá»±c tiáº¿p cho thá»­ nghiá»‡m dá»±a trÃªn khÃ³a há»c. NÃ³ cung cáº¥p cÃ¡c táº¡o pháº©m Ä‘Ã£ lÆ°u, sá»‘ liá»‡u cÃ³ thá»ƒ tÃ¡i táº¡o, báº£n ghi quy trÃ¬nh lÃ m viá»‡c chÃº thÃ­ch vÃ  táº­p lá»‡nh suy luáº­n cÃ³ thá»ƒ triá»ƒn khai. NÃ³ cÅ©ng bao gá»“m má»™t ma tráº­n bao phá»§ chá»§ Ä‘á» phÃ¹ há»£p cho viá»‡c báº£o vá»‡ miá»‡ng.
 
-Đối với việc học trong khóa học, phiên bản cập nhật cung cấp bằng chứng mạnh mẽ hơn về sự cân bằng giữa các phương pháp tiếp cận NLP cổ điển và sâu sắc theo một mục tiêu kinh doanh và một tập dữ liệu cố định.
+Äá»‘i vá»›i viá»‡c há»c trong khÃ³a há»c, phiÃªn báº£n cáº­p nháº­t cung cáº¥p báº±ng chá»©ng máº¡nh máº½ hÆ¡n vá» sá»± cÃ¢n báº±ng giá»¯a cÃ¡c phÆ°Æ¡ng phÃ¡p tiáº¿p cáº­n NLP cá»• Ä‘iá»ƒn vÃ  sÃ¢u sáº¯c theo má»™t má»¥c tiÃªu kinh doanh vÃ  má»™t táº­p dá»¯ liá»‡u cá»‘ Ä‘á»‹nh.
 
-\section{Hạn chế và công việc trong tương lai}
-Hạn chế chính vẫn là sự mất cân bằng dữ liệu, đặc biệt là về tâm lý tiêu cực và các nhãn vấn đề hiếm gặp. Điều này ảnh hưởng đến độ chính xác và độ ổn định trong một số mô hình.
+\section{Háº¡n cháº¿ vÃ  cÃ´ng viá»‡c trong tÆ°Æ¡ng lai}
+Háº¡n cháº¿ chÃ­nh váº«n lÃ  sá»± máº¥t cÃ¢n báº±ng dá»¯ liá»‡u, Ä‘áº·c biá»‡t lÃ  vá» tÃ¢m lÃ½ tiÃªu cá»±c vÃ  cÃ¡c nhÃ£n váº¥n Ä‘á» hiáº¿m gáº·p. Äiá»u nÃ y áº£nh hÆ°á»Ÿng Ä‘áº¿n Ä‘á»™ chÃ­nh xÃ¡c vÃ  Ä‘á»™ á»•n Ä‘á»‹nh trong má»™t sá»‘ mÃ´ hÃ¬nh.
 
-Một hạn chế khác là độ sâu không đồng đều giữa các chủ đề. Mặc dù mức độ bao phủ cao nhưng một số chủ đề được thể hiện bằng các tạo phẩm nhẹ (ví dụ: các biểu thức chính quy ở mức độ bao phủ 50\% và các đầu dò MLM/LLM nhỏ gọn).
+Má»™t háº¡n cháº¿ khÃ¡c lÃ  Ä‘á»™ sÃ¢u khÃ´ng Ä‘á»“ng Ä‘á»u giá»¯a cÃ¡c chá»§ Ä‘á». Máº·c dÃ¹ má»©c Ä‘á»™ bao phá»§ cao nhÆ°ng má»™t sá»‘ chá»§ Ä‘á» Ä‘Æ°á»£c thá»ƒ hiá»‡n báº±ng cÃ¡c táº¡o pháº©m nháº¹ (vÃ­ dá»¥: cÃ¡c biá»ƒu thá»©c chÃ­nh quy á»Ÿ má»©c Ä‘á»™ bao phá»§ 50\% vÃ  cÃ¡c Ä‘áº§u dÃ² MLM/LLM nhá» gá»n).
 
-Công việc trong tương lai có thể tập trung vào chiều sâu chất lượng chứ không chỉ sự hiện diện của chủ đề. Các bước tiếp theo là: tạo tác cắt bỏ hoàn toàn cho các khối phủ định/char/từ vựng, phân nhóm lỗi phong phú hơn cho các phủ định sai, phân tích tiền xử lý tập trung vào biểu thức chính quy mạnh mẽ hơn và công cụ demo chặt chẽ hơn liên kết từng dự đoán với mô-đun đóng góp của nó.
+CÃ´ng viá»‡c trong tÆ°Æ¡ng lai cÃ³ thá»ƒ táº­p trung vÃ o chiá»u sÃ¢u cháº¥t lÆ°á»£ng chá»© khÃ´ng chá»‰ sá»± hiá»‡n diá»‡n cá»§a chá»§ Ä‘á». CÃ¡c bÆ°á»›c tiáº¿p theo lÃ : táº¡o tÃ¡c cáº¯t bá» hoÃ n toÃ n cho cÃ¡c khá»‘i phá»§ Ä‘á»‹nh/char/tá»« vá»±ng, phÃ¢n nhÃ³m lá»—i phong phÃº hÆ¡n cho cÃ¡c phá»§ Ä‘á»‹nh sai, phÃ¢n tÃ­ch tiá»n xá»­ lÃ½ táº­p trung vÃ o biá»ƒu thá»©c chÃ­nh quy máº¡nh máº½ hÆ¡n vÃ  cÃ´ng cá»¥ demo cháº·t cháº½ hÆ¡n liÃªn káº¿t tá»«ng dá»± Ä‘oÃ¡n vá»›i mÃ´-Ä‘un Ä‘Ã³ng gÃ³p cá»§a nÃ³.
 
-\section{Phần kết luận}
-Công việc này trình bày một quy trình đánh giá-hiểu biết hoàn chỉnh bao gồm phân loại tình cảm, trích xuất vấn đề và mở rộng dựa trên máy biến áp. Mô hình thưa thớt nhận biết ngữ cảnh cổ điển cung cấp hành vi tiêu cực đầu tiên mạnh mẽ, trong khi phần mở rộng biến áp cải thiện độ chính xác và độ chắc chắn theo ngữ cảnh trong các trường hợp được chọn. Trích xuất vấn đề đa nhãn chuyển đổi kết quả cảm tính thành các danh mục vấn đề có liên quan đến hoạt động. Khối mở rộng giáo trình bao gồm các đường cơ sở cổ điển, mô hình ngôn ngữ N-gram, RNN/LSTM, thăm dò MLM và các tạo phẩm nhắc nhở LLM mà không đưa ra dữ liệu được gắn nhãn mới. Với bộ tạo tác hiện tại, dự án thể hiện khả năng tái tạo và độ bao phủ giáo trình ước tính là 94,3\%.
+\section{Pháº§n káº¿t luáº­n}
+CÃ´ng viá»‡c nÃ y trÃ¬nh bÃ y má»™t quy trÃ¬nh Ä‘Ã¡nh giÃ¡-hiá»ƒu biáº¿t hoÃ n chá»‰nh bao gá»“m phÃ¢n loáº¡i tÃ¬nh cáº£m, trÃ­ch xuáº¥t váº¥n Ä‘á» vÃ  má»Ÿ rá»™ng dá»±a trÃªn mÃ¡y biáº¿n Ã¡p. MÃ´ hÃ¬nh thÆ°a thá»›t nháº­n biáº¿t ngá»¯ cáº£nh cá»• Ä‘iá»ƒn cung cáº¥p hÃ nh vi tiÃªu cá»±c Ä‘áº§u tiÃªn máº¡nh máº½, trong khi pháº§n má»Ÿ rá»™ng biáº¿n Ã¡p cáº£i thiá»‡n Ä‘á»™ chÃ­nh xÃ¡c vÃ  Ä‘á»™ cháº¯c cháº¯n theo ngá»¯ cáº£nh trong cÃ¡c trÆ°á»ng há»£p Ä‘Æ°á»£c chá»n. TrÃ­ch xuáº¥t váº¥n Ä‘á» Ä‘a nhÃ£n chuyá»ƒn Ä‘á»•i káº¿t quáº£ cáº£m tÃ­nh thÃ nh cÃ¡c danh má»¥c váº¥n Ä‘á» cÃ³ liÃªn quan Ä‘áº¿n hoáº¡t Ä‘á»™ng. Khá»‘i má»Ÿ rá»™ng giÃ¡o trÃ¬nh bao gá»“m cÃ¡c Ä‘Æ°á»ng cÆ¡ sá»Ÿ cá»• Ä‘iá»ƒn, mÃ´ hÃ¬nh ngÃ´n ngá»¯ N-gram, RNN/LSTM, thÄƒm dÃ² MLM vÃ  cÃ¡c táº¡o pháº©m nháº¯c nhá»Ÿ LLM mÃ  khÃ´ng Ä‘Æ°a ra dá»¯ liá»‡u Ä‘Æ°á»£c gáº¯n nhÃ£n má»›i. Vá»›i bá»™ táº¡o tÃ¡c hiá»‡n táº¡i, dá»± Ã¡n thá»ƒ hiá»‡n kháº£ nÄƒng tÃ¡i táº¡o vÃ  Ä‘á»™ bao phá»§ giÃ¡o trÃ¬nh Æ°á»›c tÃ­nh lÃ  94,3\%.
 
 \clearpage
-\section*{Tài liệu tham khảo}
-\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\section*{TÃ i liá»‡u tham kháº£o}
+\addcontentsline{toc}{section}{TÃ i liá»‡u tham kháº£o}
 \begin{thebibliography}{99}
 
 \bibitem{jurafsky2026}
@@ -802,105 +824,111 @@ Selective Classification for Deep Neural Networks.
 \end{thebibliography}
 
 \clearpage
-\section*{Phụ lục A: Số liệu tình cảm}
-\addcontentsline{toc}{section}{Phụ lục A: Hình kết quả cảm xúc}
+\section*{Phá»¥ lá»¥c A: Sá»‘ liá»‡u tÃ¬nh cáº£m}
+\addcontentsline{toc}{section}{Phá»¥ lá»¥c A: HÃ¬nh káº¿t quáº£ cáº£m xÃºc}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/01_rating_distribution.png}}
-\caption{Phân phối xếp hạng trong dữ liệu nguồn}
+\caption{PhÃ¢n phá»‘i xáº¿p háº¡ng trong dá»¯ liá»‡u nguá»“n}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/06_f1_vs_k.png}}
-\caption{Xác thực F1 bằng Chi-square top K}
+\caption{XÃ¡c thá»±c F1 báº±ng Chi-square top K}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/06_recall0_vs_k.png}}
-\caption{Thu hồi xác thực cho lớp âm theo top K}
+\caption{Thu há»“i xÃ¡c thá»±c cho lá»›p Ã¢m theo top K}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/06b_recall0_by_variant.png}}
-\caption{Kiểm tra việc thu hồi lớp phủ định bằng biến thể NLP cổ điển}
+\caption{Kiá»ƒm tra viá»‡c thu há»“i lá»›p phá»§ Ä‘á»‹nh báº±ng biáº¿n thá»ƒ NLP cá»• Ä‘iá»ƒn}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/06b_precision0_by_variant.png}}
-\caption{Kiểm tra độ chính xác cho lớp phủ định bằng biến thể NLP cổ điển}
+\caption{Kiá»ƒm tra Ä‘á»™ chÃ­nh xÃ¡c cho lá»›p phá»§ Ä‘á»‹nh báº±ng biáº¿n thá»ƒ NLP cá»• Ä‘iá»ƒn}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/09_prob_hist_test_strong.png}}
-\caption{Biểu đồ xác suất mô hình cổ điển trên tập kiểm tra mạnh}
+\caption{Biá»ƒu Ä‘á»“ xÃ¡c suáº¥t mÃ´ hÃ¬nh cá»• Ä‘iá»ƒn trÃªn táº­p kiá»ƒm tra máº¡nh}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/dm2_steps/10_threshold_tradeoff.png}}
-\caption{Sự đánh đổi ngưỡng mô hình cổ điển cho mức độ phù hợp và thu hồi}
+\caption{Sá»± Ä‘Ã¡nh Ä‘á»•i ngÆ°á»¡ng mÃ´ hÃ¬nh cá»• Ä‘iá»ƒn cho má»©c Ä‘á»™ phÃ¹ há»£p vÃ  thu há»“i}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/nlp_confusion_matrix.png}}
-\caption{Ma trận nhầm lẫn máy biến áp trên bộ thử nghiệm}
+\caption{Ma tráº­n nháº§m láº«n mÃ¡y biáº¿n Ã¡p trÃªn bá»™ thá»­ nghiá»‡m}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/nlp_prob_hist_test.png}}
-\caption{Biểu đồ xác suất máy biến áp trên tập thử nghiệm}
+\caption{Biá»ƒu Ä‘á»“ xÃ¡c suáº¥t mÃ¡y biáº¿n Ã¡p trÃªn táº­p thá»­ nghiá»‡m}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/nlp_threshold_tradeoff.png}}
-\caption{Sự đánh đổi ngưỡng máy biến áp để phủ sóng và thu hồi}
+\caption{Sá»± Ä‘Ã¡nh Ä‘á»•i ngÆ°á»¡ng mÃ¡y biáº¿n Ã¡p Ä‘á»ƒ phá»§ sÃ³ng vÃ  thu há»“i}
 \end{figure}
 
 \clearpage
-\section*{Phụ lục B: Số liệu trích xuất vấn đề}
-\addcontentsline{toc}{section}{Phụ lục B: Hình kết quả trích xuất vấn đề}
+\section*{Phá»¥ lá»¥c B: Sá»‘ liá»‡u trÃ­ch xuáº¥t váº¥n Ä‘á»}
+\addcontentsline{toc}{section}{Phá»¥ lá»¥c B: HÃ¬nh káº¿t quáº£ trÃ­ch xuáº¥t váº¥n Ä‘á»}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/issue_steps/02_label_frequency.png}}
-\caption{Tần suất phát hành nhãn trong bộ chú thích thủ công}
+\caption{Táº§n suáº¥t phÃ¡t hÃ nh nhÃ£n trong bá»™ chÃº thÃ­ch thá»§ cÃ´ng}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/issue_steps/02_per_label_f1.png}}
-\caption{Mỗi nhãn F1 cho mô hình trích xuất vấn đề từ}
+\caption{Má»—i nhÃ£n F1 cho mÃ´ hÃ¬nh trÃ­ch xuáº¥t váº¥n Ä‘á» tá»«}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/issue_steps_char_demo/02_per_label_f1.png}}
-\caption{Mỗi nhãn F1 cho mô hình trích xuất vấn đề từ cộng với char}
+\caption{Má»—i nhÃ£n F1 cho mÃ´ hÃ¬nh trÃ­ch xuáº¥t váº¥n Ä‘á» tá»« cá»™ng vá»›i char}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/issue_transformer/nlp_issue_transformer_per_label_f1.png}}
+\caption{Per-label F1 cho mÃ´ hÃ¬nh issue transformer multi-label cáº¥p Ä‘á»™ level 4}
 \end{figure}
 
 \clearpage
-\section*{Phụ lục C: Số liệu nâng cấp giáo trình}
-\addcontentsline{toc}{section}{Phụ lục C: Hình kết quả nâng cấp học phần}
+\section*{Phá»¥ lá»¥c C: Sá»‘ liá»‡u nÃ¢ng cáº¥p giÃ¡o trÃ¬nh}
+\addcontentsline{toc}{section}{Phá»¥ lá»¥c C: HÃ¬nh káº¿t quáº£ nÃ¢ng cáº¥p há»c pháº§n}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_recall0.png}}
-\caption{Nhớ lại bài kiểm tra\_0 trên các cơ sở giáo trình được bổ sung}
+\caption{Nhá»› láº¡i bÃ i kiá»ƒm tra\_0 trÃªn cÃ¡c cÆ¡ sá»Ÿ giÃ¡o trÃ¬nh Ä‘Æ°á»£c bá»• sung}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{\detokenize{results/nlp_ext/syllabus_upgrade/nlp_syllabus_bench_f2.png}}
-\caption{Kiểm tra F2\_0 trên các cơ sở giáo trình bổ sung}
+\caption{Kiá»ƒm tra F2\_0 trÃªn cÃ¡c cÆ¡ sá»Ÿ giÃ¡o trÃ¬nh bá»• sung}
 \end{figure}
 
 
@@ -911,3 +939,4 @@ Selective Classification for Deep Neural Networks.
 \end{figure}
 
 \end{document}
+

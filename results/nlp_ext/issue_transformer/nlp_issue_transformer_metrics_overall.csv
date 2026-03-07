@@ -1,0 +1,3 @@
+model,split,micro_f1,macro_f1,subset_accuracy,hamming_loss,label_cardinality_true,label_cardinality_pred
+transformer_multilabel,val,0.6412961567445365,0.19648544773047302,0.523,0.10577777777777778,1.067,1.587
+transformer_multilabel,test,0.6463627546071775,0.1878024414924206,0.551,0.10127777777777777,1.07,1.5075
