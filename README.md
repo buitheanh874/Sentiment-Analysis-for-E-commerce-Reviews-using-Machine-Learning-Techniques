@@ -94,7 +94,7 @@ python -m src.issue_steps predict --text "good but slow delivery"
 python demo_transformer.py "not bad at all"
 
 # UI demo (optional)
-streamlit run demo_app.py.
+streamlit run demo_app.py
 ```
 
 Demo smoke inputs and expected behavior:
