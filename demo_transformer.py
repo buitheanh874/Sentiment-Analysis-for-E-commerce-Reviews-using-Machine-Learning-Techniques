@@ -211,7 +211,7 @@ def interactive_mode(tokenizer, model):
         "This is amazing!",
         "Terrible experience",
         "not good, not bad",
-        "not bad at all!",
+        "not bad !",
         "good but late delivery",
     ]
     
