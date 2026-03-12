@@ -59,7 +59,7 @@
 \begin{titlepage}
 \centering
 \vspace*{0.1cm}
-\includegraphics[width=0.7\textwidth]{\detokenize{results/dm2_steps/01_rating_distribution.png}}\par
+\includegraphics[width=0.7\textwidth]{\detokenize{D:/Code/NLP_code/p01_chart1.png}}\par
 \vspace{1.0cm}
 {\LARGE\bfseries\color{primaryblue} Sentiment Analysis for E-commerce Reviews\par}
 \vspace{0.3cm}
@@ -140,6 +140,8 @@ Rating & Count \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:rating_distribution} confirms an extreme long-tail sentiment distribution in raw e-commerce reviews. Rating 5 alone accounts for roughly 84.1\% of all rows, while rating 1 and 2 together account for about 9.3\%. This imbalance explains why accuracy-only evaluation is insufficient and why the project prioritizes negative-class recall and F2. It also justifies the decision to keep rating 3 as an uncertainty set instead of forcing it into hard supervision.
+
 Strong-label sentiment rows (ratings 1,2,4,5) total 149,139, with 14,199 negatives and 134,940 positives.
 
 \subsection{Observed Language Noise}
@@ -168,6 +170,8 @@ other & 15,960 & 0.8400 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The issue distribution in Table \ref{tab:issue_freq} is even more skewed than sentiment labels: \texttt{other} dominates at 84.0\%, and several actionable labels remain below 1.0\% prevalence. This creates a high risk that naive models appear strong on aggregate metrics while missing operationally important minority issues. Therefore, macro-F1, per-label F1, and per-label threshold tuning are necessary to avoid majority-label bias in deployment decisions.
 
 \section{Text Processing Design}
 \subsection{Normalization}
@@ -242,6 +246,8 @@ K & Class weight & Precision\_0 & Recall\_0 & F2\_0 & Accuracy \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:chi2_k} shows a monotonic quality gain as feature dimension increases from 1,000 to 10,000. Precision\_0 improves from 0.555 to 0.621 and F2\_0 rises from 0.806 to 0.850, while recall\_0 stays high across all settings. This pattern indicates that larger sparse vocabularies mainly improve false-positive control on the negative class without sacrificing triage sensitivity.
+
 \subsection{Variant Comparison}
 Table \ref{tab:classic_variants} reports test performance for engineered variants. V6 is the selected main model.
 
@@ -266,6 +272,7 @@ V7 & 5,000 & w10 & 0.657 & 0.927 & 0.857 \\
 \end{table}
 
 Compared with dummy sentiment baselines (\texttt{dummy\_most\_frequent}: \texttt{F2\_0=0.000}, \texttt{dummy\_stratified}: \texttt{F2\_0=0.092}), the selected V6 model (\texttt{F2\_0=0.867}) shows a large practical margin on the negative class objective.
+Within the non-dummy family, V6 also gives the best balance: it achieves the highest precision\_0 (0.677) while retaining recall\_0 above 0.93, outperforming nearby variants V5 and V7 on F2\_0. This suggests that the joint use of word+character TF-IDF plus negation modeling contributes complementary signals rather than redundant complexity.
 
 \subsection{Threshold and Uncertainty Behavior}
 For V6, the recommended threshold band is 0.40/0.60. Table \ref{tab:classic_threshold} shows sensitivity to threshold movement.
@@ -286,6 +293,8 @@ Thresholds & Coverage & Sel. precision\_0 & Sel. recall\_0 & Sel. F2\_0 \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:classic_threshold} reveals a controlled precision-recall trade-off as thresholds move upward. Increasing the positive-decision band improves selective recall\_0 (0.956 to 0.970) but reduces selective precision\_0 (0.730 to 0.646), while coverage remains stable around 0.88--0.89. This stability is valuable for operations because policy adjustments can tune risk profile without large throughput disruption.
+
 \section{Results for Transformer NLP Extension}
 \subsection{Transformer Metrics}
 Table \ref{tab:tf_metrics} summarizes transformer sentiment metrics.
@@ -304,6 +313,8 @@ Test & 0.966 & 0.981 & 0.799 & 0.853 & 0.842 & 0.910 \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:tf_metrics} indicates strong generalization consistency: validation and test metrics are closely aligned, with no sign of major overfitting in one-epoch fine-tuning. Compared to the classic model, transformer improves negative precision materially (0.799 vs 0.677) but reduces negative recall (0.853 vs 0.932). This means transformer is better at avoiding false alarms, while classic V6 remains better at catching risky negative cases under the project’s triage-first objective.
+
 \subsection{Transformer Threshold Sweep}
 \begin{table}[H]
 \centering
@@ -320,6 +331,8 @@ Thresholds & Coverage & Sel. precision\_0 & Sel. recall\_0 & Sel. F2\_0 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Table \ref{tab:tf_threshold} shows the transformer selective curve is relatively flat, with coverage near 0.91 across all tested bands and only small F2\_0 movement (0.843 to 0.847). This suggests the model is calibration-stable in the evaluated range and can be tuned conservatively without destabilizing decision volume.
 
 \subsection{Hard-case Comparison}
 Saved hard-case probes show complementary behavior. For \textit{not bad} and \textit{good but late delivery}, the classic model predicts negative while the transformer predicts positive. For very short tokens (\textit{gr8}, \textit{thx}, \textit{idk}), both systems route to uncertain due to short-text policy.
@@ -346,6 +359,7 @@ Dummy label prior (test) & 0.809 & 0.101 & 0.811 & 0.0438 \\
 \end{table}
 
 Dummy baselines rank high on micro-F1 and subset accuracy because they almost always predict the dominant \texttt{other} label; macro-F1 exposes that they fail on minority issue labels.
+From Table \ref{tab:issue_overall}, OVR Logistic is preferred for balanced production utility: it leads micro-F1 and subset accuracy among non-dummy models, while LinearSVM offers slightly better macro-F1. The blend does not beat both parents, implying that simple averaging is not sufficient under the current label imbalance and would require stronger routing or calibration logic.
 
 \subsection{Per-label Improvement}
 Table \ref{tab:issue_delta} compares per-label F1 between SVM and Logistic on test.
@@ -371,6 +385,8 @@ other & 0.911 & 0.911 & +0.001 \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:issue_delta} highlights where SVM helps versus hurts. The largest gain is on \texttt{fraud\_scam} (+0.241), followed by \texttt{value\_price} (+0.056), indicating better separation on specific sparse semantic cues. However, Logistic remains better on \texttt{customer\_service}, \texttt{refund\_return}, and \texttt{product\_quality}, which are critical support labels; this is why the main pipeline keeps Logistic as default and uses SVM as a comparator rather than replacement.
+
 \subsection{Threshold Strategy in Multi-label Setting}
 The tuned per-label thresholds for the main \texttt{ovr\_logreg} pipeline are shown in Table \ref{tab:issue_thresholds}. Lower thresholds are assigned to rare labels to improve recall, while \texttt{fraud\_scam} and \texttt{other} are kept more conservative.
 
@@ -394,6 +410,8 @@ other & 0.30 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Threshold values in Table \ref{tab:issue_thresholds} encode an explicit policy: rare but important labels are granted low activation cutoffs (0.10--0.15) to reduce missed incidents, while high-risk false-positive channels are constrained with higher cutoffs (\texttt{fraud\_scam}=0.50, \texttt{other}=0.30). This per-label asymmetry is more realistic than a global threshold and better aligned with downstream ticketing workflows.
 
 \section{Results for Syllabus Upgrade Package}
 \subsection{Classic Baselines for Core Course Algorithms}
@@ -419,6 +437,8 @@ ffnn\_mlp\_svd & 0.730 & 0.799 & 0.742 \\
 \end{tabular}
 \end{table}
 
+Table \ref{tab:syllabus_baselines} provides a clear algorithmic trade-off map for defense: Complement NB maximizes recall\_0 (0.952) but with weak precision\_0 (0.510), while LinearSVM gives high precision\_0 (0.789) at lower recall\_0. The best negative-class balance under F2 is achieved by logistic regression (\texttt{F2\_0=0.862}), which supports its role as the primary classic baseline in this project.
+
 \subsection{Selective Behavior in the Added Baselines}
 \begin{table}[H]
 \centering
@@ -436,6 +456,8 @@ sgd\_log\_loss\_selective & 0.863 & 0.696 & 0.959 & 0.892 \\
 \end{tabular}
 \end{table}
 
+Selective results in Table \ref{tab:syllabus_selective} show that \texttt{logreg\_l2\_selective} remains strongest on Sel.\ F2\_0 (0.903), combining high Sel.\ recall\_0 (0.946) with solid precision\_0 (0.763). Complement NB still reaches the highest Sel.\ recall\_0 (0.963) but precision collapses, confirming it is suitable only when maximum capture is prioritized over review workload.
+
 \subsection{N-Gram Language Model Results}
 \begin{table}[H]
 \centering
@@ -450,6 +472,8 @@ Bigram add-k & 358.59 & 363.08 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Table \ref{tab:ngram_ppl} confirms expected language-model behavior: bigram consistently outperforms unigram on both validation and test perplexity. On test data, perplexity drops from 378.02 to 363.08 (about 3.95\% relative reduction), showing that even short review texts benefit from one-step context modeling. This provides concrete evidence for the course N-gram component beyond classification metrics.
 
 \subsection{Updated Course-Fit Matrix}
 Table \ref{tab:course_fit} reports the topic-coverage matrix generated from current artifacts. The mean coverage is \textbf{94.3\%}.
@@ -480,6 +504,8 @@ Applications of LLMs & 90 \\
 \end{tabular}
 \end{table}
 
+The matrix in Table \ref{tab:course_fit} indicates strong breadth across core topics, with most items at 100\%. Remaining gaps are concentrated in \textit{Regular Expressions} (50\%) and partly in \textit{Vector Semantics and Embeddings} (80\%), so these are the highest-impact targets if the team wants to further improve academic completeness without changing dataset scope.
+
 \section{Classic Versus Transformer Discussion}
 On sentiment classification, transformer improves overall accuracy and negative precision (0.799 vs 0.677), while classic V6 remains stronger on negative recall (0.932 vs 0.853) and F2\_0 (0.867 vs 0.842). Under the same threshold band (0.40/0.60), transformer yields higher selective precision but lower selective recall than classic.
 
@@ -501,6 +527,7 @@ transformer\_multilabel & 0.646 & 0.188 & 0.551 & 0.1013 \\
 \end{table}
 
 Relative to pure transformer on this fair split, the classic issue model gains +0.146 micro-F1 and +0.340 macro-F1.
+Table \ref{tab:issue_fair} also shows that hybrid routing recovers part of the transformer gap but remains clearly below the classic model, especially on macro-F1 where minority-label handling is critical. This suggests transformer issue modeling is not yet data-efficient enough under current annotation volume and should be treated as an auxiliary component until label support increases or architecture is adapted.
 
 \section{Error Analysis and Failure Modes}
 The evaluation-rigor package records 1,454 sentiment misclassified rows (194 false negatives for class 0, 1,260 false positives for class 0). Dominant false-positive categories are negation patterns (49.8\%), other mixed contexts (32.4\%), and contrast patterns (10.4\%). Dominant false-negative categories are other contexts (52.1\%), short text (23.2\%), and negation patterns (14.4\%).
