@@ -2,29 +2,18 @@
 
 ## Preconditions
 - Activate venv.
-- Ensure artifacts exist from:
-  - `python -m src.issue_steps train ... --max_performance`
-  - `python -m src.run_all ...`
+- Install dependencies from `requirements.txt` and `requirements-optional.txt`.
 
-## Fast CLI Demo (Recommended)
+## Demo Command (Tests Only)
 ```bash
-python demo.py "great product and fast delivery" "terrible quality, broke after two days" "not bad at all"
-python -m src.issue_steps predict --text "card not working and support did not help"
-python demo_transformer.py "good but late shipping"
+python -m pytest D:\Code\NLP_code\tests\test_smoke_cli.py -q
 ```
 
-## Optional UI Demo
+## Backup Command (Focused Smoke)
 ```bash
-streamlit run demo_app.py
-```
-
-## Backup Commands (if one component fails)
-```bash
-python -m src.dm2_steps 11 --text "idk" --data_path data/Gift_Cards.jsonl
-python -m src.issue_steps predict --text "idk if this is worth the price"
+python -m pytest tests/test_smoke_cli.py -q
 ```
 
 ## Expected Direction
-- Strong positive text -> `Positive`
-- Clear complaint text -> `Negative`/`Needs attention` + issue labels
-- Very short/ambiguous text -> `Uncertain` (fallback-safe)
+- The test run should collect and execute test cases from `tests/`.
+- Smoke tests should pass and end with exit code `0`.

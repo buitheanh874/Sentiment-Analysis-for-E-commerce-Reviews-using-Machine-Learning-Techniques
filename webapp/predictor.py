@@ -24,6 +24,16 @@ LABEL_PRIORITY = {
     "POSITIVE": 1,
 }
 
+ISSUE_TAG_TO_LABEL = {
+    "shipping": "delivery_shipping",
+    "quality": "product_quality",
+    "packaging": "product_quality",
+    "service": "customer_service",
+    "usability": "usability",
+    "value": "value_price",
+    "general": "other",
+}
+
 
 def _base_dir() -> Path:
     return Path(__file__).resolve().parents[1]
@@ -73,6 +83,53 @@ def summarize_issue_labels(result: Dict[str, Any]) -> str:
     if fallback:
         return ", ".join(fallback)
     return "-"
+
+
+def _resolve_issue_labels(result: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Resolve issue labels for UI:
+    - Keep trained labels when they are specific.
+    - If trained output is only `other` but rule-based tags contain a specific issue,
+      prefer the specific issue labels for clearer demo behavior.
+    """
+    issue_rows = result.get("issue_labels", [])
+    fallback_tags = [str(tag).strip().lower() for tag in result.get("issue_tags", []) if str(tag).strip()]
+
+    trained_labels = [str(row.get("label", "")).strip() for row in issue_rows]
+    has_specific_trained = any(label and label != "other" for label in trained_labels)
+
+    mapped_rule_labels: List[str] = []
+    for tag in fallback_tags:
+        mapped = ISSUE_TAG_TO_LABEL.get(tag)
+        if mapped and mapped not in mapped_rule_labels:
+            mapped_rule_labels.append(mapped)
+
+    # Keep trained output if it already has specific labels.
+    if has_specific_trained:
+        return issue_rows
+
+    # Only override if there is at least one specific rule label (not just "other").
+    specific_rule_labels = [label for label in mapped_rule_labels if label != "other"]
+    if not specific_rule_labels:
+        return issue_rows
+
+    other_conf = 0.75
+    if issue_rows:
+        best_other = max(
+            [to_float(row.get("confidence")) for row in issue_rows if str(row.get("label", "")).strip() == "other"],
+            default=None,
+        )
+        if best_other is not None:
+            other_conf = max(0.55, min(0.95, float(best_other) - 0.05))
+
+    return [
+        {
+            "label": label,
+            "confidence": float(other_conf),
+            "threshold": 0.5,
+        }
+        for label in specific_rule_labels
+    ]
 
 
 def build_risk_score(label: str, probability: Optional[float]) -> float:
@@ -156,7 +213,18 @@ def build_attention_queue(classic_df: pd.DataFrame) -> List[Dict[str, Any]]:
         return []
     queue = queue.sort_values(["risk_score", "classic_probability"], ascending=[False, True], na_position="last")
     queue = queue[["text", "classic_label", "classic_probability", "issue_summary", "risk_score"]].head(20)
-    return queue.to_dict(orient="records")
+
+    # FastAPI/JSON strict serialization rejects NaN, so normalize NaN -> None.
+    if "classic_probability" in queue.columns:
+        queue["classic_probability"] = queue["classic_probability"].where(
+            pd.notna(queue["classic_probability"]),
+            None,
+        )
+
+    records = queue.to_dict(orient="records")
+    for row in records:
+        row["classic_probability"] = to_float(row.get("classic_probability"))
+    return records
 
 
 def _parse_texts(raw_texts: List[str]) -> List[str]:
@@ -240,9 +308,12 @@ def analyze_reviews(raw_texts: List[str], include_transformer: bool = False) -> 
             meta,
             issue_bundle=issue_bundle,
         )
+        resolved_issue_rows = _resolve_issue_labels(classic_result)
+        classic_result["issue_labels"] = resolved_issue_rows
+
         classic_probability = to_float(classic_result.get("probability"))
         classic_label = str(classic_result.get("label", "N/A"))
-        issue_rows = classic_result.get("issue_labels", [])
+        issue_rows = resolved_issue_rows
         fallback_tags = classic_result.get("issue_tags", [])
 
         row = {

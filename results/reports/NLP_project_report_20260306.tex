@@ -97,7 +97,7 @@ Khuong Bao Duc & 22BA13077 \\
 \newpage
 \renewcommand{\abstractname}{\Large\bfseries\color{primaryblue} Abstract}
 \begin{abstract}
-This report rewrites the project paper in strict alignment with the current repository state (commit \texttt{d9c7e6f}) while preserving a formal NLP paper structure. The project addresses three tasks: binary sentiment classification with uncertainty control, multi-label issue extraction, and transformer-based extension. The source corpus contains 152,410 reviews; the issue annotation set contains 19,000 rows. In classic sentiment, variant V6 (word 1--2 + char 3--5 + negation, class weight w10) reaches test \texttt{precision\_0=0.677}, \texttt{recall\_0=0.932}, and \texttt{F2\_0=0.867}, with selective coverage 0.885 under threshold band 0.40/0.60. The transformer sentiment extension reaches \texttt{accuracy=0.966}, \texttt{precision\_0=0.799}, \texttt{recall\_0=0.853}, and \texttt{F2\_0=0.842}, with coverage 0.910. For issue extraction on the 3,800-row split, OVR Logistic reaches \texttt{micro-F1=0.780} and \texttt{macro-F1=0.387}, OVR LinearSVM reaches \texttt{micro-F1=0.771} and \texttt{macro-F1=0.405}, while dummy labelset baselines show high micro-F1 (\texttt{0.809}) but very low macro-F1 (\texttt{0.101}) due to majority-label dominance. The no-new-data upgrade package adds syllabus baselines, n-gram language modeling, evaluation-rigor artifacts, and transformer issue-routing experiments. All quantitative statements are sourced from saved files under \texttt{results/}.
+This report presents a consolidated NLP study in formal academic structure. The project addresses three tasks: binary sentiment classification with uncertainty control, multi-label issue extraction, and transformer-based extension. The source corpus contains 152,410 reviews; the issue annotation set contains 19,000 rows. In classic sentiment, variant V6 (word 1--2 + char 3--5 + negation, class weight w10) reaches test \texttt{precision\_0=0.677}, \texttt{recall\_0=0.932}, and \texttt{F2\_0=0.867}, with selective coverage 0.885 under threshold band 0.40/0.60. The transformer sentiment extension reaches \texttt{accuracy=0.966}, \texttt{precision\_0=0.799}, \texttt{recall\_0=0.853}, and \texttt{F2\_0=0.842}, with coverage 0.910. For issue extraction on the 3,800-row split, OVR Logistic reaches \texttt{micro-F1=0.780} and \texttt{macro-F1=0.387}, OVR LinearSVM reaches \texttt{micro-F1=0.771} and \texttt{macro-F1=0.405}, while dummy labelset baselines show high micro-F1 (\texttt{0.809}) but very low macro-F1 (\texttt{0.101}) due to majority-label dominance. The no-new-data upgrade package adds syllabus baselines, n-gram language modeling, evaluation-rigor artifacts, and transformer issue-routing experiments. All quantitative statements are sourced from saved experiment artifacts under \texttt{results/}.
 \end{abstract}
 
 \tableofcontents
@@ -107,7 +107,17 @@ This report rewrites the project paper in strict alignment with the current repo
 \section{Introduction}
 User reviews are short, noisy, and often mix praise and complaints in the same sentence. This project treats review understanding as a complete NLP pipeline problem rather than a single classifier benchmark \cite{jurafsky2026,turney2002}. The system is designed for practical support triage where missing negative feedback has higher operational risk than over-flagging.
 
-The paper is rewritten to follow the established course report format while synchronizing every reported metric with current artifacts in the repository. The scope is constrained to no-new-data upgrades: modeling, evaluation, calibration, and analysis improvements are performed on existing data only.
+\subsection{Project Goals}
+The first goal is to build a sentiment analysis pipeline that can distinguish negative and positive reviews while handling uncertain cases more carefully than a standard hard classifier. The second goal is to move beyond coarse sentiment and extract concrete issue categories that can support downstream service action. The third goal is to compare classic sparse NLP with transformer-based contextual modeling under the same review domain.
+
+\subsection{Target Users and Customers}
+The primary target users are customer-support teams, operations teams, and product analysts working with large volumes of e-commerce feedback. A secondary target group is instructors and students in an NLP course setting, where the project can be used as a case study of how text classification, uncertainty handling, multi-label learning, and transformer extensions connect within one applied problem.
+
+From an application perspective, the problem carries clear operational pain points. First, manual reading at scale is expensive and slow, so urgent negative cases can be buried among large volumes of positive comments. Second, a coarse positive/negative decision is not enough for action: support teams still need explicit issue types such as delivery, redemption, refund, or fraud signals. Third, short and ambiguous reviews create decision risk, where forcing hard labels can increase both false alarms and missed complaints.
+
+These constraints motivate a design that goes beyond single-model accuracy. The project emphasizes recall-sensitive evaluation for risky negative cases, explicit issue extraction for downstream handling, and uncertainty-aware outputs for low-information texts. This framing links NLP model choices directly to practical service quality and response time.
+
+The scope is constrained to no-new-data upgrades: modeling, evaluation, calibration, and analysis improvements are performed on existing data only.
 
 \section{NLP Problem Definition}
 \subsection{Task A: Sentiment Understanding}
@@ -203,7 +213,7 @@ The classic sentiment backbone is Logistic Regression. Class-weight modes are se
 Issue extraction uses calibrated one-vs-rest Logistic Regression with per-label threshold tuning. One-vs-rest LinearSVM and a probability-level blend (\texttt{ovr\_blend\_lr\_svm}) are retained as strong classical comparators. Two dummy baselines (\texttt{dummy\_labelset\_majority}, \texttt{dummy\_label\_prior}) are also reported as sanity checks. Current train configuration includes per-label class-weight search and sigmoid calibration (CV=3).
 
 \subsection{Transformer Extension}
-The transformer extension uses HuggingFace sequence-classification fine-tuning (default base family: DistilBERT in current scripts). It is evaluated with the same threshold-band policy to enable direct comparison with classic selective behavior.
+The transformer extension uses HuggingFace sequence-classification fine-tuning (default base family: DistilBERT in this setup). It is evaluated with the same threshold-band policy to enable direct comparison with classic selective behavior.
 
 \section{Experimental Setup}
 \subsection{Split and Protocol}
@@ -216,7 +226,7 @@ For sentiment, main metrics are \texttt{accuracy}, \texttt{F1}, \texttt{precisio
 Selective classification uses a threshold band \([t_{low}, t_{high}]\). Samples with probability inside the band are marked uncertain; remaining samples are covered decisions. Reported selective metrics include coverage, selective precision\_0, selective recall\_0, selective F2\_0, and covered false-negative rate \cite{geifman2017}.
 
 \section{No-New-Data Syllabus Upgrade Package}
-The upgrade package extends the project without collecting new data. Major additions in the current codebase are:
+The upgrade package extends the project without collecting new data. Major components in the current experimental package are:
 \begin{enumerate}
 \item Issue Level-3 enhancements: per-label class-weight search, probability calibration, threshold stability diagnostics.
 \item Issue Level-4 transformer baseline and hybrid routing with capped route rate.
@@ -535,9 +545,9 @@ The evaluation-rigor package records 1,454 sentiment misclassified rows (194 fal
 Pairwise significance tests against baseline comparators show positive deltas for V6 (for example recall\_0 +0.063 vs multinomial NB, +0.085 vs LinearSVM), but p-values remain above 0.05 in this run, so gains are treated as directional rather than statistically confirmed.
 
 \section{Practical Value for NLP Course}
-The project now provides a full, reproducible course artifact chain: cleaned datasets, stepwise scripts, saved models, threshold analyses, uncertainty policy, transformer extension, and evaluation-rigor outputs. This supports both engineering deployment discussion and academic defense requirements.
+The project now provides a full, reproducible course artifact chain: cleaned datasets, stepwise experimental outputs, saved models, threshold analyses, uncertainty policy, transformer extension, and evaluation-rigor outputs. This supports both engineering deployment discussion and academic defense requirements.
 
-The upgraded syllabus package strengthens mapping to core course topics while preserving the same data budget, making the project suitable for methodology-focused assessment. Based on measurable repository artifacts, the latest rubric assessment estimates 18.04/20 (90.2\%) and syllabus-topic coverage 94.3\%.
+The upgraded syllabus package strengthens mapping to core course topics while preserving the same data budget, making the project suitable for methodology-focused assessment. Based on measurable experimental artifacts, the latest rubric assessment estimates 18.04/20 (90.2\%) and syllabus-topic coverage 94.3\%.
 
 \section{Limitations and Future Work}
 Main limitations are class imbalance, high dominance of the \texttt{other} issue label, and weak transformer multi-label performance under current small-split fine-tuning. Error taxonomy also shows persistent sensitivity to negation and mixed-contrast sentences.
@@ -545,7 +555,7 @@ Main limitations are class imbalance, high dominance of the \texttt{other} issue
 Future work should prioritize calibration-aware ensembling, better contextual augmentation without new labels, and lightweight sequence models for issue extraction that preserve interpretability.
 
 \section{Conclusion}
-This rewritten paper aligns report structure and quantitative claims with the current codebase. The main production model for sentiment is still the classic V6 variant because it optimizes negative recall/F2 under project policy. Transformer sentiment provides stronger precision and overall accuracy, and remains valuable for complementary analysis. For issue extraction, calibrated classic OVR models remain the strongest option in the current repository state. The no-new-data upgrade package substantially improves academic completeness, reproducibility, and course-topic coverage.
+This report summarizes model structure and quantitative findings in one consistent analysis. The main production model for sentiment is still the classic V6 variant because it optimizes negative recall/F2 under project policy. Transformer sentiment provides stronger precision and overall accuracy, and remains valuable for complementary analysis. For issue extraction, calibrated classic OVR models remain the strongest option in the current experiments. The no-new-data upgrade package substantially improves academic completeness, reproducibility, and course-topic coverage.
 
 \clearpage
 \section*{References}

@@ -46,9 +46,8 @@
 
 ## Slide 9 - Demo (8:20-9:20)
 - Live demo order:
-  1. `demo.py` (classic sentiment)
-  2. `python -m src.issue_steps predict ...`
-  3. `streamlit run demo_app.py` (if UI mode allowed)
+  1. `python -m pytest tests/test_smoke_cli.py -q`
+  2. Show one failing/edge case if available, then rerun to green.
 
 ## Slide 10 - Conclusion & Q/A (9:20-10:00)
 - Project achieves strong practical NLP coverage and reproducibility.

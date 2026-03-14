@@ -1,4 +1,5 @@
 const BATCH_SIZE = 80;
+const PREDICT_CHUNK_SIZE = 20;
 
 const ISSUE_LABELS = [
   { key: "delivery_shipping", label: "Delivery & Shipping", color: "#f29d38" },
@@ -32,6 +33,12 @@ const dom = {
   datasetReviewsFeed: document.getElementById("dataset-reviews-feed"),
   runSampleFromLeftBtn: document.getElementById("run-sample-from-left"),
   writeReviewBtn: document.getElementById("write-review-btn"),
+  reviewComposePanel: document.getElementById("review-compose-panel"),
+  reviewComposeRating: document.getElementById("review-compose-rating"),
+  reviewComposeText: document.getElementById("review-compose-text"),
+  reviewComposeError: document.getElementById("review-compose-error"),
+  reviewComposeSubmit: document.getElementById("review-compose-submit"),
+  reviewComposeCancel: document.getElementById("review-compose-cancel"),
   runMessage: document.getElementById("run-message"),
   summaryPanel: document.getElementById("summary-panel"),
   distributionPanel: document.getElementById("distribution-panel"),
@@ -52,6 +59,14 @@ let catalogItems = [];
 let datasetReviews = [];
 let datasetSource = "";
 let currentBatchRows = [];
+
+function emptyIssueFlags() {
+  const flags = {};
+  ISSUE_LABELS.forEach((item) => {
+    flags[item.key] = 0;
+  });
+  return flags;
+}
 
 function setMessage(text, isError = false) {
   if (!dom.runMessage) return;
@@ -271,6 +286,51 @@ function renderStatus(status) {
     .join("");
 }
 
+function setComposeError(text = "") {
+  if (!dom.reviewComposeError) return;
+  if (!text) {
+    dom.reviewComposeError.textContent = "";
+    dom.reviewComposeError.classList.add("hidden");
+    return;
+  }
+  dom.reviewComposeError.textContent = text;
+  dom.reviewComposeError.classList.remove("hidden");
+}
+
+function closeComposePanel(resetFields = false) {
+  if (!dom.reviewComposePanel) return;
+  dom.reviewComposePanel.classList.add("hidden");
+  setComposeError("");
+  if (resetFields) {
+    if (dom.reviewComposeText) dom.reviewComposeText.value = "";
+    if (dom.reviewComposeRating) dom.reviewComposeRating.value = "5";
+  }
+}
+
+function openComposePanel() {
+  if (!dom.reviewComposePanel) return;
+  dom.reviewComposePanel.classList.remove("hidden");
+  setComposeError("");
+  if (dom.reviewComposeText) {
+    dom.reviewComposeText.focus();
+  }
+}
+
+function prependManualReview(text, rating) {
+  const row = {
+    id: `manual_${Date.now()}`,
+    rating: normalizedRating(rating),
+    text: String(text || "").trim(),
+    issue_flags: emptyIssueFlags(),
+  };
+
+  if (!row.text) return false;
+  datasetSource = datasetSource || "manual_input";
+  datasetReviews = [row, ...datasetReviews];
+  currentBatchRows = [row, ...currentBatchRows].slice(0, BATCH_SIZE);
+  return true;
+}
+
 function niceNameFromFile(fileName, index) {
   const base = String(fileName || "").replace(/\.[^.]+$/, "");
   if (!base) return `Recommended Item ${index + 1}`;
@@ -483,6 +543,11 @@ function buildFallbackPredictions(rows) {
       issue_summary: issueSummary,
       issue_count: issueCount,
       risk_score: Math.max(0, (6 - rating) * 70 + issueCount * 18),
+      transformer_label: null,
+      transformer_probability: null,
+      transformer_confidence: null,
+      transformer_reason: null,
+      agreement: null,
     };
   });
 }
@@ -519,6 +584,39 @@ function issueRowsFromBatch(rows) {
       share,
     };
   }).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+}
+
+function mergeDatasetIssueHints(predictions, sourceRows) {
+  if (!Array.isArray(predictions) || !Array.isArray(sourceRows) || !predictions.length) {
+    return predictions || [];
+  }
+
+  return predictions.map((row, idx) => {
+    const source = sourceRows[idx];
+    if (!source) return row;
+
+    const sourceFlags = normalizeIssueFlags(source);
+    const sourceSummary = issueSummaryFromFlags(sourceFlags);
+    if (!sourceSummary || sourceSummary === "-") {
+      return row;
+    }
+
+    const currentSummary = String(row.issue_summary || "-").trim();
+    if (currentSummary && currentSummary !== "-") {
+      return row;
+    }
+
+    const sourceIssueCount = activeIssueKeys(sourceFlags).length;
+    const existingReason = String(row.fallback_reason || "-");
+    const nextReason = existingReason && existingReason !== "-" ? existingReason : "dataset_issue_hint";
+
+    return {
+      ...row,
+      issue_summary: sourceSummary,
+      issue_count: sourceIssueCount,
+      fallback_reason: nextReason,
+    };
+  });
 }
 
 function renderKpis(summary) {
@@ -625,8 +723,70 @@ async function fetchCatalog() {
   renderRecommendedProducts(catalogItems);
 }
 
+function nonEmptyTextsFromRows(rows) {
+  return rows.map((row) => String(row.text || "").trim()).filter(Boolean);
+}
+
+async function requestPredictChunk(chunkRows) {
+  const texts = nonEmptyTextsFromRows(chunkRows);
+  if (!texts.length) {
+    return { predictions: [], status: null };
+  }
+
+  const response = await fetch("/api/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texts, include_transformer: false }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || `Prediction request failed (${response.status}).`);
+  }
+
+  const predictions = Array.isArray(data.predictions) ? data.predictions : [];
+  if (predictions.length !== texts.length) {
+    throw new Error("Prediction response size mismatch.");
+  }
+
+  return { predictions, status: data.status || null };
+}
+
+async function predictRowsRobust(rows) {
+  const mergedPredictions = [];
+  const errors = [];
+  let apiStatus = null;
+  let fallbackChunks = 0;
+  let chunkCount = 0;
+
+  for (let i = 0; i < rows.length; i += PREDICT_CHUNK_SIZE) {
+    const chunkRows = rows.slice(i, i + PREDICT_CHUNK_SIZE);
+    if (!chunkRows.length) continue;
+    chunkCount += 1;
+    try {
+      const chunkResult = await requestPredictChunk(chunkRows);
+      mergedPredictions.push(...chunkResult.predictions);
+      if (!apiStatus && chunkResult.status) {
+        apiStatus = chunkResult.status;
+      }
+    } catch (error) {
+      fallbackChunks += 1;
+      errors.push(error.message || String(error));
+      mergedPredictions.push(...buildFallbackPredictions(chunkRows));
+    }
+  }
+
+  return {
+    predictions: mergedPredictions,
+    status: apiStatus,
+    fallbackChunks,
+    chunkCount,
+    errors,
+  };
+}
+
 async function analyzeCurrentBatch() {
-  const texts = currentBatchRows.map((row) => String(row.text || "").trim()).filter(Boolean);
+  const texts = nonEmptyTextsFromRows(currentBatchRows);
   if (!texts.length) {
     currentPredictions = [];
     renderBatchReviewFeed([]);
@@ -637,23 +797,19 @@ async function analyzeCurrentBatch() {
 
   try {
     setMessage(`Analyzing ${texts.length} reviews from current batch...`);
-    const response = await fetch("/api/predict", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ texts, include_transformer: false }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || "Prediction request failed.");
-
-    currentPredictions = Array.isArray(data.predictions) ? data.predictions : [];
+    const result = await predictRowsRobust(currentBatchRows);
+    currentPredictions = result.predictions;
     if (!currentPredictions.length) {
       currentPredictions = buildFallbackPredictions(currentBatchRows);
     }
+    currentPredictions = mergeDatasetIssueHints(currentPredictions, currentBatchRows);
 
     const issueRows = issueRowsFromBatch(currentBatchRows);
-    const summary = data.summary || buildSummaryFromPredictions(currentPredictions);
+    const summary = buildSummaryFromPredictions(currentPredictions);
 
-    renderStatus(data.status || {});
+    if (result.status) {
+      renderStatus(result.status);
+    }
     renderKpis(summary);
     renderCustomerSay(summary, issueRows);
     renderBatchReviewFeed(currentPredictions);
@@ -661,10 +817,24 @@ async function analyzeCurrentBatch() {
     renderSingleReviewAnalysis(null);
 
     if (dom.mismatchNote) {
-      dom.mismatchNote.textContent = "Click Analyze on each review card to inspect detail.";
+      if (result.fallbackChunks === 0) {
+        dom.mismatchNote.textContent = "Click Analyze on each review card to inspect detail.";
+      } else if (result.fallbackChunks >= result.chunkCount) {
+        dom.mismatchNote.textContent = "Fallback mode from labeled dataset";
+      } else {
+        dom.mismatchNote.textContent = `Partial fallback: ${result.fallbackChunks}/${result.chunkCount} chunks`;
+      }
     }
     showAnalyticsPanels(true);
-    setMessage(`Done. Current batch analyzed: ${texts.length} reviews.`);
+    if (result.fallbackChunks === 0) {
+      setMessage(`Done. Current batch analyzed: ${texts.length} reviews.`);
+    } else {
+      const firstError = result.errors[0] || "unknown error";
+      setMessage(
+        `Done with fallback on ${result.fallbackChunks}/${result.chunkCount} chunks. First error: ${firstError}`,
+        true
+      );
+    }
   } catch (error) {
     currentPredictions = buildFallbackPredictions(currentBatchRows);
     const issueRows = issueRowsFromBatch(currentBatchRows);
@@ -709,8 +879,53 @@ function attachEvents() {
     setMessage("Refreshing current batch...");
     await fetchReviewPool();
   });
+
   dom.writeReviewBtn?.addEventListener("click", () => {
+    const panelIsOpen = dom.reviewComposePanel && !dom.reviewComposePanel.classList.contains("hidden");
+    if (panelIsOpen) {
+      closeComposePanel(false);
+      return;
+    }
+    openComposePanel();
+  });
+
+  dom.reviewComposeCancel?.addEventListener("click", () => {
+    closeComposePanel(true);
+  });
+
+  dom.reviewComposeSubmit?.addEventListener("click", async () => {
+    const text = String(dom.reviewComposeText?.value || "").trim();
+    const rating = normalizedRating(dom.reviewComposeRating?.value || 5);
+
+    if (text.length < 6) {
+      setComposeError("Please write at least 6 characters.");
+      return;
+    }
+
+    const inserted = prependManualReview(text, rating);
+    if (!inserted) {
+      setComposeError("Could not add this review. Please try again.");
+      return;
+    }
+
+    closeComposePanel(true);
+    refreshRatingPanels();
+    renderDatasetReviewFeed(datasetReviews);
+    renderOpsPieChart(currentBatchRows);
+    await analyzeCurrentBatch();
     dom.reviewsFeed?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setMessage("Review added and analyzed in current batch.");
+  });
+
+  dom.reviewComposeText?.addEventListener("keydown", async (event) => {
+    if (event.key === "Escape") {
+      closeComposePanel(false);
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+      event.preventDefault();
+      dom.reviewComposeSubmit?.click();
+    }
   });
 }
 

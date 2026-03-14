@@ -65,7 +65,7 @@ def build_assessment() -> Dict[str, object]:
     content_checks = [
         ("readme", _exists(ROOT / "README.md"), 0.16),
         ("run_all_pipeline", _exists(ROOT / "src" / "run_all.py"), 0.16),
-        ("demo_scripts", _exists(ROOT / "demo.py") and _exists(ROOT / "demo_transformer.py"), 0.14),
+        ("demo_tests", _exists(ROOT / "tests" / "test_smoke_cli.py"), 0.14),
         ("scoreboard", _exists(RESULTS_DIR / "scoreboard" / "model_scoreboard.csv"), 0.16),
         ("report_pdf", _exists(RESULTS_DIR / "reports" / "NLP_project_report_20260306.pdf"), 0.12),
         ("smoke_tests", _exists(ROOT / "tests" / "test_smoke_cli.py"), 0.12),
@@ -96,13 +96,11 @@ def build_assessment() -> Dict[str, object]:
         ("eval_rigor_significance", _exists(RESULTS_DIR / "nlp_ext" / "syllabus_upgrade" / "nlp_eval_significance.csv"), 0.15),
     ]
     demo_checks = [
-        ("demo_cli", _exists(ROOT / "demo.py"), 0.20),
-        ("demo_transformer", _exists(ROOT / "demo_transformer.py"), 0.15),
-        ("demo_ui", _exists(ROOT / "demo_app.py"), 0.20),
-        ("demo_inputs", _exists(ROOT / "docs" / "demo_inputs.txt"), 0.15),
+        ("demo_test_entry", _exists(ROOT / "tests" / "test_smoke_cli.py"), 0.45),
+        ("demo_inputs", _exists(ROOT / "docs" / "demo_inputs.txt"), 0.20),
         ("expected_outputs", _exists(ROOT / "docs" / "expected_outputs.md"), 0.15),
         ("demo_runbook", _exists(ROOT / "docs" / "demo_runbook.md"), 0.10),
-        ("demo_recording", _exists(ROOT / "docs" / "demo_recording.mp4"), 0.05),
+        ("demo_recording", _exists(ROOT / "docs" / "demo_recording.mp4"), 0.10),
     ]
 
     # Weighted estimate from observable artifacts only.

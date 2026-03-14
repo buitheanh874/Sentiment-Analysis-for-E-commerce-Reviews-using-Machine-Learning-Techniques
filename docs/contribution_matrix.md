@@ -12,7 +12,7 @@ This matrix defines clear module ownership and required cross-review.
 | Chuong | Multi-label issue extraction (`src/issue_steps`) | Training/inference updates, per-label metrics |
 | Duc | Transformer extension (`src/nlp_ext`, `demo_transformer.py`) | Fine-tuning pipeline, threshold/coverage analysis |
 | Tuan | Reports and benchmark synthesis (`results/reports`, syllabus outputs) | Final tables, citation consistency, summary integrity |
-| Tung | Product demo integration (`demo.py`, `demo_app.py`) | User-facing flow, fallback behavior, demo readiness |
+| Tung | Demo/test integration (`tests/test_smoke_cli.py`, demo runbook) | Reproducible demo flow, fallback behavior, demo readiness |
 
 ## Cross-Review Rules
 

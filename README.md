@@ -119,49 +119,42 @@ python scripts/build_issue_fair_comparison.py
 python scripts/build_rubric_syllabus_assessment.py
 ```
 
-## Run the System
+Runtime note:
+- On CPU-only environments, use `--fast_mode` for transformer training.
+- Full transformer fine-tuning can exceed 20 minutes depending on machine.
 
-CLI demo:
-
-```bash
-python demo.py "great product and fast shipping" "terrible experience, support never replied"
-```
-
-Issue prediction:
+## Demo
 
 ```bash
+# CLI sentiment demo
+python demo.py "great product!" "terrible experience"
+
+# Issue inference demo
 python -m src.issue_steps predict --text "good but slow delivery"
-```
 
-Transformer demo:
-
-```bash
+# Transformer demo (optional model/deps)
 python demo_transformer.py "not bad at all"
-```
 
-## Deploy the Demo
-
-Streamlit UI:
-
-```bash
+# UI demo (optional)
 streamlit run demo_app.py
-```
 
-FastAPI app:
-
-```bash
+# FastAPI + Web UI (recommended)
 python -m uvicorn webapp.main:app --reload
+# then open http://127.0.0.1:8000
 ```
 
-Then open `http://127.0.0.1:8000`.
+Demo smoke inputs and expected behavior:
 
-Available API endpoints:
+- `docs/demo_inputs.txt`
+- `docs/expected_outputs.md`
+
+FastAPI endpoints:
 
 - `GET /api/health`
 - `GET /api/status?include_transformer=false`
 - `POST /api/predict`
 
-Example request body:
+Example request body for `POST /api/predict`:
 
 ```json
 {
@@ -173,13 +166,26 @@ Example request body:
 }
 ```
 
-## Main Submission Outputs
+## Rubric Alignment Artifacts
 
-- report PDF: `results/reports/NLP_project_report_20260306.pdf`
-- scoreboard tables: `results/scoreboard/`
-- classic sentiment outputs: `results/dm2_steps/`
-- issue extraction outputs: `results/issue_steps/`
-- transformer and extension outputs: `results/nlp_ext/`
+- Rubric-to-evidence map: `docs/rubric_checklist.md`
+- Team process and cross-review matrix: `docs/contribution_matrix.md`
+- 10-minute presentation script: `docs/presentation_10min_script.md`
+- Demo runbook: `docs/demo_runbook.md`
+- PR quality gate template: `.github/pull_request_template.md`
+- Unified metrics table:
+  - `results/scoreboard/model_scoreboard.csv`
+  - `results/scoreboard/model_scoreboard.md`
+
+## Main Outputs
+
+- `results/dm2_steps/`: classic sentiment artifacts.
+- `results/issue_steps/`: multi-label issue metrics and plots.
+- `results/nlp_ext/`: transformer and syllabus-upgrade outputs.
+- `results/nlp_ext/syllabus_upgrade/nlp_ablation.csv`: ablation results for classic variants.
+- `results/reports/`: project reports (EN + VI).
+- `models/`: trained artifacts used by demos.
+- `*/_run_metadata/`: per-command run metadata JSON (args, git commit, status, duration).
 
 ## Testing
 

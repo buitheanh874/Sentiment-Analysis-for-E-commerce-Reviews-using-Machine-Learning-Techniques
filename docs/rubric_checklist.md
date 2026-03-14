@@ -6,7 +6,7 @@ This file maps grading criteria to concrete, reproducible project evidence.
 
 - Reproducible commands: [`README.md`](/d:/Code/NLP_code/README.md)
 - End-to-end runner: [`src/run_all.py`](/d:/Code/NLP_code/src/run_all.py)
-- Demo commands: [`demo.py`](/d:/Code/NLP_code/demo.py), [`demo_transformer.py`](/d:/Code/NLP_code/demo_transformer.py), [`demo_app.py`](/d:/Code/NLP_code/demo_app.py)
+- Demo command (tests-only): `python -m pytest D:\Code\NLP_code\tests\test_smoke_cli.py -q`
 - Presentation script: [`docs/presentation_10min_script.md`](/d:/Code/NLP_code/docs/presentation_10min_script.md)
 - Demo runbook: [`docs/demo_runbook.md`](/d:/Code/NLP_code/docs/demo_runbook.md)
 - Unified metrics table: `python scripts/build_scoreboard.py`
@@ -50,8 +50,8 @@ This file maps grading criteria to concrete, reproducible project evidence.
 
 ## 5) Demo Quality
 
-- CLI demo inputs and expected behavior:
+- Test-based demo inputs and expected behavior:
   - [`docs/demo_inputs.txt`](/d:/Code/NLP_code/docs/demo_inputs.txt)
   - [`docs/expected_outputs.md`](/d:/Code/NLP_code/docs/expected_outputs.md)
-- Interactive demo app:
-  - [`demo_app.py`](/d:/Code/NLP_code/demo_app.py)
+- Smoke test entry:
+  - [`tests/test_smoke_cli.py`](/d:/Code/NLP_code/tests/test_smoke_cli.py)

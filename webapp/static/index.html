@@ -10,7 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="/static/styles.css?v=20260312m" />
+  <link rel="stylesheet" href="/static/styles.css?v=20260314a" />
 </head>
 <body>
   <header class="site-header">
@@ -144,6 +144,28 @@
           <h3>Review this product</h3>
           <p class="muted">Share your thoughts with other customers.</p>
           <button id="write-review-btn" class="outline-btn" type="button">Write a customer review</button>
+          <div id="review-compose-panel" class="review-compose-panel hidden" aria-live="polite">
+            <label for="review-compose-rating">Rating</label>
+            <select id="review-compose-rating">
+              <option value="5">5 stars</option>
+              <option value="4">4 stars</option>
+              <option value="3">3 stars</option>
+              <option value="2">2 stars</option>
+              <option value="1">1 star</option>
+            </select>
+            <label for="review-compose-text">Your review</label>
+            <textarea
+              id="review-compose-text"
+              rows="4"
+              maxlength="1200"
+              placeholder="Example: Delivery was late but support resolved it quickly."
+            ></textarea>
+            <p id="review-compose-error" class="compose-error hidden"></p>
+            <div class="compose-actions">
+              <button id="review-compose-submit" class="prime-btn" type="button">Submit review</button>
+              <button id="review-compose-cancel" class="outline-btn" type="button">Cancel</button>
+            </div>
+          </div>
         </article>
 
         <article id="issues-panel" class="card hidden">
@@ -184,16 +206,6 @@
           <div id="reviews-feed" class="reviews-feed current-batch-feed">
             <p class="muted">Loading current batch reviews...</p>
           </div>
-          <section id="dataset-reviews-block" class="dataset-reviews-block">
-            <div class="row-between">
-              <h3>Historical reviews from dataset</h3>
-              <span id="dataset-review-count" class="muted"></span>
-            </div>
-            <p id="dataset-review-source" class="muted"></p>
-            <div id="dataset-reviews-feed" class="reviews-feed dataset-reviews-feed">
-              <p class="muted">Loading dataset reviews...</p>
-            </div>
-          </section>
         </article>
       </section>
 
@@ -222,7 +234,7 @@
     </section>
   </main>
 
-  <script src="/static/app.js?v=20260312m"></script>
+  <script src="/static/app.js?v=20260314b"></script>
 </body>
 </html>
 

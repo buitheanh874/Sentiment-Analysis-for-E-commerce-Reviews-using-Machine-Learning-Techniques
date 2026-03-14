@@ -10,7 +10,7 @@ Tai lieu nay doi chieu truc tiep voi rubric cham diem va chi ra minh chung can s
 | Y nghia du an (4) | Van de thuc te + so lieu minh chung | Manh | Bang phan bo rating, metrics triage negative-first, issue extraction |
 | Qua trinh lam viec (4) | Phan cong module, hieu biet cheo, commit/review cheo | Can bo sung minh chung quy trinh | phan **Team Workflow and Quality Assurance** trong report + anh commit/review tu repo git goc |
 | Ket qua (4) | Quy trinh chuan, nhieu metrics, so sanh nhieu mo hinh, giai thich sai | Manh sau khi bo sung bang error case cu the | phan ket qua V0-V7, transformer, syllabus bench, bang `nlp_error_cases` |
-| Demo (4) | UI/UX tot, thanh phan tron tru, ket qua tot | Da co ban UI + fallback CLI | `demo_app.py`, `demo.py`, `demo_transformer.py` |
+| Demo (4) | Quy trinh chay on dinh, ket qua ro rang, de tai lap | Da co demo theo test + fallback CLI | `tests/`, `demo.py`, `demo_transformer.py` |
 
 ## 2) Cac diem can lam ngay truoc bao ve
 
@@ -19,10 +19,10 @@ Tai lieu nay doi chieu truc tiep voi rubric cham diem va chi ra minh chung can s
    - Screenshot commit graph.
    - 2-3 PR/review comments cheo.
    - 1 bang phan cong module theo thanh vien.
-3. Chay thu demo UI:
-   - `streamlit run demo_app.py`
-   - test 3 case: positive, negative + issue, uncertain.
-4. Chuan bi file backup demo CLI neu UI gap loi:
+3. Chay thu demo theo test:
+   - `python -m pytest tests/test_smoke_cli.py -q`
+   - test 3 huong: positive, negative + issue, uncertain.
+4. Chuan bi file backup demo CLI neu test gap loi:
    - `python demo.py "good but late delivery"`
    - `python demo_transformer.py "not bad"`
 
