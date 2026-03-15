@@ -28,9 +28,6 @@ const dom = {
   customerSayText: document.getElementById("customer-say-text"),
   customerSayTags: document.getElementById("customer-say-tags"),
   reviewsFeed: document.getElementById("reviews-feed"),
-  datasetReviewCount: document.getElementById("dataset-review-count"),
-  datasetReviewSource: document.getElementById("dataset-review-source"),
-  datasetReviewsFeed: document.getElementById("dataset-reviews-feed"),
   runSampleFromLeftBtn: document.getElementById("run-sample-from-left"),
   writeReviewBtn: document.getElementById("write-review-btn"),
   reviewComposePanel: document.getElementById("review-compose-panel"),
@@ -54,19 +51,10 @@ const dom = {
   singleReviewContent: document.getElementById("single-review-content"),
 };
 
-let currentPredictions = [];
 let catalogItems = [];
 let datasetReviews = [];
-let datasetSource = "";
 let currentBatchRows = [];
-
-function emptyIssueFlags() {
-  const flags = {};
-  ISSUE_LABELS.forEach((item) => {
-    flags[item.key] = 0;
-  });
-  return flags;
-}
+let currentPredictions = [];
 
 function setMessage(text, isError = false) {
   if (!dom.runMessage) return;
@@ -74,16 +62,39 @@ function setMessage(text, isError = false) {
   dom.runMessage.style.color = isError ? "#a4371f" : "";
 }
 
-function formatProb(value) {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return "N/A";
+function setComposeError(text = "") {
+  if (!dom.reviewComposeError) return;
+  if (!text) {
+    dom.reviewComposeError.textContent = "";
+    dom.reviewComposeError.classList.add("hidden");
+    return;
   }
-  return Number(value).toFixed(3);
+  dom.reviewComposeError.textContent = text;
+  dom.reviewComposeError.classList.remove("hidden");
 }
 
-function labelPill(label) {
-  const normalized = String(label || "").toLowerCase();
-  return `<span class="pill ${normalized}">${label || "N/A"}</span>`;
+function closeComposePanel(resetFields = false) {
+  if (!dom.reviewComposePanel) return;
+  dom.reviewComposePanel.classList.add("hidden");
+  setComposeError("");
+  if (!resetFields) return;
+  if (dom.reviewComposeText) dom.reviewComposeText.value = "";
+  if (dom.reviewComposeRating) dom.reviewComposeRating.value = "5";
+}
+
+function openComposePanel() {
+  if (!dom.reviewComposePanel) return;
+  dom.reviewComposePanel.classList.remove("hidden");
+  setComposeError("");
+  dom.reviewComposeText?.focus();
+}
+
+function emptyIssueFlags() {
+  const flags = {};
+  ISSUE_LABELS.forEach((item) => {
+    flags[item.key] = 0;
+  });
+  return flags;
 }
 
 function normalizedRating(raw) {
@@ -97,11 +108,11 @@ function starText(count) {
 }
 
 function starCountFromLabel(label, prob) {
-  const currentLabel = String(label || "");
-  if (currentLabel === "POSITIVE") return 5;
-  if (currentLabel === "NEGATIVE") return 1;
-  if (currentLabel === "NEEDS_ATTENTION") return 2;
-  if (currentLabel === "UNCERTAIN") return 3;
+  const normalized = String(label || "");
+  if (normalized === "POSITIVE") return 5;
+  if (normalized === "NEGATIVE") return 1;
+  if (normalized === "NEEDS_ATTENTION") return 2;
+  if (normalized === "UNCERTAIN") return 3;
   if (prob === null || prob === undefined || Number.isNaN(Number(prob))) return 3;
   return Math.max(1, Math.min(5, Math.round(Number(prob) * 5)));
 }
@@ -114,14 +125,28 @@ function sentimentFromRating(rating) {
   return "NEGATIVE";
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function labelPill(label) {
+  const normalized = String(label || "").toLowerCase();
+  return `<span class="pill ${normalized}">${label || "N/A"}</span>`;
+}
+
 function normalizeIssueFlags(row) {
   const source = row?.issue_flags || {};
-  const flags = {};
+  const normalized = {};
   ISSUE_LABELS.forEach((item) => {
     const raw = source[item.key] ?? row?.[item.key] ?? 0;
-    flags[item.key] = Number(raw) >= 1 ? 1 : 0;
+    normalized[item.key] = Number(raw) >= 1 ? 1 : 0;
   });
-  return flags;
+  return normalized;
 }
 
 function activeIssueKeys(issueFlags) {
@@ -150,7 +175,7 @@ function issueCountsFromRows(rows) {
 }
 
 function totalIssueHits(counts) {
-  return ISSUE_LABELS.reduce((acc, item) => acc + Number(counts[item.key] || 0), 0);
+  return ISSUE_LABELS.reduce((total, item) => total + Number(counts[item.key] || 0), 0);
 }
 
 function renderOpsPieChart(rows) {
@@ -235,6 +260,7 @@ function renderProductRating(summary) {
 
 function renderRatingBars(summary) {
   if (!dom.ratingBars || !dom.distributionBars) return;
+
   const data = summary || { count: 0, starCounts: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } };
   const total = data.count || 1;
   const ordered = [5, 4, 3, 2, 1];
@@ -274,6 +300,7 @@ function renderStatus(status) {
     ["Transformer", status?.transformer?.message ?? "disabled"],
     ["Model Timestamp", modelInfo.trained_at ?? "N/A"],
   ];
+
   dom.statusStrip.innerHTML = cards
     .map(
       ([label, value]) => `
@@ -284,51 +311,6 @@ function renderStatus(status) {
     `
     )
     .join("");
-}
-
-function setComposeError(text = "") {
-  if (!dom.reviewComposeError) return;
-  if (!text) {
-    dom.reviewComposeError.textContent = "";
-    dom.reviewComposeError.classList.add("hidden");
-    return;
-  }
-  dom.reviewComposeError.textContent = text;
-  dom.reviewComposeError.classList.remove("hidden");
-}
-
-function closeComposePanel(resetFields = false) {
-  if (!dom.reviewComposePanel) return;
-  dom.reviewComposePanel.classList.add("hidden");
-  setComposeError("");
-  if (resetFields) {
-    if (dom.reviewComposeText) dom.reviewComposeText.value = "";
-    if (dom.reviewComposeRating) dom.reviewComposeRating.value = "5";
-  }
-}
-
-function openComposePanel() {
-  if (!dom.reviewComposePanel) return;
-  dom.reviewComposePanel.classList.remove("hidden");
-  setComposeError("");
-  if (dom.reviewComposeText) {
-    dom.reviewComposeText.focus();
-  }
-}
-
-function prependManualReview(text, rating) {
-  const row = {
-    id: `manual_${Date.now()}`,
-    rating: normalizedRating(rating),
-    text: String(text || "").trim(),
-    issue_flags: emptyIssueFlags(),
-  };
-
-  if (!row.text) return false;
-  datasetSource = datasetSource || "manual_input";
-  datasetReviews = [row, ...datasetReviews];
-  currentBatchRows = [row, ...currentBatchRows].slice(0, BATCH_SIZE);
-  return true;
 }
 
 function niceNameFromFile(fileName, index) {
@@ -380,14 +362,13 @@ function renderRecommendedProducts(items) {
     .map((item, idx) => {
       const price = itemPriceVnd(item, idx).toLocaleString("vi-VN");
       const rating = itemRating(item, idx);
-      const ratingStars = starText(Math.round(rating));
       return `
       <article class="recommended-card">
         <p class="recommended-badge">${escapeHtml(itemBadge(item))}</p>
         <img src="${item.url}" alt="${item.name}" />
         <p class="recommended-title">${escapeHtml(itemDisplayName(item, idx))}</p>
         <p class="recommended-meta">${escapeHtml(itemSubtitle(item))}</p>
-        <p class="recommended-rating">${ratingStars} ${rating.toFixed(1)}</p>
+        <p class="recommended-rating">${starText(Math.round(rating))} ${rating.toFixed(1)}</p>
         <p class="recommended-price">VND ${price}</p>
       </article>
       `;
@@ -397,6 +378,7 @@ function renderRecommendedProducts(items) {
 
 function renderProductGallery(items) {
   if (!dom.mainProductImage || !dom.productThumbGrid) return;
+
   if (!items.length) {
     dom.mainProductImage.src =
       "data:image/svg+xml;charset=UTF-8," +
@@ -429,7 +411,7 @@ function renderProductGallery(items) {
       if (!url) return;
       dom.mainProductImage.src = url;
       dom.mainProductImage.alt = name || "Product image";
-      thumbs.forEach((x) => x.classList.remove("active"));
+      thumbs.forEach((node) => node.classList.remove("active"));
       thumb.classList.add("active");
     });
   });
@@ -442,24 +424,9 @@ function reviewHeadline(label) {
   return "Uncertain sentiment, manual check needed";
 }
 
-function sourceFileName(pathValue) {
-  const path = String(pathValue || "");
-  if (!path) return "";
-  const parts = path.split(/[\\/]/);
-  return parts[parts.length - 1] || path;
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 function renderSingleReviewAnalysis(row, displayIndex = 0) {
   if (!dom.singleReviewContent || !dom.singleReviewHint) return;
+
   if (!row) {
     dom.singleReviewHint.textContent =
       "Click Analyze on a review card to inspect prediction details for that exact review.";
@@ -515,47 +482,9 @@ function renderBatchReviewFeed(rows) {
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
       const idx = Number(button.getAttribute("data-review-index"));
-      const selected = displayedRows[idx];
-      renderSingleReviewAnalysis(selected, idx + 1);
+      renderSingleReviewAnalysis(displayedRows[idx], idx + 1);
     });
   });
-}
-
-function renderDatasetReviewFeed(rows) {
-  if (!dom.datasetReviewsFeed || !dom.datasetReviewCount || !dom.datasetReviewSource) return;
-  const shownRows = rows.slice(0, 1000);
-  const sourceName = sourceFileName(datasetSource);
-  dom.datasetReviewSource.textContent = sourceName
-    ? `Source dataset: ${sourceName}`
-    : "Source dataset: not found";
-  dom.datasetReviewCount.textContent = `${shownRows.length} shown / ${rows.length} loaded`;
-
-  if (!shownRows.length) {
-    dom.datasetReviewsFeed.innerHTML = `<p class="muted">No dataset reviews available.</p>`;
-    return;
-  }
-
-  dom.datasetReviewsFeed.innerHTML = shownRows
-    .map((row, idx) => {
-      const stars = normalizedRating(row.rating);
-      const reviewId = row.id ? String(row.id) : `row_${idx + 1}`;
-      return `
-      <article class="review-card">
-        <div class="review-head">
-          <div class="review-head-main">
-            <div class="avatar">D${idx + 1}</div>
-            <div>
-              <p class="review-title">Historical customer review</p>
-              <p class="review-meta">CSV id: ${escapeHtml(reviewId)}</p>
-            </div>
-          </div>
-        </div>
-        <p class="review-stars">${starText(stars)} <span class="review-meta">${stars} / 5</span></p>
-        <p class="review-text">${escapeHtml(row.text || "")}</p>
-      </article>
-      `;
-    })
-    .join("");
 }
 
 function buildFallbackPredictions(rows) {
@@ -563,7 +492,6 @@ function buildFallbackPredictions(rows) {
     const rating = normalizedRating(row.rating);
     const label = sentimentFromRating(rating);
     const flags = normalizeIssueFlags(row);
-    const issueSummary = issueSummaryFromFlags(flags);
     const issueCount = activeIssueKeys(flags).length;
     return {
       text: row.text || "",
@@ -571,7 +499,7 @@ function buildFallbackPredictions(rows) {
       classic_probability: rating / 5,
       classic_confidence: "Dataset",
       fallback_reason: "dataset_seed",
-      issue_summary: issueSummary,
+      issue_summary: issueSummaryFromFlags(flags),
       issue_count: issueCount,
       risk_score: Math.max(0, (6 - rating) * 70 + issueCount * 18),
       transformer_label: null,
@@ -592,6 +520,7 @@ function buildSummaryFromPredictions(rows) {
     uncertain: 0,
     positive: 0,
   };
+
   rows.forEach((row) => {
     const label = String(row.classic_label || "");
     if (label === "NEGATIVE") summary.negative += 1;
@@ -599,6 +528,7 @@ function buildSummaryFromPredictions(rows) {
     else if (label === "UNCERTAIN") summary.uncertain += 1;
     else if (label === "POSITIVE") summary.positive += 1;
   });
+
   summary.flagged = summary.negative + summary.needs_attention;
   return summary;
 }
@@ -606,6 +536,7 @@ function buildSummaryFromPredictions(rows) {
 function issueRowsFromBatch(rows) {
   const counts = issueCountsFromRows(rows);
   const total = totalIssueHits(counts);
+
   return ISSUE_LABELS.map((item) => {
     const count = Number(counts[item.key] || 0);
     const share = total > 0 ? Number((count / total).toFixed(3)) : 0;
@@ -628,30 +559,23 @@ function mergeDatasetIssueHints(predictions, sourceRows) {
 
     const sourceFlags = normalizeIssueFlags(source);
     const sourceSummary = issueSummaryFromFlags(sourceFlags);
-    if (!sourceSummary || sourceSummary === "-") {
-      return row;
-    }
+    if (!sourceSummary || sourceSummary === "-") return row;
 
     const currentSummary = String(row.issue_summary || "-").trim();
-    if (currentSummary && currentSummary !== "-") {
-      return row;
-    }
-
-    const sourceIssueCount = activeIssueKeys(sourceFlags).length;
-    const existingReason = String(row.fallback_reason || "-");
-    const nextReason = existingReason && existingReason !== "-" ? existingReason : "dataset_issue_hint";
+    if (currentSummary && currentSummary !== "-") return row;
 
     return {
       ...row,
       issue_summary: sourceSummary,
-      issue_count: sourceIssueCount,
-      fallback_reason: nextReason,
+      issue_count: activeIssueKeys(sourceFlags).length,
+      fallback_reason: row.fallback_reason && row.fallback_reason !== "-" ? row.fallback_reason : "dataset_issue_hint",
     };
   });
 }
 
 function renderKpis(summary) {
   if (!dom.kpiGrid) return;
+
   const items = [
     ["Inputs", summary.total ?? 0, ""],
     ["Flagged", summary.flagged ?? 0, "alert"],
@@ -659,6 +583,7 @@ function renderKpis(summary) {
     ["Uncertain", summary.uncertain ?? 0, ""],
     ["Positive", summary.positive ?? 0, "good"],
   ];
+
   dom.kpiGrid.innerHTML = items
     .map(
       ([label, value, tone]) => `
@@ -673,20 +598,20 @@ function renderKpis(summary) {
 
 function renderCustomerSay(summary, issueRows) {
   if (!dom.customerSayText || !dom.customerSayTags) return;
+
   const total = summary?.total ?? 0;
   const flagged = summary?.flagged ?? 0;
-  const flaggedRate = total > 0 ? Math.round((flagged / total) * 100) : 0;
   const positive = summary?.positive ?? 0;
+  const flaggedRate = total > 0 ? Math.round((flagged / total) * 100) : 0;
 
-  let sentence =
-    "Owner insight will be generated from the current batch once data loading is complete.";
+  let sentence = "Owner insight will be generated from the current batch once data loading is complete.";
   if (total > 0) {
     if (flaggedRate >= 55) {
       sentence = `Current batch shows elevated risk (${flaggedRate}% flagged). Focus on service quality and shipping/refund workflow.`;
     } else if (positive >= flagged) {
       sentence = `Current batch is mostly positive (${positive}/${total}), but recurring issue labels still need monitoring.`;
     } else {
-      sentence = `Customer feedback is mixed in this batch. Investigate the top issue labels before scaling sales.`;
+      sentence = "Customer feedback is mixed in this batch. Investigate the top issue labels before scaling sales.";
     }
   }
   dom.customerSayText.textContent = sentence;
@@ -695,14 +620,14 @@ function renderCustomerSay(summary, issueRows) {
     .filter((row) => row.count > 0)
     .slice(0, 6)
     .map((row) => `${row.label} (${row.count})`);
-  if (!tags.length) {
-    tags.push("no issue spikes", "stable feedback");
-  }
+
+  if (!tags.length) tags.push("no issue spikes", "stable feedback");
   dom.customerSayTags.innerHTML = tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
 }
 
 function renderIssues(issueRows) {
   if (!dom.issuesTableBody) return;
+
   const rows = issueRows.filter((row) => Number(row.count) > 0);
   if (!rows.length) {
     dom.issuesTableBody.innerHTML = `<tr><td>No issue labels in current batch.</td></tr>`;
@@ -728,12 +653,29 @@ function showAnalyticsPanels(show) {
   dom.issuesPanel.classList[method]("hidden");
 }
 
+function prependManualReview(text, rating) {
+  const row = {
+    id: `manual_${Date.now()}`,
+    rating: normalizedRating(rating),
+    text: String(text || "").trim(),
+    issue_flags: emptyIssueFlags(),
+  };
+
+  if (!row.text) return false;
+  datasetReviews = [row, ...datasetReviews];
+  currentBatchRows = [row, ...currentBatchRows].slice(0, BATCH_SIZE);
+  return true;
+}
+
+function nonEmptyTextsFromRows(rows) {
+  return rows.map((row) => String(row.text || "").trim()).filter(Boolean);
+}
+
 async function fetchStatus() {
   try {
     const response = await fetch("/api/status?include_transformer=false");
     if (!response.ok) throw new Error(`Status endpoint failed (${response.status})`);
-    const status = await response.json();
-    renderStatus(status);
+    renderStatus(await response.json());
   } catch (error) {
     setMessage(`Cannot load model status: ${error.message}`, true);
   }
@@ -754,15 +696,9 @@ async function fetchCatalog() {
   renderRecommendedProducts(catalogItems);
 }
 
-function nonEmptyTextsFromRows(rows) {
-  return rows.map((row) => String(row.text || "").trim()).filter(Boolean);
-}
-
 async function requestPredictChunk(chunkRows) {
   const texts = nonEmptyTextsFromRows(chunkRows);
-  if (!texts.length) {
-    return { predictions: [], status: null };
-  }
+  if (!texts.length) return { predictions: [], status: null };
 
   const response = await fetch("/api/predict", {
     method: "POST",
@@ -776,9 +712,7 @@ async function requestPredictChunk(chunkRows) {
   }
 
   const predictions = Array.isArray(data.predictions) ? data.predictions : [];
-  if (predictions.length !== texts.length) {
-    throw new Error("Prediction response size mismatch.");
-  }
+  if (predictions.length !== texts.length) throw new Error("Prediction response size mismatch.");
 
   return { predictions, status: data.status || null };
 }
@@ -793,13 +727,12 @@ async function predictRowsRobust(rows) {
   for (let i = 0; i < rows.length; i += PREDICT_CHUNK_SIZE) {
     const chunkRows = rows.slice(i, i + PREDICT_CHUNK_SIZE);
     if (!chunkRows.length) continue;
+
     chunkCount += 1;
     try {
       const chunkResult = await requestPredictChunk(chunkRows);
       mergedPredictions.push(...chunkResult.predictions);
-      if (!apiStatus && chunkResult.status) {
-        apiStatus = chunkResult.status;
-      }
+      if (!apiStatus && chunkResult.status) apiStatus = chunkResult.status;
     } catch (error) {
       fallbackChunks += 1;
       errors.push(error.message || String(error));
@@ -823,29 +756,29 @@ async function analyzeCurrentBatch() {
     renderBatchReviewFeed([]);
     renderSingleReviewAnalysis(null);
     showAnalyticsPanels(false);
+    setMessage("No reviews available in current batch.", true);
     return;
   }
 
   try {
     setMessage(`Analyzing ${texts.length} reviews from current batch...`);
     const result = await predictRowsRobust(currentBatchRows);
-    currentPredictions = result.predictions;
-    if (!currentPredictions.length) {
-      currentPredictions = buildFallbackPredictions(currentBatchRows);
-    }
+
+    currentPredictions = result.predictions.length
+      ? result.predictions
+      : buildFallbackPredictions(currentBatchRows);
     currentPredictions = mergeDatasetIssueHints(currentPredictions, currentBatchRows);
 
-    const issueRows = issueRowsFromBatch(currentBatchRows);
     const summary = buildSummaryFromPredictions(currentPredictions);
+    const issueRows = issueRowsFromBatch(currentBatchRows);
 
-    if (result.status) {
-      renderStatus(result.status);
-    }
+    if (result.status) renderStatus(result.status);
     renderKpis(summary);
     renderCustomerSay(summary, issueRows);
     renderBatchReviewFeed(currentPredictions);
     renderIssues(issueRows);
     renderSingleReviewAnalysis(null);
+    showAnalyticsPanels(true);
 
     if (dom.mismatchNote) {
       if (result.fallbackChunks === 0) {
@@ -856,30 +789,28 @@ async function analyzeCurrentBatch() {
         dom.mismatchNote.textContent = `Partial fallback: ${result.fallbackChunks}/${result.chunkCount} chunks`;
       }
     }
-    showAnalyticsPanels(true);
+
     if (result.fallbackChunks === 0) {
       setMessage(`Done. Current batch analyzed: ${texts.length} reviews.`);
     } else {
-      const firstError = result.errors[0] || "unknown error";
       setMessage(
-        `Done with fallback on ${result.fallbackChunks}/${result.chunkCount} chunks. First error: ${firstError}`,
+        `Done with fallback on ${result.fallbackChunks}/${result.chunkCount} chunks.`,
         true
       );
     }
   } catch (error) {
     currentPredictions = buildFallbackPredictions(currentBatchRows);
-    const issueRows = issueRowsFromBatch(currentBatchRows);
     const summary = buildSummaryFromPredictions(currentPredictions);
+    const issueRows = issueRowsFromBatch(currentBatchRows);
 
     renderKpis(summary);
     renderCustomerSay(summary, issueRows);
     renderBatchReviewFeed(currentPredictions);
     renderIssues(issueRows);
     renderSingleReviewAnalysis(null);
-    if (dom.mismatchNote) {
-      dom.mismatchNote.textContent = "Fallback mode from labeled dataset";
-    }
     showAnalyticsPanels(true);
+    if (dom.mismatchNote) dom.mismatchNote.textContent = "Fallback mode from labeled dataset";
+
     setMessage(`Auto-analysis fallback: ${error.message}`, true);
   }
 }
@@ -888,19 +819,17 @@ async function fetchReviewPool() {
   try {
     const response = await fetch("/api/review_pool?limit=1000");
     if (!response.ok) throw new Error(`Review pool endpoint failed (${response.status})`);
+
     const data = await response.json();
-    datasetSource = String(data.source || "");
     datasetReviews = Array.isArray(data.reviews) ? data.reviews : [];
     currentBatchRows = datasetReviews.slice(0, BATCH_SIZE);
   } catch (error) {
-    datasetSource = "";
     datasetReviews = [];
     currentBatchRows = [];
     setMessage(`Cannot load review dataset: ${error.message}`, true);
   }
 
   refreshRatingPanels();
-  renderDatasetReviewFeed(datasetReviews);
   renderOpsPieChart(currentBatchRows);
   await analyzeCurrentBatch();
 }
@@ -933,22 +862,20 @@ function attachEvents() {
       return;
     }
 
-    const inserted = prependManualReview(text, rating);
-    if (!inserted) {
+    if (!prependManualReview(text, rating)) {
       setComposeError("Could not add this review. Please try again.");
       return;
     }
 
     closeComposePanel(true);
     refreshRatingPanels();
-    renderDatasetReviewFeed(datasetReviews);
     renderOpsPieChart(currentBatchRows);
     await analyzeCurrentBatch();
     dom.reviewsFeed?.scrollIntoView({ behavior: "smooth", block: "start" });
     setMessage("Review added and analyzed in current batch.");
   });
 
-  dom.reviewComposeText?.addEventListener("keydown", async (event) => {
+  dom.reviewComposeText?.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       closeComposePanel(false);
       return;
@@ -963,10 +890,10 @@ function attachEvents() {
 function init() {
   renderOpsPieChart([]);
   renderBatchReviewFeed([]);
-  renderDatasetReviewFeed([]);
   renderSingleReviewAnalysis(null);
   renderCustomerSay({}, []);
   refreshRatingPanels();
+
   attachEvents();
   fetchStatus();
   fetchCatalog();
