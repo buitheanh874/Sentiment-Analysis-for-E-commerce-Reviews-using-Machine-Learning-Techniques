@@ -1,0 +1,7 @@
+text,baseline_decision,baseline_prob,baseline_reason,transformer_decision,transformer_prob,transformer_reason
+not bad,Uncertain,0.5667761188521949,threshold_band,Uncertain,0.5117847323417664,threshold_band
+not good,Negative,0.003927655189331609,,Uncertain,0.5115207433700562,threshold_band
+good but late delivery,Positive,0.7056132915681482,,Uncertain,0.515606701374054,threshold_band
+gr8,Uncertain,0.9826457343187042,too_short,Uncertain,0.5245472192764282,too_short
+thx,Uncertain,0.9508765862322771,too_short,Uncertain,0.5193710923194885,too_short
+idk,Negative,0.09739181963235116,,Uncertain,0.5011423230171204,threshold_band

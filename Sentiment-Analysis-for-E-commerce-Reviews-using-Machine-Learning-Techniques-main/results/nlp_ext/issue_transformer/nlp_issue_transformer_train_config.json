@@ -1,0 +1,30 @@
+{
+  "labels_path": "data\\issue_labels.csv",
+  "data_path": "data\\Gift_Cards.jsonl",
+  "model_name": "distilbert-base-uncased",
+  "seed": 42,
+  "epochs": 1.0,
+  "batch_size": 16,
+  "max_length": 192,
+  "max_total_samples": 10000,
+  "max_train_samples": 3000,
+  "split_method": "random",
+  "tune_thresholds": false,
+  "hybrid_margin": 0.08,
+  "hybrid_max_route_rate": 0.25,
+  "classic_model_dir": "models\\issue_classifier",
+  "skip_model_save": true,
+  "export_quantized": false,
+  "prep_info": {
+    "rows_total_input": 19000,
+    "rows_invalid_labels_dropped": 0,
+    "rows_zero_labels_dropped": 0,
+    "rows_after_cleaning": 10000,
+    "rows_sampled_cap": 10000,
+    "cleaning": {
+      "enable_abbrev_norm": false,
+      "enable_negation": true,
+      "negation_window": 3
+    }
+  }
+}

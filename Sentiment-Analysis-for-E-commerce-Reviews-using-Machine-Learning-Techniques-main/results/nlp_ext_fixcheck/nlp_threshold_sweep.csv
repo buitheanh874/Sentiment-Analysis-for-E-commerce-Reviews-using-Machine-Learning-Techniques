@@ -1,0 +1,5 @@
+coverage,uncertain_rate,selective_precision_0,selective_recall_0,selective_f2_0,fnr_covered_0,threshold_low,threshold_high
+0.0,1.0,,,,,0.4,0.6
+0.0,1.0,,,,,0.45,0.6
+0.01,0.99,0.1,1.0,0.35714285714285715,0.0,0.5,0.65
+0.8385,0.16149999999999998,0.09719737626714371,1.0,0.3499355946758265,0.0,0.55,0.7

@@ -1,0 +1,4 @@
+Base pipeline initialized.
+Data directory: D:\Code\NLP_code\base\data
+Results directory: D:\Code\NLP_code\base\results
+Next step: each member develops their assigned module.

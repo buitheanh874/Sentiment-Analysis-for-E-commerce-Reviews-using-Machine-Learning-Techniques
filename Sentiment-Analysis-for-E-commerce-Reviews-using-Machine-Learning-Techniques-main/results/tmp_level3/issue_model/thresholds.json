@@ -1,0 +1,18 @@
+{
+  "thresholds": {
+    "delivery_shipping": 0.15000000000000002,
+    "redemption_activation": 0.1,
+    "product_quality": 0.1,
+    "customer_service": 0.5,
+    "refund_return": 0.5000000000000001,
+    "usability": 0.1,
+    "value_price": 0.1,
+    "fraud_scam": 0.5000000000000001,
+    "other": 0.1
+  },
+  "cleaning": {
+    "enable_abbrev_norm": false,
+    "enable_negation": true,
+    "negation_window": 3
+  }
+}

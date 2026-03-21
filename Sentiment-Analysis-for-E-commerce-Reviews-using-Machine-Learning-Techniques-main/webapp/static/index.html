@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NLP Review Ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/static/styles.css?v=20260320b" />
+</head>
+<body data-app-view="customer">
+  <header class="site-header">
+    <div class="header-top">
+      <div class="logo-block">
+        <div class="logo-mark">nlp<span>shop</span></div>
+        <div class="logo-sub">review understanding</div>
+      </div>
+
+      <div class="ship-block">
+        <span class="ship-label">Workspace</span>
+        <span class="ship-value">NLP Team</span>
+      </div>
+
+      <div class="admin-chip" data-view="admin">
+        <span class="admin-chip-label">Console</span>
+        <span class="admin-chip-value">Admin / CSKH Dashboard</span>
+      </div>
+
+      <div class="search-block" data-view="customer">
+        <select aria-label="Search category">
+          <option>All</option>
+          <option>Gift Cards</option>
+          <option>Customer Reviews</option>
+          <option>Related Products</option>
+        </select>
+        <input type="text" value="Search this product page" readonly />
+        <button type="button" aria-label="Search">Go</button>
+      </div>
+
+      <div class="header-actions" data-view="customer">
+        <div class="action-tile">
+          <span class="small">Hello, Team</span>
+          <span class="large">Account & Lists</span>
+        </div>
+        <div class="action-tile">
+          <span class="small">Returns</span>
+          <span class="large">& Orders</span>
+        </div>
+        <div class="cart-tile">
+          <span class="cart-icon">Cart</span>
+          <span>Cart</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="header-sub" data-view="customer">
+      <a href="#">All</a>
+      <a href="#">Today's Deals</a>
+      <a href="#">Gift Cards</a>
+      <a href="#">Registry</a>
+      <a href="#">Prime Video</a>
+      <a href="#">Customer Service</a>
+      <a href="#">Categories</a>
+      <a href="#">Best Sellers</a>
+      <a href="#">Memberships</a>
+    </nav>
+  </header>
+
+  <section class="view-switch-bar">
+    <div class="page-wrap view-switch-inner">
+      <div class="view-switch-copy">
+        <p class="view-switch-label">Persona Toggle</p>
+        <p id="view-switch-text" class="view-switch-text">
+          Customer View: browse the product page and submit a new review.
+        </p>
+      </div>
+      <div class="view-switch-group" role="tablist" aria-label="Dashboard views">
+        <button id="customer-view-btn" class="view-switch-btn active" type="button" data-view-target="customer">
+          Customer View
+        </button>
+        <button id="admin-view-btn" class="view-switch-btn" type="button" data-view-target="admin">
+          Admin / CSKH Dashboard
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="page-wrap">
+    <section class="product-grid">
+      <aside class="card product-left" data-view="customer">
+        <div class="product-image-frame">
+          <img id="main-product-image" src="" alt="Main product image" />
+        </div>
+        <div id="product-thumb-grid" class="thumb-grid">
+          <button class="thumb active" type="button"></button>
+        </div>
+        <button id="run-sample-from-left" class="outline-btn" type="button">Refresh batch</button>
+      </aside>
+
+      <section class="card product-center">
+        <div data-view="customer">
+          <p class="breadcrumbs">Giftcards &gt; NLP &gt; Review Intelligence</p>
+          <h1>NLP Project: Sentiment Analysis for E-commerce Reviews using Machine Learning Techniques</h1>
+          <p class="byline">by SkyDom+</p>
+          <p class="byline-sub">Supervisor: Dr. Pham Quang Nhat Minh</p>
+          <div class="rating-line">
+            <span id="product-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+            <span id="product-rating-value">4.7 out of 5</span>
+            <span id="product-rating-count">(0 reviews)</span>
+          </div>
+          <hr />
+          <p class="description">
+            Browse the mock product page, read recent customer reviews, and submit a new review to
+            the AI pipeline.
+          </p>
+          <ul class="highlights">
+            <li>Customer-facing product detail page with gallery and rating breakdown.</li>
+            <li>New review submission flow for end-user input.</li>
+            <li>Recent customer reviews generated from the active batch.</li>
+          </ul>
+        </div>
+
+        <div class="dashboard-hero" data-view="admin">
+          <p class="breadcrumbs">Operations &gt; Review Understanding &gt; Triage Console</p>
+          <h1>Admin / CSKH Dashboard</h1>
+          <p class="description">
+            Monitor the trained sentiment and issue-classification pipeline, inspect the attention
+            queue, and move escalations into the case-resolution workflow.
+          </p>
+          <ul class="highlights">
+            <li>Manager insight panel for issue distribution across the active review batch.</li>
+            <li>Batch metrics, issue summary, and attention queue for CSKH triage.</li>
+            <li>Selected review analysis with workflow escalation context.</li>
+          </ul>
+          <div id="status-strip" class="status-strip"></div>
+        </div>
+      </section>
+
+      <aside class="product-right" data-view="admin">
+        <article class="card manager-insight-card">
+          <h3>Manager Insight Panel</h3>
+          <p class="muted">
+            Distribution of issue labels predicted by the active model for the current review batch.
+          </p>
+          <div class="ops-pie-layout">
+            <div id="ops-label-pie" class="ops-label-pie">
+              <div class="ops-pie-center">
+                <p id="ops-total-flags">0</p>
+                <span>issue hits</span>
+              </div>
+            </div>
+            <div id="ops-label-legend" class="ops-label-legend"></div>
+          </div>
+          <p id="ops-batch-note" class="muted">Batch loading...</p>
+          <p id="run-message" class="run-message">System ready.</p>
+        </article>
+      </aside>
+    </section>
+
+    <nav class="review-tabs" data-view="customer">
+      <a href="#">Top</a>
+      <a href="#">About this item</a>
+      <a href="#">Similar</a>
+      <a href="#">From the Brand</a>
+      <a href="#">From the Author</a>
+      <a class="active" href="#">Reviews</a>
+    </nav>
+
+    <section class="review-grid">
+      <aside class="left-column">
+        <article class="card" data-view="customer">
+          <h3>Customer reviews</h3>
+          <p id="left-overall-score" class="overall-score">4.7 out of 5</p>
+          <p id="left-rating-count" class="muted">0 global ratings</p>
+          <div id="rating-bars" class="rating-bars"></div>
+          <a class="muted-link" href="#">How customer reviews and ratings work</a>
+        </article>
+
+        <article class="card" data-view="customer">
+          <h3>Review this product</h3>
+          <p class="muted">Share your thoughts with other customers.</p>
+          <button id="write-review-btn" class="outline-btn" type="button">Write a customer review</button>
+          <div id="review-compose-panel" class="review-compose-panel hidden" aria-live="polite">
+            <label for="review-compose-rating">Rating</label>
+            <select id="review-compose-rating">
+              <option value="5">5 stars</option>
+              <option value="4">4 stars</option>
+              <option value="3">3 stars</option>
+              <option value="2">2 stars</option>
+              <option value="1">1 star</option>
+            </select>
+            <label for="review-compose-text">Your review</label>
+            <textarea id="review-compose-text" rows="4" maxlength="1200"></textarea>
+            <p id="review-compose-error" class="compose-error hidden"></p>
+            <div class="compose-actions">
+              <button id="review-compose-submit" class="prime-btn" type="button">Submit review</button>
+              <button id="review-compose-cancel" class="outline-btn" type="button">Cancel</button>
+            </div>
+          </div>
+        </article>
+
+        <article id="issues-panel" class="card hidden" data-view="admin">
+          <h3>Issue Summary</h3>
+          <div class="table-wrap small">
+            <table id="issues-table">
+              <thead>
+                <tr>
+                  <th>Issue Label</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+      </aside>
+
+      <section class="center-column">
+        <article class="card" data-view="admin">
+          <h3>Customers say</h3>
+          <p id="customer-say-text" class="customer-say-text">
+            System is loading current batch to generate owner insights.
+          </p>
+          <p class="muted">AI generated from prediction outputs</p>
+          <div id="customer-say-tags" class="tag-row"></div>
+        </article>
+
+        <article id="summary-panel" class="card hidden" data-view="admin">
+          <h3>Batch Metrics</h3>
+          <div id="kpi-grid" class="kpi-grid"></div>
+        </article>
+
+        <article class="card">
+          <div class="row-between">
+            <h3 id="reviews-section-title">Recent Customer Reviews</h3>
+            <span id="reviews-section-note" class="muted">Customer-facing review feed.</span>
+          </div>
+          <div id="reviews-feed" class="reviews-feed current-batch-feed">
+            <p class="muted">Loading current batch reviews...</p>
+          </div>
+        </article>
+      </section>
+
+      <aside class="right-column">
+        <article id="distribution-panel" class="card hidden" data-view="customer">
+          <h3>Rating Breakdown</h3>
+          <div id="distribution-bars" class="distribution-bars"></div>
+        </article>
+
+        <article id="single-review-panel" class="card single-review-panel" data-view="admin">
+          <h3>Selected Review Analysis</h3>
+          <p id="single-review-hint" class="muted">
+            Click Analyze on a queue item to inspect prediction details for that review.
+          </p>
+          <div id="single-review-content"></div>
+        </article>
+      </aside>
+    </section>
+
+    <section class="recommended-section card" data-view="customer">
+      <div class="row-between">
+        <h3>Products related to this item</h3>
+        <a href="#">See more</a>
+      </div>
+      <div id="recommended-grid" class="recommended-grid"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js?v=20260320b"></script>
+</body>
+</html>

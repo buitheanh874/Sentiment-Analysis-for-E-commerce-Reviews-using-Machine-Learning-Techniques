@@ -1,0 +1,194 @@
+{
+  "rubric_percent": {
+    "Content representation": 86.0,
+    "Project significance": 100.0,
+    "Working process": 75.0,
+    "Results quality": 100.0,
+    "Demo": 90.0
+  },
+  "rubric_points_out_of_4": {
+    "Content representation": 3.44,
+    "Project significance": 4.0,
+    "Working process": 3.0,
+    "Results quality": 4.0,
+    "Demo": 3.6
+  },
+  "rubric_total_points_out_of_20": 18.04,
+  "rubric_overall_percent": 90.2,
+  "syllabus_coverage_percent": 94.3,
+  "checks": {
+    "content": [
+      [
+        "readme",
+        true,
+        0.16
+      ],
+      [
+        "run_all_pipeline",
+        true,
+        0.16
+      ],
+      [
+        "demo_scripts",
+        true,
+        0.14
+      ],
+      [
+        "scoreboard",
+        true,
+        0.16
+      ],
+      [
+        "report_pdf",
+        true,
+        0.12
+      ],
+      [
+        "smoke_tests",
+        true,
+        0.12
+      ],
+      [
+        "slide_deck_file",
+        false,
+        0.14
+      ]
+    ],
+    "significance": [
+      [
+        "problem_framing",
+        true,
+        0.25
+      ],
+      [
+        "uncertainty_handling",
+        true,
+        0.2
+      ],
+      [
+        "hard_case_analysis",
+        true,
+        0.2
+      ],
+      [
+        "issue_task_metrics",
+        true,
+        0.15
+      ],
+      [
+        "transformer_metrics",
+        true,
+        0.1
+      ],
+      [
+        "report_pdf",
+        true,
+        0.1
+      ]
+    ],
+    "process": [
+      [
+        "contribution_matrix",
+        true,
+        0.2
+      ],
+      [
+        "pr_template",
+        true,
+        0.15
+      ],
+      [
+        "tests",
+        true,
+        0.15
+      ],
+      [
+        "run_metadata",
+        true,
+        0.1
+      ],
+      [
+        "multi_author_git",
+        true,
+        0.15
+      ],
+      [
+        "review_log_artifact",
+        false,
+        0.25
+      ]
+    ],
+    "results": [
+      [
+        "sentiment_results",
+        true,
+        0.2
+      ],
+      [
+        "issue_results",
+        true,
+        0.2
+      ],
+      [
+        "transformer_results",
+        true,
+        0.15
+      ],
+      [
+        "model_diversity",
+        true,
+        0.15
+      ],
+      [
+        "eval_rigor_ci",
+        true,
+        0.15
+      ],
+      [
+        "eval_rigor_significance",
+        true,
+        0.15
+      ]
+    ],
+    "demo": [
+      [
+        "demo_cli",
+        true,
+        0.2
+      ],
+      [
+        "demo_transformer",
+        true,
+        0.15
+      ],
+      [
+        "demo_ui",
+        true,
+        0.2
+      ],
+      [
+        "demo_inputs",
+        true,
+        0.15
+      ],
+      [
+        "expected_outputs",
+        true,
+        0.15
+      ],
+      [
+        "demo_runbook",
+        true,
+        0.1
+      ],
+      [
+        "demo_recording",
+        false,
+        0.05
+      ]
+    ]
+  },
+  "git_author_count": 7,
+  "scoreboard_rows": 33,
+  "course_fit_rows": 14
+}

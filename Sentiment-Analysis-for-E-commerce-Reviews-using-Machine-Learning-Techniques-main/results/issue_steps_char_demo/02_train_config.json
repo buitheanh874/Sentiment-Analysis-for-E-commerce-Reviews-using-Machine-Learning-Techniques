@@ -1,0 +1,66 @@
+{
+  "labels_path": "data\\issue_labels.csv",
+  "data_path": "data\\Gift_Cards.jsonl",
+  "split_method": "random",
+  "split_sizes": {
+    "train": 13300,
+    "val": 1900,
+    "test": 3800
+  },
+  "seed": 42,
+  "enable_char_ngrams": true,
+  "enable_chi2_topk": true,
+  "selected_chi2_k": 10000,
+  "chi2_val_micro_f1": [
+    {
+      "k": 2000,
+      "val_micro_f1": 0.6192485432991762
+    },
+    {
+      "k": 5000,
+      "val_micro_f1": 0.6374948154292824
+    },
+    {
+      "k": 10000,
+      "val_micro_f1": 0.6598812553011026
+    }
+  ],
+  "min_df_fallback_to_1": false,
+  "class_weight": "balanced",
+  "tune_thresholds": true,
+  "include_svm_baseline": false,
+  "label_list": [
+    "delivery_shipping",
+    "redemption_activation",
+    "product_quality",
+    "customer_service",
+    "refund_return",
+    "usability",
+    "value_price",
+    "fraud_scam",
+    "other"
+  ],
+  "cleaning": {
+    "enable_abbrev_norm": false,
+    "enable_negation": true,
+    "negation_window": 3
+  },
+  "dropped_rows": {
+    "invalid_label_rows": 0,
+    "zero_label_rows": 0
+  },
+  "warnings": {
+    "other_with_other_labels": 498
+  },
+  "model_notes": {
+    "delivery_shipping": "trained",
+    "redemption_activation": "trained",
+    "product_quality": "trained",
+    "customer_service": "trained",
+    "refund_return": "trained",
+    "usability": "trained",
+    "value_price": "trained",
+    "fraud_scam": "trained",
+    "other": "trained"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "variant": "V6",
+  "total_features": 100000,
+  "vocab_size": 50000,
+  "component_dims": {
+    "word_tfidf": 50000,
+    "char_tfidf": 50000
+  },
+  "train_shape": [
+    104397,
+    100000
+  ],
+  "val_shape": [
+    14914,
+    100000
+  ],
+  "test_shape": [
+    29828,
+    100000
+  ],
+  "three_star_shape": [
+    3271,
+    100000
+  ],
+  "train_avg_nnz": 225.8150808931291,
+  "val_avg_nnz": 222.58126592463458,
+  "test_avg_nnz": 224.4374078047472,
+  "top_idf_tokens": [
+    {
+      "token": "word_tfidf/tfidf::save save",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::itouch",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::nativity card",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::violate",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::books books",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::sony",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::scraping",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::NOT_in NOT_them",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::scott",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::happy treats",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::unlimited account",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::deo",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::deo who",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::thinkgeek",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::airbnb gift",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::10 s",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::new clothes",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::that fandango",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::payless",
+      "idf": 11.457353508490943
+    },
+    {
+      "token": "word_tfidf/tfidf::virtual credit",
+      "idf": 11.457353508490943
+    }
+  ]
+}

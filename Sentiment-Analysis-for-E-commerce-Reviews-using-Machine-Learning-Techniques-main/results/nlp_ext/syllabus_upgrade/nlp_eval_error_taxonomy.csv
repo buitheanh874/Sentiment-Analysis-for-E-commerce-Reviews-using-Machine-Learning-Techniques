@@ -1,0 +1,13 @@
+error_type,taxonomy_category,count,share
+false_negative_0,other,101,0.520618556701031
+false_negative_0,short_text,45,0.23195876288659795
+false_negative_0,negation_pattern,28,0.14432989690721648
+false_negative_0,contrast_pattern,17,0.08762886597938144
+false_negative_0,domain_issue_term,3,0.015463917525773196
+false_positive_0,negation_pattern,627,0.4976190476190476
+false_positive_0,other,408,0.3238095238095238
+false_positive_0,contrast_pattern,131,0.10396825396825397
+false_positive_0,short_text,49,0.03888888888888889
+false_positive_0,domain_issue_term,40,0.031746031746031744
+false_positive_0,slang_or_abbrev,3,0.002380952380952381
+false_positive_0,punctuation_heavy,2,0.0015873015873015873

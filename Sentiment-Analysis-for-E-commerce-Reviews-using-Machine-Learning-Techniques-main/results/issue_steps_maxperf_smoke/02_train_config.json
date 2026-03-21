@@ -1,0 +1,135 @@
+{
+  "labels_path": "data\\issue_labels.csv",
+  "data_path": "data\\Gift_Cards.jsonl",
+  "split_method": "random",
+  "split_sizes": {
+    "train": 13300,
+    "val": 1900,
+    "test": 3800
+  },
+  "seed": 42,
+  "enable_char_ngrams": true,
+  "enable_chi2_topk": true,
+  "selected_chi2_k": 2000,
+  "chi2_val_micro_f1": [
+    {
+      "k": 2000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.8065573770491803
+    },
+    {
+      "k": 5000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.8054642044017202
+    },
+    {
+      "k": 10000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.8058793715154587
+    }
+  ],
+  "min_df_fallback_to_1": false,
+  "class_weight": "balanced",
+  "class_weight_mode": "per_label_search",
+  "class_weight_per_label": {
+    "delivery_shipping": "balanced",
+    "redemption_activation": "balanced",
+    "product_quality": "balanced",
+    "customer_service": "balanced",
+    "refund_return": "balanced",
+    "usability": "balanced",
+    "value_price": "balanced",
+    "fraud_scam": "balanced",
+    "other": "none"
+  },
+  "calibrate_probs": true,
+  "calibration_method": "sigmoid",
+  "calibration_cv": 3,
+  "tune_thresholds": true,
+  "include_svm_baseline": true,
+  "enable_model_blend": true,
+  "auto_select_best_model": true,
+  "selected_model_name": "ovr_logreg",
+  "selected_thresholds": {
+    "delivery_shipping": 0.25000000000000006,
+    "redemption_activation": 0.1,
+    "product_quality": 0.1,
+    "customer_service": 0.15000000000000002,
+    "refund_return": 0.15000000000000002,
+    "usability": 0.1,
+    "value_price": 0.15000000000000002,
+    "fraud_scam": 0.5000000000000001,
+    "other": 0.25000000000000006
+  },
+  "blend_weights": {
+    "delivery_shipping": 0.0,
+    "redemption_activation": 0.0,
+    "product_quality": 0.0,
+    "customer_service": 0.1,
+    "refund_return": 0.7000000000000001,
+    "usability": 0.0,
+    "value_price": 0.2,
+    "fraud_scam": 0.5,
+    "other": 0.30000000000000004
+  },
+  "label_list": [
+    "delivery_shipping",
+    "redemption_activation",
+    "product_quality",
+    "customer_service",
+    "refund_return",
+    "usability",
+    "value_price",
+    "fraud_scam",
+    "other"
+  ],
+  "cleaning": {
+    "enable_abbrev_norm": false,
+    "enable_negation": true,
+    "negation_window": 3
+  },
+  "dropped_rows": {
+    "invalid_label_rows": 0,
+    "zero_label_rows": 0
+  },
+  "warnings": {
+    "other_with_other_labels": 498
+  },
+  "model_notes": {
+    "ovr_logreg": {
+      "delivery_shipping": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "redemption_activation": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "product_quality": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "customer_service": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "refund_return": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "usability": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "value_price": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "fraud_scam": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+      "other": "trained;cw=none;calibrated=yes;calibration_method=sigmoid;calibration_cv=3"
+    },
+    "ovr_linearsvm": {
+      "delivery_shipping": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "redemption_activation": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "product_quality": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "customer_service": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "refund_return": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "usability": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "value_price": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "fraud_scam": "trained;cw=balanced;calibrated=no;calibration_method=none;calibration_cv=0",
+      "other": "trained;cw=none;calibrated=no;calibration_method=none;calibration_cv=0"
+    },
+    "ovr_blend_lr_svm": {
+      "delivery_shipping": "blend_alpha_lr=0.00",
+      "redemption_activation": "blend_alpha_lr=0.00",
+      "product_quality": "blend_alpha_lr=0.00",
+      "customer_service": "blend_alpha_lr=0.10",
+      "refund_return": "blend_alpha_lr=0.70",
+      "usability": "blend_alpha_lr=0.00",
+      "value_price": "blend_alpha_lr=0.20",
+      "fraud_scam": "blend_alpha_lr=0.50",
+      "other": "blend_alpha_lr=0.30",
+      "__primary_model": "ovr_logreg",
+      "__secondary_model": "ovr_linearsvm"
+    }
+  }
+}

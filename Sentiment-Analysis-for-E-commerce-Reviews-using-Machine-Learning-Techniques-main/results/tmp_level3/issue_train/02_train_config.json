@@ -1,0 +1,84 @@
+{
+  "labels_path": "results\\tmp_level3\\issue_labels_sample.csv",
+  "data_path": "data\\Gift_Cards.jsonl",
+  "split_method": "random",
+  "split_sizes": {
+    "train": 840,
+    "val": 120,
+    "test": 240
+  },
+  "seed": 42,
+  "enable_char_ngrams": true,
+  "enable_chi2_topk": true,
+  "selected_chi2_k": 2000,
+  "chi2_val_micro_f1": [
+    {
+      "k": 2000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.7777777777777778
+    },
+    {
+      "k": 5000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.7777777777777778
+    },
+    {
+      "k": 10000,
+      "class_weight_probe": "none",
+      "val_micro_f1": 0.776
+    }
+  ],
+  "min_df_fallback_to_1": false,
+  "class_weight": "balanced",
+  "class_weight_mode": "per_label_search",
+  "class_weight_per_label": {
+    "delivery_shipping": "balanced",
+    "redemption_activation": "none",
+    "product_quality": "balanced",
+    "customer_service": "balanced",
+    "refund_return": "none",
+    "usability": "balanced",
+    "value_price": "balanced",
+    "fraud_scam": "none",
+    "other": "none"
+  },
+  "calibrate_probs": true,
+  "calibration_method": "sigmoid",
+  "calibration_cv": 3,
+  "tune_thresholds": true,
+  "include_svm_baseline": false,
+  "label_list": [
+    "delivery_shipping",
+    "redemption_activation",
+    "product_quality",
+    "customer_service",
+    "refund_return",
+    "usability",
+    "value_price",
+    "fraud_scam",
+    "other"
+  ],
+  "cleaning": {
+    "enable_abbrev_norm": false,
+    "enable_negation": true,
+    "negation_window": 3
+  },
+  "dropped_rows": {
+    "invalid_label_rows": 0,
+    "zero_label_rows": 0
+  },
+  "warnings": {
+    "other_with_other_labels": 33
+  },
+  "model_notes": {
+    "delivery_shipping": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "redemption_activation": "trained;cw=none;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "product_quality": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "customer_service": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "refund_return": "trained;cw=none;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "usability": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "value_price": "trained;cw=balanced;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "fraud_scam": "trained;cw=none;calibrated=yes;calibration_method=sigmoid;calibration_cv=3",
+    "other": "trained;cw=none;calibrated=yes;calibration_method=sigmoid;calibration_cv=3"
+  }
+}

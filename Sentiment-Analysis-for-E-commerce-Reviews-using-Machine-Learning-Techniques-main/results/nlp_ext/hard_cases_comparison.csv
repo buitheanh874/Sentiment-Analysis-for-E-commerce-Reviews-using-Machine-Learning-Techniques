@@ -1,0 +1,7 @@
+text,baseline_decision,baseline_prob,baseline_reason,transformer_decision,transformer_prob,transformer_reason
+not bad,Negative,0.01492857742386913,,Positive,0.995140552520752,
+not good,Negative,0.018547401276648955,,Negative,0.009403443895280361,
+good but late delivery,Negative,0.39438232257129885,,Positive,0.99665367603302,
+gr8,Uncertain,0.7722924876315891,too_short,Uncertain,0.981472373008728,too_short
+thx,Uncertain,0.7722924876315891,too_short,Uncertain,0.9890908598899841,too_short
+idk,Uncertain,0.7722924876315891,too_short,Uncertain,0.9253780245780945,too_short
