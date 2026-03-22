@@ -1,9 +1,0 @@
-## Optional extras (not required for default NLP run)
-vaderSentiment==3.3.2
-nltk==3.9
-sentence-transformers==2.7.0
-torch==2.5.1
-transformers==4.36.2
-accelerate==0.25.0
-fastapi>=0.111.0
-uvicorn>=0.30.0

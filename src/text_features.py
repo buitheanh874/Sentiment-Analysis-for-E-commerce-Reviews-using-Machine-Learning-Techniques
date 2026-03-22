@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import FunctionTransformer
 
-# ----------- Lexicons & defaults -----------
+                                             
 NEGATION_CUES: List[str] = [
     "not",
     "no",
@@ -69,11 +69,11 @@ class VariantSpec:
     use_negation: bool = False
     use_clause: bool = False
     use_char: bool = False
-    use_lexicon: bool = False  # NEW: AFINN sentiment lexicon features
+    use_lexicon: bool = False                                         
     description: str = ""
 
 
-# Fixed set of variants used in step06b (keeps baseline V0 intact)
+                                                                  
 CONTEXT_VARIANTS: List[VariantSpec] = [
     VariantSpec("V0", word_ngram=(1, 2), description="Baseline word 1-2"),
     VariantSpec("V1", word_ngram=(1, 3), description="Word 1-3"),
@@ -99,7 +99,7 @@ CONTEXT_VARIANTS: List[VariantSpec] = [
         use_char=True,
         description="Word 1-2 + char 3-5 + negation",
     ),
-    # V7: TF-IDF + AFINN lexicon features (4 columns: raw, negated, intensified, contrast)
+                                                                                          
     VariantSpec(
         "V7",
         word_ngram=(1, 2),
@@ -110,7 +110,7 @@ CONTEXT_VARIANTS: List[VariantSpec] = [
 ]
 
 
-# ----------- Text normalization helpers -----------
+                                                    
 def normalize_abbrev(text: str, mapping: Dict[str, str]) -> str:
     """Expand common chat/typo abbreviations in a case-insensitive way."""
     if not mapping:
@@ -174,13 +174,13 @@ def clean_text(
         text = normalize_abbrev(text, abbrev_map)
     if enable_negation:
         text = apply_negation_tagging(text, window=negation_window)
-    # Remove punctuation but keep underscores so NOT_ tokens survive
+                                                                    
     text = re.sub(f"[{_PUNCT_NO_UNDERSCORE}]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
 
-# ----------- Contrast handling -----------
+                                           
 def split_at_contrast_marker(text: str) -> Tuple[str, str]:
     """
     Split cleaned text at the first contrast marker.
@@ -201,7 +201,7 @@ def contrast_flags(text: str) -> List[int]:
     return [1 if marker in tokens else 0 for marker in CONTRAST_MARKERS]
 
 
-# ----------- Transformers for sklearn pipelines -----------
+                                                            
 def _prep_texts(
     texts: Sequence[str],
     enable_abbrev_norm: bool,
@@ -241,7 +241,7 @@ def build_word_vectorizer(ngram_range: Tuple[int, int]) -> TfidfVectorizer:
         min_df=2,
         max_df=0.9,
         max_features=50000,
-        lowercase=False,  # already cleaned
+        lowercase=False,                   
         preprocessor=None,
         tokenizer=str.split,
         token_pattern=None,
@@ -342,7 +342,7 @@ def build_vectorizer_from_spec(
             )
         )
 
-    # NEW: Add AFINN lexicon features (4 separate columns)
+                                                          
     if spec.use_lexicon:
         from src.sentiment_lexicon import SentimentFeatureTransformer
         transformers.append(("sentiment_lexicon", SentimentFeatureTransformer()))
@@ -350,7 +350,7 @@ def build_vectorizer_from_spec(
     return FeatureUnion(transformer_list=transformers)
 
 
-# ----------- Small unit-like sanity checks -----------
+                                                       
 def negation_sanity_tests(window: int = DEFAULT_NEGATION_WINDOW) -> List[Tuple[str, str]]:
     """
     Return a list of (input, output) pairs for quick verification.

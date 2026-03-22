@@ -172,7 +172,7 @@ def main():
             result = func(config)
             ran_steps.append(name)
             if result is not None:
-                # Some steps return (best_k, best_cw); ignore otherwise
+                                                                       
                 pass
         print(f"Done. Artifacts saved under {args.output_dir}")
         end_run(record, status="success", extra={"ran_steps": ran_steps})

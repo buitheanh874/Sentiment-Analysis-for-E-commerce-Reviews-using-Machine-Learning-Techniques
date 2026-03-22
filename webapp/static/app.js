@@ -15,7 +15,7 @@ const ISSUE_LABELS = [
 
 const VIEW_COPY = Object.freeze({
   customer: "Customer View: browse the product page and submit a new review.",
-  admin: "Admin / CSKH Dashboard: inspect AI triage outputs, issue distribution, and the attention queue.",
+  admin: "Admin / CSKH Dashboard: review the queue, issue mix, and current escalations.",
 });
 
 const WORKFLOW_COPY = Object.freeze({
@@ -127,7 +127,7 @@ function setComposeError(text = "") {
 function syncComposeButton() {
   if (!dom.writeReviewBtn || !dom.reviewComposePanel) return;
   const isOpen = !dom.reviewComposePanel.classList.contains("hidden");
-  dom.writeReviewBtn.textContent = isOpen ? "📝 Hide Test Console" : "📝 Open Test Console";
+  dom.writeReviewBtn.textContent = isOpen ? "📝 Hide Test Tool" : "📝 Open Test Tool";
 }
 
 function closeComposePanel(resetFields = false) {
@@ -195,7 +195,8 @@ function escapeHtml(value) {
 
 function labelPill(label) {
   const normalized = String(label || "").toLowerCase();
-  return `<span class="pill ${normalized}">${label || "N/A"}</span>`;
+  const meta = queueSentimentMeta(label);
+  return `<span class="pill ${normalized}">${escapeHtml(meta.text || "N/A")}</span>`;
 }
 
 function dateRangeLabel() {
@@ -299,7 +300,7 @@ function renderOpsPieChart(issueRows) {
 
   const total = ISSUE_LABELS.reduce((sum, item) => sum + Number(counts[item.key] || 0), 0);
   dom.opsTotalFlags.textContent = String(total);
-  dom.opsBatchNote.textContent = `Current batch: ${currentPredictions.length} reviews | Predicted issue hits: ${total}`;
+  dom.opsBatchNote.textContent = `Current batch: ${currentPredictions.length} reviews | Issue hits: ${total}`;
 
   if (total <= 0) {
     dom.opsLabelPie.style.background = "conic-gradient(#d5d9d9 0deg 360deg)";
@@ -413,7 +414,7 @@ function renderTriageFocus(summary = {}, issueRows = [], rows = []) {
     ["Top issue", topIssueLabel, topIssue ? `${topIssue.count} issue hits in batch` : "No issue concentration detected"],
     ["Queue pressure", `${queueRows.length} cases`, "Items currently prioritized for manual CSKH triage"],
     ["Recommended owner", leadPlaybook.owner, leadPlaybook.sla],
-    ["Hidden risk", hiddenShare, "High-star reviews that still carry NLP risk signals"],
+    ["Hidden risk", hiddenShare, "High-star reviews that still need follow-up after text review"],
   ];
 
   dom.triageFocusContent.innerHTML = `
@@ -779,7 +780,7 @@ function queueSentimentMeta(label) {
     return { text: "Mixed", tone: "warning" };
   }
   if (label === "UNCERTAIN") {
-    return { text: "Manual Review", tone: "neutral" };
+    return { text: "Needs Review", tone: "neutral" };
   }
   return { text: "Positive", tone: "positive" };
 }
@@ -959,7 +960,7 @@ function attachSourceMetadata(sourceRows, predictions) {
 function issueTagMarkup(issueSummary, limit = null) {
   const labels = parseIssueKeys(issueSummary);
   if (!labels.length) {
-    return `<span class="queue-issue-tag queue-issue-tag--muted">No issue labels</span>`;
+    return `<span class="queue-issue-tag queue-issue-tag--muted">No issue categories</span>`;
   }
 
   const visible = limit ? labels.slice(0, limit) : labels;
@@ -979,13 +980,13 @@ function renderSingleReviewAnalysis(row, displayIndex = 0) {
 
   if (!row || currentView !== "admin") {
     dom.singleReviewHint.textContent =
-      "Click Analyze on a queue item to inspect prediction details for that review.";
+      "Select Inspect on a queue item to open the full case details.";
     dom.singleReviewContent.innerHTML = "";
     dom.playbookContent.innerHTML = `<p class="muted">Select a queue item to load the recommended recovery path.</p>`;
     return;
   }
 
-  dom.singleReviewHint.textContent = `Showing analysis for queue item #${displayIndex}.`;
+  dom.singleReviewHint.textContent = `Showing details for queue item #${displayIndex}.`;
   const workflow = ensureWorkflowState(row, displayIndex - 1);
   const workflowMeta = ticketStatusMeta(workflow.status);
   const normalizedRisk = normalizedRiskScore(row.risk_score);
@@ -1022,18 +1023,16 @@ function renderSingleReviewAnalysis(row, displayIndex = 0) {
         <span class="single-review-summary-value">${escapeHtml(primaryDriver)}</span>
       </article>
       <article class="single-review-summary-card">
-        <span class="single-review-summary-label">Issue Labels</span>
+        <span class="single-review-summary-label">Issue Categories</span>
         <span class="single-review-summary-value">${issueLabels.length}</span>
       </article>
     </div>
     <table class="single-review-table">
       <tbody>
-        <tr><th>Label</th><td>${labelPill(row.classic_label)}</td></tr>
-        <tr><th>Queue Tag</th><td>${escapeHtml(queueSentimentMeta(row.classic_label).text)}</td></tr>
-        <tr><th>Probability</th><td>${row.classic_probability == null ? "N/A" : Number(row.classic_probability).toFixed(3)}</td></tr>
-        <tr><th>Risk Score</th><td>${normalizedRisk}/100 <span class="muted">(raw ${escapeHtml(String(row.risk_score ?? "N/A"))})</span></td></tr>
+        <tr><th>Review Status</th><td>${labelPill(row.classic_label)}</td></tr>
+        <tr><th>Risk Score</th><td>${normalizedRisk}/100</td></tr>
         <tr><th>Ticket Status</th><td>${escapeHtml(workflowMeta.text)}</td></tr>
-        <tr><th>Issue Labels</th><td>${escapeHtml(row.issue_summary || "-")}</td></tr>
+        <tr><th>Issue Categories</th><td>${issueLabels.length ? escapeHtml(issueLabels.map((label) => ISSUE_LABELS.find((item) => item.key === label)?.label || label).join(", ")) : "No issue categories"}</td></tr>
         <tr><th>Review</th><td class="single-review-text-cell">${escapeHtml(queueText(row.text || ""))}</td></tr>
       </tbody>
     </table>
@@ -1144,13 +1143,11 @@ function renderBatchReviewFeed(rows) {
                       ${escapeHtml(sentiment.text)}
                     </span>
                     <span class="queue-meta-line">Source rating: ${escapeHtml(String(row.source_rating ?? 3))}/5</span>
-                    <span class="queue-meta-line">Confidence: ${escapeHtml(row.classic_confidence || "N/A")}</span>
                   </div>
-                  <div class="queue-issue-tags">${issueTagMarkup(row.issue_summary, 4)}</div>
+                  <div class="queue-issue-tags">${issueTagMarkup(row.issue_summary, 3)}</div>
                   <div class="queue-cell-meta">
-                    <p class="queue-meta-line">Queue tag: ${escapeHtml(row.classic_label || "N/A")}</p>
                     <p class="queue-meta-line">Primary driver: ${escapeHtml(primaryDriver)}</p>
-                    <p class="queue-meta-line">${issueLabels.length} active label${issueLabels.length === 1 ? "" : "s"}</p>
+                    <p class="queue-meta-line">${issueLabels.length} issue ${issueLabels.length === 1 ? "category" : "categories"}</p>
                   </div>
                 </td>
                 <td>
@@ -1409,8 +1406,8 @@ function renderCustomerSay(summary, issueRows) {
   let sentence = "Owner insight will be generated from the current batch once data loading is complete.";
   if (total > 0) {
     sentence =
-      `Automation coverage is ${automationRate}% for the active batch. `
-      + `${flagged} reviews are flagged and ${uncertain} remain uncertain for manual follow-up.`;
+      `${flagged} reviews currently need follow-up and ${uncertain} are still waiting for manual review. `
+      + `${automationRate}% of the batch is already routed into a clear queue.`;
   }
   dom.customerSayText.textContent = sentence;
 
@@ -1502,7 +1499,7 @@ async function fetchStatus() {
     currentStatus = await response.json();
     renderStatus(currentStatus);
   } catch (error) {
-    setMessage(`Cannot load model status: ${error.message}`, true);
+    setMessage(`Cannot load service status: ${error.message}`, true);
   }
 }
 
