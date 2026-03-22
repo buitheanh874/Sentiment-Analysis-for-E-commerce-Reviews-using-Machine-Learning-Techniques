@@ -240,12 +240,14 @@ def _parse_texts(raw_texts: List[str]) -> List[str]:
 
 def model_status(include_transformer: bool = False) -> Dict[str, Any]:
     _, _, _, _, model_info, issue_bundle = load_classic_runtime()
+    issue_mode = "trained classifier" if issue_bundle is not None else "rule-based fallback"
 
     result: Dict[str, Any] = {
         "classic": {
             "loaded": True,
+            "message": "Trained scikit-learn runtime online",
             "model_info": model_info,
-            "issue_mode": "trained classifier" if issue_bundle is not None else "rule-based fallback",
+            "issue_mode": issue_mode,
         },
         "transformer": {
             "requested": include_transformer,
@@ -361,6 +363,7 @@ def analyze_reviews(raw_texts: List[str], include_transformer: bool = False) -> 
         "status": {
             "classic": {
                 "loaded": True,
+                "message": "Trained scikit-learn runtime online",
                 "model_info": model_info,
                 "issue_mode": "trained classifier" if issue_bundle is not None else "rule-based fallback",
             },
@@ -373,4 +376,3 @@ def analyze_reviews(raw_texts: List[str], include_transformer: bool = False) -> 
         "mismatch_count": mismatch_count,
         "predictions": classic_rows,
     }
-

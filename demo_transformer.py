@@ -11,13 +11,19 @@ Usage:
 """
 
 import argparse
+import io
 import json
 import sys
-import io
 from pathlib import Path
 
-# Fix Windows console encoding
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+def _configure_console_stdout() -> None:
+    """Keep UTF-8 output for CLI mode without mutating stdout on import."""
+    stdout = getattr(sys, "stdout", None)
+    if stdout is None or not hasattr(stdout, "buffer"):
+        return
+    if isinstance(stdout, io.TextIOWrapper) and stdout.encoding and stdout.encoding.lower() == "utf-8":
+        return
+    sys.stdout = io.TextIOWrapper(stdout.buffer, encoding="utf-8", errors="replace")
 
 # ============== Configuration ==============
 VERSION = "1.0.0"
@@ -30,15 +36,17 @@ def load_transformer_model(base_dir: Path, verbose: bool = True):
     try:
         from transformers import AutoTokenizer, AutoModelForSequenceClassification
     except ImportError:
-        print("[ERROR] Missing optional dependencies: torch/transformers")
-        print("        Install: pip install -r requirements-optional.txt")
+        if verbose:
+            print("[ERROR] Missing optional dependencies: torch/transformers")
+            print("        Install: pip install -r requirements-optional.txt")
         sys.exit(1)
 
     model_path = base_dir / MODEL_PATH
     
     if not model_path.exists():
-        print(f"[ERROR] Transformer model not found at: {model_path}")
-        print(f"        Run: python -m src.nlp_ext transformer_finetune --data_path data/Gift_Cards.jsonl")
+        if verbose:
+            print(f"[ERROR] Transformer model not found at: {model_path}")
+            print(f"        Run: python -m src.nlp_ext transformer_finetune --data_path data/Gift_Cards.jsonl")
         sys.exit(1)
     
     if verbose:
@@ -289,6 +297,7 @@ def json_output_mode(reviews: list, tokenizer, model):
 
 # ============== Main ==============
 def main():
+    _configure_console_stdout()
     parser = argparse.ArgumentParser(
         description="NLP Transformer Demo: Context-Aware Sentiment Classification",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -320,4 +329,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-

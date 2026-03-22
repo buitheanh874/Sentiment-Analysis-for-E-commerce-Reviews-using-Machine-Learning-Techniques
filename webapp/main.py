@@ -1,17 +1,20 @@
-"""FastAPI backend for the standalone demo UI."""
+"""FastAPI backend for the NLPSHOP web UI."""
 
 from __future__ import annotations
 
 import csv
 import os
+from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from webapp.predictor import analyze_reviews, load_classic_runtime, model_status
 
 ISSUE_LABELS = [
     "delivery_shipping",
@@ -26,26 +29,6 @@ ISSUE_LABELS = [
 ]
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
-POSITIVE_KEYWORDS = {"good", "great", "perfect", "excellent", "love", "fast", "happy", "satisfied"}
-NEGATIVE_KEYWORDS = {"bad", "poor", "terrible", "awful", "hate", "broken", "late", "slow", "scam"}
-ATTENTION_KEYWORDS = {"but", "however", "although", "issue", "problem", "support", "refund"}
-ISSUE_KEYWORDS = {
-    "delivery_shipping": ("ship", "shipping", "delivery", "arrive", "courier", "late"),
-    "redemption_activation": ("redeem", "activation", "activate", "code", "claim"),
-    "product_quality": ("quality", "print", "card", "damaged", "broken", "defect"),
-    "customer_service": ("support", "service", "agent", "staff", "response", "replied"),
-    "refund_return": ("refund", "return", "money back", "replace", "exchange"),
-    "usability": ("use", "usable", "confusing", "steps", "difficult", "instructions"),
-    "value_price": ("price", "cost", "value", "expensive", "cheap"),
-    "fraud_scam": ("fraud", "scam", "fake", "stolen", "hack"),
-}
-
-DEMO_MODEL_INFO = {
-    "variant": "demo_heuristic_ui",
-    "k_features": "N/A",
-    "thresholds": "heuristic",
-    "trained_at": "demo mode",
-}
 
 APP_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = APP_DIR.parent
@@ -74,16 +57,6 @@ ITEM_SUBTITLE_PRESETS = [
     "Simple and modern card look.",
     "Great value bundle for repeat gifts.",
 ]
-
-
-app = FastAPI(
-    title="NLP Review API",
-    version="2.0.0",
-    description="Lightweight demo backend for the web UI.",
-)
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-ITEMS_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/items", StaticFiles(directory=ITEMS_DIR), name="items")
 
 
 class PredictRequest(BaseModel):
@@ -255,26 +228,6 @@ def load_review_pool() -> dict[str, Any]:
     return {"source": "demo_fallback", "rows": fallback_rows}
 
 
-def _status_payload(include_transformer: bool) -> dict[str, Any]:
-    transformer_message = "disabled in demo mode"
-    if include_transformer:
-        transformer_message = "requested but disabled in demo mode"
-
-    return {
-        "classic": {
-            "loaded": True,
-            "message": "demo heuristic ready",
-            "issue_mode": "keyword heuristic",
-            "model_info": DEMO_MODEL_INFO,
-        },
-        "transformer": {
-            "requested": include_transformer,
-            "loaded": False,
-            "message": transformer_message,
-        },
-    }
-
-
 def _catalog_items() -> list[dict[str, Any]]:
     files = [
         path
@@ -293,168 +246,63 @@ def _catalog_items() -> list[dict[str, Any]]:
     return items
 
 
-def _infer_issue_flags(text: str) -> dict[str, int]:
-    lowered = text.lower()
-    flags = {label: 0 for label in ISSUE_LABELS}
-
-    for label, keywords in ISSUE_KEYWORDS.items():
-        if any(keyword in lowered for keyword in keywords):
-            flags[label] = 1
-
-    if not any(flags.values()) and any(token in lowered for token in ATTENTION_KEYWORDS):
-        flags["other"] = 1
-    return flags
-
-
-def _keyword_hits(text: str, keywords: set[str]) -> int:
-    lowered = text.lower()
-    return sum(1 for token in keywords if token in lowered)
-
-
-def _infer_sentiment(text: str) -> tuple[str, float, str]:
-    positive_hits = _keyword_hits(text, POSITIVE_KEYWORDS)
-    negative_hits = _keyword_hits(text, NEGATIVE_KEYWORDS)
-    attention_hits = _keyword_hits(text, ATTENTION_KEYWORDS)
-    score = positive_hits - negative_hits
-
-    if negative_hits >= positive_hits + 1:
-        label = "NEGATIVE"
-        probability = 0.18
-    elif score == -1 or attention_hits >= 2:
-        label = "NEEDS_ATTENTION"
-        probability = 0.42
-    elif score == 0:
-        label = "UNCERTAIN"
-        probability = 0.50
-    else:
-        label = "POSITIVE"
-        probability = 0.84
-
-    intensity = max(positive_hits, negative_hits)
-    if intensity >= 3:
-        confidence = "High"
-    elif intensity >= 1 or attention_hits >= 1:
-        confidence = "Medium"
-    else:
-        confidence = "Low"
-
-    return label, probability, confidence
-
-
-def _risk_score(label: str, probability: float, issue_count: int) -> float:
-    base_by_label = {
-        "NEGATIVE": 410.0,
-        "NEEDS_ATTENTION": 305.0,
-        "UNCERTAIN": 205.0,
-        "POSITIVE": 110.0,
-    }
-    base = base_by_label.get(label, 100.0)
-    label_boost = (1.0 - probability) * 30.0
-    return round(base + label_boost + issue_count * 9.0, 1)
-
-
-def _clean_texts(raw_texts: list[str]) -> list[str]:
-    return [text.strip() for text in raw_texts if isinstance(text, str) and text.strip()]
-
-
-def _build_prediction(text: str) -> dict[str, Any]:
-    issue_flags = _infer_issue_flags(text)
-    active_issues = [label for label, value in issue_flags.items() if value >= 1]
-    label, probability, confidence = _infer_sentiment(text)
-
+def _runtime_error_payload(include_transformer: bool, message: str) -> dict[str, Any]:
     return {
-        "text": text,
-        "classic_label": label,
-        "classic_probability": probability,
-        "classic_confidence": confidence,
-        "fallback_reason": "demo_heuristic",
-        "issue_summary": ", ".join(active_issues) if active_issues else "-",
-        "issue_count": len(active_issues),
-        "risk_score": _risk_score(label, probability, len(active_issues)),
-        "transformer_label": None,
-        "transformer_probability": None,
-        "transformer_confidence": None,
-        "transformer_reason": None,
-        "agreement": None,
+        "classic": {
+            "loaded": False,
+            "message": message,
+            "issue_mode": "unavailable",
+            "model_info": {},
+        },
+        "transformer": {
+            "requested": include_transformer,
+            "loaded": False,
+            "message": "unavailable",
+        },
     }
 
 
-def _build_summary(predictions: list[dict[str, Any]]) -> dict[str, int]:
-    labels = [str(row.get("classic_label", "")) for row in predictions]
-    negative = labels.count("NEGATIVE")
-    needs_attention = labels.count("NEEDS_ATTENTION")
-    uncertain = labels.count("UNCERTAIN")
-    positive = labels.count("POSITIVE")
-    return {
-        "total": len(predictions),
-        "flagged": negative + needs_attention,
-        "negative": negative,
-        "needs_attention": needs_attention,
-        "uncertain": uncertain,
-        "positive": positive,
-    }
+def _ensure_classic_runtime(request: Request) -> None:
+    if getattr(request.app.state, "classic_runtime_ready", False):
+        return
+
+    try:
+        load_classic_runtime()
+    except RuntimeError as exc:
+        request.app.state.classic_runtime_ready = False
+        request.app.state.classic_runtime_error = str(exc)
+        raise
+
+    request.app.state.classic_runtime_ready = True
+    request.app.state.classic_runtime_error = None
 
 
-def _build_label_distribution(summary: dict[str, int]) -> list[dict[str, Any]]:
-    total = max(summary.get("total", 0), 1)
-    ordered = [
-        ("NEGATIVE", summary.get("negative", 0)),
-        ("NEEDS_ATTENTION", summary.get("needs_attention", 0)),
-        ("UNCERTAIN", summary.get("uncertain", 0)),
-        ("POSITIVE", summary.get("positive", 0)),
-    ]
-    return [
-        {
-            "label": label,
-            "count": count,
-            "share_percent": round((count / total) * 100, 1),
-        }
-        for label, count in ordered
-    ]
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.classic_runtime_ready = False
+    app.state.classic_runtime_error = None
+
+    try:
+        load_classic_runtime()
+    except RuntimeError as exc:
+        app.state.classic_runtime_ready = False
+        app.state.classic_runtime_error = str(exc)
+    else:
+        app.state.classic_runtime_ready = True
+        app.state.classic_runtime_error = None
+
+    yield
 
 
-def _build_issue_summary(predictions: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    counts: dict[str, int] = {}
-    for row in predictions:
-        issue_summary = str(row.get("issue_summary", "")).strip()
-        if not issue_summary or issue_summary == "-":
-            continue
-        for label in issue_summary.split(","):
-            normalized = label.strip()
-            if not normalized:
-                continue
-            counts[normalized] = counts.get(normalized, 0) + 1
-
-    sorted_counts = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    return [
-        {
-            "label": label,
-            "count": count,
-            "avg_confidence": 1.0,
-        }
-        for label, count in sorted_counts
-    ]
-
-
-def _build_attention_queue(predictions: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    queue = [
-        row
-        for row in predictions
-        if row.get("classic_label") in {"NEGATIVE", "NEEDS_ATTENTION", "UNCERTAIN"}
-    ]
-    queue.sort(
-        key=lambda row: (-float(row.get("risk_score", 0.0)), float(row.get("classic_probability", 0.5)))
-    )
-    return [
-        {
-            "text": row.get("text", ""),
-            "classic_label": row.get("classic_label"),
-            "classic_probability": row.get("classic_probability"),
-            "issue_summary": row.get("issue_summary", "-"),
-            "risk_score": row.get("risk_score", 0.0),
-        }
-        for row in queue[:20]
-    ]
+app = FastAPI(
+    title="NLP Review API",
+    version="3.0.0",
+    description="FastAPI backend for the NLPSHOP review understanding UI.",
+    lifespan=lifespan,
+)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+ITEMS_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/items", StaticFiles(directory=ITEMS_DIR), name="items")
 
 
 @app.get("/")
@@ -463,13 +311,25 @@ def index() -> FileResponse:
 
 
 @app.get("/api/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health(request: Request) -> dict[str, Any]:
+    return {
+        "status": "ok",
+        "classic_runtime_ready": bool(getattr(request.app.state, "classic_runtime_ready", False)),
+    }
 
 
 @app.get("/api/status")
-def status(include_transformer: bool = False) -> dict[str, Any]:
-    return _status_payload(include_transformer=include_transformer)
+def status(request: Request, include_transformer: bool = False) -> dict[str, Any]:
+    try:
+        _ensure_classic_runtime(request)
+    except RuntimeError:
+        message = getattr(request.app.state, "classic_runtime_error", None) or "Classic model is unavailable."
+        return _runtime_error_payload(include_transformer=include_transformer, message=message)
+
+    try:
+        return model_status(include_transformer=include_transformer)
+    except RuntimeError as exc:
+        return _runtime_error_payload(include_transformer=include_transformer, message=str(exc))
 
 
 @app.get("/api/catalog")
@@ -500,22 +360,19 @@ def review_pool(limit: int = 1000) -> dict[str, Any]:
 
 
 @app.post("/api/predict")
-def predict(payload: PredictRequest) -> dict[str, Any]:
+def predict(payload: PredictRequest, request: Request) -> dict[str, Any]:
     if len(payload.texts) > 500:
         raise HTTPException(status_code=400, detail="Maximum 500 input rows per request.")
 
-    texts = _clean_texts(payload.texts)
-    if not texts:
-        raise HTTPException(status_code=400, detail="No valid input texts found.")
+    try:
+        _ensure_classic_runtime(request)
+    except RuntimeError:
+        message = getattr(request.app.state, "classic_runtime_error", None) or "Classic model is unavailable."
+        raise HTTPException(status_code=503, detail=message)
 
-    predictions = [_build_prediction(text) for text in texts]
-    summary = _build_summary(predictions)
-    return {
-        "status": _status_payload(include_transformer=payload.include_transformer),
-        "summary": summary,
-        "label_distribution": _build_label_distribution(summary),
-        "attention_queue": _build_attention_queue(predictions),
-        "issue_summary": _build_issue_summary(predictions),
-        "mismatch_count": None,
-        "predictions": predictions,
-    }
+    try:
+        return analyze_reviews(payload.texts, include_transformer=payload.include_transformer)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc

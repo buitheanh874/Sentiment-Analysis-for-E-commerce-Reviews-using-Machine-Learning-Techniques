@@ -12,10 +12,10 @@ Usage:
 """
 
 import argparse
+import io
 import json
 import os
 import sys
-import io
 from datetime import datetime
 from pathlib import Path
 
@@ -25,8 +25,14 @@ from src.dm2_steps.common import DEFAULT_THRESHOLDS, MIN_NNZ_DEFAULT, apply_unce
 from src.issue_steps import load_issue_bundle, predict_issue_labels
 from src.text_features import clean_text
 
-# Fix Windows console encoding
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+def _configure_console_stdout() -> None:
+    """Keep UTF-8 output for CLI mode without mutating stdout on import."""
+    stdout = getattr(sys, "stdout", None)
+    if stdout is None or not hasattr(stdout, "buffer"):
+        return
+    if isinstance(stdout, io.TextIOWrapper) and stdout.encoding and stdout.encoding.lower() == "utf-8":
+        return
+    sys.stdout = io.TextIOWrapper(stdout.buffer, encoding="utf-8", errors="replace")
 
 # ============== Configuration ==============
 VERSION = "1.0.0"
@@ -50,8 +56,9 @@ def load_models(base_dir: Path, verbose: bool = True):
             missing.append(path.name)
     
     if missing:
-        print(f"[ERROR] Missing model files: {', '.join(missing)}")
-        print(f"        Run 'python -m src.run_all --data_path data/Gift_Cards.jsonl' first.")
+        if verbose:
+            print(f"[ERROR] Missing model files: {', '.join(missing)}")
+            print(f"        Run 'python -m src.run_all --data_path data/Gift_Cards.jsonl' first.")
         sys.exit(1)
     
     vectorizer = joblib.load(vectorizer_path)
@@ -582,6 +589,7 @@ def json_output_mode(
 
 # ============== Main ==============
 def main():
+    _configure_console_stdout()
     parser = argparse.ArgumentParser(
         description="NLP Demo: Customer Review Sentiment Classification",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -629,5 +637,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-
-
