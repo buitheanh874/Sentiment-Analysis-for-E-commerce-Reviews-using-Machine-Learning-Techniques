@@ -291,7 +291,7 @@ def run_classic_syllabus_bench(args) -> None:
                 }
             )
 
-    # Vector semantics + FFNN path (SVD embedding)
+                                                  
     svd = TruncatedSVD(n_components=args.svd_dim, random_state=SEED)
     X_train_svd = svd.fit_transform(X_train)
     X_val_svd = svd.transform(X_val)
@@ -1843,10 +1843,10 @@ def run_llm_prompt_baseline(args) -> None:
     def _eval_split(split_df: pd.DataFrame, y_true: np.ndarray) -> Tuple[Dict[str, float], Dict[str, float]]:
         texts = split_df["clean_text"].tolist()
         text_emb = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False)
-        sims = text_emb @ prompt_emb.T  # [n,2] : neg, pos
-        # Stretch similarity gap into a more separable probability signal.
+        sims = text_emb @ prompt_emb.T                    
+                                                                          
         diff = sims[:, 1] - sims[:, 0]
-        probs = 1.0 / (1.0 + np.exp(-args.logit_scale * diff))  # P(positive)
+        probs = 1.0 / (1.0 + np.exp(-args.logit_scale * diff))               
         y_pred = (probs >= 0.5).astype(int)
 
         base_metrics = _metrics_from_labels(y_true, y_pred)
@@ -2086,7 +2086,7 @@ def build_course_fit_matrix(args) -> None:
     has_trans = trans_path.exists()
     has_issue = issue_path.exists()
 
-    # Simple coverage points by topic, max 1.0 each.
+                                                    
     topics = [
         ("Probability", 1.0 if has_ngram or has_bench else 0.5),
         ("Regular Expressions", 0.5),

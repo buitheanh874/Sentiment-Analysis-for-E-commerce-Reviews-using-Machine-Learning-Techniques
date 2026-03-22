@@ -58,8 +58,8 @@ def _decisions_from_probs(probs: np.ndarray, texts: list, thresholds) -> pd.Data
 
 
 def _baseline_predict(texts: list, enable_abbrev_norm: bool, data_path: Path, output_dir: Path):
-    # dm2_steps loader now returns (vectorizer, selector, model, meta)
-    # Keep backward compatibility if the return shape changes again.
+                                                                      
+                                                                    
     loaded = _load_trained_artifacts()
     vec = selector = model = None
     if isinstance(loaded, tuple) and len(loaded) >= 3:
@@ -168,7 +168,7 @@ def transformer_finetune(args):
             item["labels"] = torch.tensor(self.labels[idx])
             return item
 
-    # Stratified-ish sampling for train size cap
+                                                
     train_texts = splits.train["clean_text"].tolist()
     if len(train_texts) > max_train_samples:
         rng = np.random.default_rng(42)
@@ -238,7 +238,7 @@ def transformer_finetune(args):
 
     trainer.train()
     
-    # Save model for demo usage
+                               
     if not args.skip_model_save:
         model_save_path = Path("models/transformer_model")
         model_save_path.mkdir(parents=True, exist_ok=True)
@@ -246,7 +246,7 @@ def transformer_finetune(args):
         tokenizer.save_pretrained(model_save_path)
         print(f"[NLP EXT] Model saved to {model_save_path}")
 
-    # Evaluation
+                
     val_logits = trainer.predict(val_ds).predictions
     test_logits = trainer.predict(test_ds).predictions
     val_probs = _softmax(val_logits)[:, 1]
@@ -269,7 +269,7 @@ def transformer_finetune(args):
     out_dir.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(metrics_rows).to_csv(out_dir / "nlp_metrics.csv", index=False)
 
-    # Confusion matrix on test (0.5 decision)
+                                             
     from sklearn.metrics import confusion_matrix
     import matplotlib.pyplot as plt
 
@@ -288,7 +288,7 @@ def transformer_finetune(args):
     plt.savefig(out_dir / "nlp_confusion_matrix.png", dpi=200)
     plt.close()
 
-    # Probability histogram
+                           
     bins = np.linspace(0, 1, 31)
     plt.figure(figsize=(6, 4))
     plt.hist(test_probs[y_test == 0], bins=bins, alpha=0.6, label="Negative")
@@ -301,7 +301,7 @@ def transformer_finetune(args):
     plt.savefig(out_dir / "nlp_prob_hist_test.png", dpi=200)
     plt.close()
 
-    # Threshold sweep
+                     
     sweep_rows = []
     for low, high in CS_THRESHOLD_PAIRS:
         dec = _decisions_from_probs(test_probs, splits.test["clean_text"].tolist(), (low, high))
@@ -324,7 +324,7 @@ def transformer_finetune(args):
     plt.savefig(out_dir / "nlp_threshold_tradeoff.png", dpi=200)
     plt.close()
 
-    # Hard cases comparison
+                           
     if not args.skip_hard_cases:
         hard_cases = ["not bad", "not good", "good but late delivery", "gr8", "thx", "idk"]
         baseline_preds = _baseline_predict(

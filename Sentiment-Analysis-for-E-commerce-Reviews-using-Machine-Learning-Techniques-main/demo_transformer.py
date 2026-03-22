@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+﻿                       
 """
 NLP Transformer Demo: Context-Aware Sentiment Classification
 ==============================================================
@@ -25,12 +25,12 @@ def _configure_console_stdout() -> None:
         return
     sys.stdout = io.TextIOWrapper(stdout.buffer, encoding="utf-8", errors="replace")
 
-# ============== Configuration ==============
+                                             
 VERSION = "1.0.0"
 THRESHOLDS = (0.40, 0.60)
-MODEL_PATH = "models/transformer_model"  # Saved by nlp_ext training
+MODEL_PATH = "models/transformer_model"                             
 
-# ============== Load Model ==============
+                                          
 def load_transformer_model(base_dir: Path, verbose: bool = True):
     """Load fine-tuned DistilBERT model."""
     try:
@@ -64,7 +64,7 @@ def load_transformer_model(base_dir: Path, verbose: bool = True):
     return tokenizer, model
 
 
-# ============== Prediction ==============
+                                          
 def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
     """
     Predict sentiment using Transformer (context-aware).
@@ -74,11 +74,11 @@ def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
     """
     import torch
 
-    # Tokenize
+              
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
     
-    # Check for too short input
-    token_count = inputs['input_ids'].shape[1] - 2  # Exclude [CLS] and [SEP]
+                               
+    token_count = inputs['input_ids'].shape[1] - 2                           
     if token_count < 1 or text.strip() == "":
         return {
             "label": "UNCERTAIN (too short)",
@@ -87,18 +87,18 @@ def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
             "fallback_reason": "too_short",
         }
     
-    # OOV detection: only block gibberish (random characters)
-    # Let Transformer understand context for real English words
+                                                             
+                                                               
     tokens = tokenizer.convert_ids_to_tokens(inputs['input_ids'][0])
     content_tokens = [t for t in tokens if t not in ['[CLS]', '[SEP]', '[PAD]']]
     
     if content_tokens and len(content_tokens) <= 5:
-        # Count subword tokens (##) - high ratio indicates gibberish
+                                                                    
         subword_count = sum(1 for t in content_tokens if t.startswith('##'))
         whole_word_count = len(content_tokens) - subword_count
         
-        # If mostly subword tokens with no real whole words â†’ gibberish
-        # Examples: "bta" â†’ ['b', '##ta'], "xyz123" â†’ ['x', '##y', '##z', '##12', '##3']
+                                                                         
+                                                                                            
         if whole_word_count <= 1 and subword_count >= 1 and len(content_tokens) <= 3:
             return {
                 "label": "UNCERTAIN (unknown words)",
@@ -107,8 +107,8 @@ def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
                 "fallback_reason": "oov_detected",
             }
     
-    # For short inputs: check if contains sentiment-indicating words
-    # Prevents false positives on neutral greetings like "hello", "thanks"
+                                                                    
+                                                                          
     word_count = len(text.split())
     if word_count <= 3:
         text_lower = text.lower()
@@ -130,13 +130,13 @@ def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
                 "fallback_reason": "no_sentiment",
             }
     
-    # Predict
+             
     with torch.no_grad():
         outputs = model(**inputs)
         probs = torch.softmax(outputs.logits, dim=1)
         prob_positive = probs[0][1].item()
     
-    # Apply thresholds
+                      
     low, high = thresholds
     if prob_positive <= low:
         label = "NEGATIVE"
@@ -156,7 +156,7 @@ def predict_sentiment(text: str, tokenizer, model, thresholds=THRESHOLDS):
     }
 
 
-# ============== Display Result ==============
+                                              
 def display_result(result: dict, original_text: str = None):
     """Pretty print prediction result."""
     print("\n" + "=" * 60)
@@ -172,7 +172,7 @@ def display_result(result: dict, original_text: str = None):
     confidence = result["confidence"]
     fallback_reason = result.get("fallback_reason")
     
-    # Symbol
+            
     if "POSITIVE" in label:
         symbol = "[+]"
     elif "NEGATIVE" in label:
@@ -182,7 +182,7 @@ def display_result(result: dict, original_text: str = None):
     
     print(f"\n  {symbol} Sentiment: {label}")
     
-    # Handle NaN
+                
     import math
     if math.isnan(prob):
         print(f"      P(Positive): N/A")
@@ -194,7 +194,7 @@ def display_result(result: dict, original_text: str = None):
         print(f"      P(Positive): {prob:.4f}")
         print(f"      Confidence:  {confidence}")
         
-        # Visual bar
+                    
         bar_length = 40
         filled = int(prob * bar_length)
         bar = "#" * filled + "-" * (bar_length - filled)
@@ -206,7 +206,7 @@ def display_result(result: dict, original_text: str = None):
     print("=" * 60 + "\n")
 
 
-# ============== Interactive Mode ==============
+                                                
 def interactive_mode(tokenizer, model):
     """Interactive prediction mode."""
     print("=" * 60)
@@ -240,7 +240,7 @@ def interactive_mode(tokenizer, model):
         if not user_input:
             continue
         
-        # Check if number
+                         
         if user_input.isdigit():
             idx = int(user_input) - 1
             if 0 <= idx < len(examples):
@@ -254,7 +254,7 @@ def interactive_mode(tokenizer, model):
         display_result(result, user_input)
 
 
-# ============== Batch Mode ==============
+                                          
 def batch_mode(reviews: list, tokenizer, model):
     """Process multiple reviews."""
     print("\n" + "=" * 80)
@@ -278,7 +278,7 @@ def batch_mode(reviews: list, tokenizer, model):
     print()
 
 
-# ============== JSON Output ==============
+                                           
 def json_output_mode(reviews: list, tokenizer, model):
     """Output as JSON."""
     for review in reviews:
@@ -295,7 +295,7 @@ def json_output_mode(reviews: list, tokenizer, model):
         print(json.dumps(record, ensure_ascii=False))
 
 
-# ============== Main ==============
+                                    
 def main():
     _configure_console_stdout()
     parser = argparse.ArgumentParser(

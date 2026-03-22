@@ -44,7 +44,7 @@ def load_classic_runtime():
     base_dir = _base_dir()
     try:
         vectorizer, selector, model, meta, model_info = load_models(base_dir, verbose=False)
-    except SystemExit as exc:  # pragma: no cover - controlled outside tests
+    except SystemExit as exc:                                               
         raise RuntimeError("Classic model artifacts are missing or invalid.") from exc
 
     issue_bundle = load_issue_model(base_dir, verbose=False)
@@ -58,9 +58,9 @@ def load_transformer_runtime():
         from demo_transformer import load_transformer_model
 
         tokenizer, model = load_transformer_model(base_dir, verbose=False)
-    except SystemExit as exc:  # pragma: no cover - controlled outside tests
+    except SystemExit as exc:                                               
         raise RuntimeError("Transformer model/dependencies are unavailable.") from exc
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:                
         raise RuntimeError(str(exc)) from exc
     return tokenizer, model
 
@@ -104,11 +104,11 @@ def _resolve_issue_labels(result: Dict[str, Any]) -> List[Dict[str, Any]]:
         if mapped and mapped not in mapped_rule_labels:
             mapped_rule_labels.append(mapped)
 
-    # Keep trained output if it already has specific labels.
+                                                            
     if has_specific_trained:
         return issue_rows
 
-    # Only override if there is at least one specific rule label (not just "other").
+                                                                                    
     specific_rule_labels = [label for label in mapped_rule_labels if label != "other"]
     if not specific_rule_labels:
         return issue_rows
@@ -214,7 +214,7 @@ def build_attention_queue(classic_df: pd.DataFrame) -> List[Dict[str, Any]]:
     queue = queue.sort_values(["risk_score", "classic_probability"], ascending=[False, True], na_position="last")
     queue = queue[["text", "classic_label", "classic_probability", "issue_summary", "risk_score"]].head(20)
 
-    # FastAPI/JSON strict serialization rejects NaN, so normalize NaN -> None.
+                                                                              
     if "classic_probability" in queue.columns:
         queue["classic_probability"] = queue["classic_probability"].where(
             pd.notna(queue["classic_probability"]),

@@ -10,7 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="/static/styles.css?v=20260321q" />
+  <link rel="stylesheet" href="/static/styles.css?v=20260321s" />
   <style>
     body::before,
     body::after {
@@ -19,7 +19,7 @@
 
     .admin-shell {
       display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
+      grid-template-columns: 440px minmax(0, 1fr);
       gap: 12px;
       position: relative;
       z-index: 1;
@@ -483,15 +483,15 @@
         <div class="summary-head">
           <span class="summary-icon" aria-hidden="true">🚩</span>
           <div>
-            <p class="status-label">Issue Signals</p>
+            <p class="status-label">Issue Mix</p>
             <p class="admin-summary-period" data-current-period>(for current period)</p>
           </div>
         </div>
         <p id="ops-batch-note" class="customer-say-text">
-          Loading NLP categorization for the active batch.
+          Loading issue mix for the active batch.
         </p>
         <div id="customer-say-tags" class="tag-row">
-          <span class="tag">waiting for model output</span>
+          <span class="tag">loading current batch</span>
         </div>
       </article>
 
@@ -499,14 +499,14 @@
         <div class="summary-head">
           <span class="summary-icon" aria-hidden="true">🧠</span>
           <div>
-            <p class="status-label">Owner Insight</p>
+            <p class="status-label">Ops Summary</p>
             <p class="admin-summary-period" data-current-period>(for current period)</p>
           </div>
         </div>
         <p id="customer-say-text" class="customer-say-text">
           Owner insight will be generated from the active batch once analysis completes.
         </p>
-        <p class="muted">Narrative summary generated from current prediction outputs.</p>
+        <p class="muted">Short summary of the current queue and follow-up load.</p>
       </article>
     </section>
 
@@ -540,7 +540,7 @@
               <span class="section-icon" aria-hidden="true">🔎</span>
               <div>
               <h3>Hidden Risk Detection</h3>
-              <p class="muted">NLP vs star rating mismatch for the active batch</p>
+              <p class="muted">Review text vs star rating mismatch for the active batch</p>
               </div>
             </div>
           </div>
@@ -618,12 +618,12 @@
         <div class="section-heading section-heading--compact">
           <span class="section-icon" aria-hidden="true">🧾</span>
           <div>
-            <h3>Selected Review Analysis</h3>
-            <p class="muted">Prediction details, workflow state, and routing context</p>
+            <h3>Selected Review Details</h3>
+            <p class="muted">Review details, workflow state, and routing context</p>
           </div>
         </div>
         <p id="single-review-hint" class="muted">
-          Click Analyze on a queue item to inspect prediction details for that review.
+          Select Inspect on a queue item to open the full case details.
         </p>
         <div id="single-review-content"></div>
       </article>
@@ -647,13 +647,13 @@
         <div class="section-heading">
           <span class="section-icon" aria-hidden="true">🧪</span>
           <div>
-          <h3>Manual NLP Test Tool</h3>
+          <h3>Manual Review Test</h3>
           <p class="muted">
-            Input custom text and run it through the same pipeline used by the active batch.
+            Add a sample review and see how it routes through the current workflow.
           </p>
           </div>
         </div>
-        <button id="write-review-btn" class="outline-btn" type="button">📝 Open Test Console</button>
+        <button id="write-review-btn" class="outline-btn" type="button">📝 Open Test Tool</button>
       </div>
 
       <div class="prompt-chip-row">
@@ -699,6 +699,6 @@
     </div>
   </main>
 
-  <script src="/static/app.js?v=20260321q"></script>
+  <script src="/static/app.js?v=20260321s"></script>
 </body>
 </html>

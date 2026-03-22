@@ -106,7 +106,7 @@ def step01_data_overview(config: DM2Config) -> None:
         strong_pos.shape[0] / strong_neg.shape[0] if strong_neg.shape[0] > 0 else np.nan
     )
 
-    # CSVs
+          
     rating_counts.to_csv(out_dir / "01_rating_distribution.csv", header=["count"])
     pd.DataFrame(
         {
@@ -116,14 +116,14 @@ def step01_data_overview(config: DM2Config) -> None:
         }
     ).to_csv(out_dir / "01_strong_label_counts.csv", index=False)
 
-    # Figure
+            
     plot_bar(
         {str(k): int(v) for k, v in rating_counts.items()},
         out_dir / "01_rating_distribution.png",
         "Rating Distribution (1-5)",
     )
 
-    # Markdown
+              
     lines = [
         "# Step 01 · Data Overview",
         f"- Total rows: {total_rows}",
@@ -163,7 +163,7 @@ def step02_cleaning_preview(config: DM2Config) -> None:
         )
     pd.DataFrame(preview_rows).to_csv(out_dir / "02_cleaning_examples.csv", index=False)
 
-    # Abbreviation normalization table
+                                      
     abbrev_examples = [
         "gr8 product",
         "thx for the gift card",
@@ -187,7 +187,7 @@ def step02_cleaning_preview(config: DM2Config) -> None:
         out_dir / "02_abbrev_norm_comparison.csv", index=False
     )
 
-    # Negation tagging sanity examples
+                                      
     neg_rows = []
     for raw, tagged in negation_sanity_tests(window=config.negation_window):
         neg_rows.append({"example": raw, "with_negation_tag": tagged})
@@ -328,7 +328,7 @@ def step04_tfidf_stats(config: DM2Config) -> None:
     }
     save_json(out_dir / "04_tfidf_stats.json", payload)
 
-    # Sparsity histogram
+                        
     plt_path = out_dir / "04_tfidf_sparsity.png"
     import matplotlib.pyplot as plt
 
@@ -471,7 +471,7 @@ def _parse_best_variant(out_dir: Path) -> Optional[Tuple[VariantSpec, int, str]]
 def _choose_best_and_write(
     sweep_df: pd.DataFrame, out_dir: Path
 ) -> Tuple[int, str]:
-    # pick best by negative-first tie-breaker already encoded in sweep_df order
+                                                                               
     sweep_df = sweep_df.copy()
     best_row = sweep_df.sort_values(
         by=["recall_0", "f2_0", "precision_0", "k"],
@@ -584,7 +584,7 @@ def step06b_context_feature_variants_sweep(config: DM2Config):
 
     val_tables = []
     test_rows = []
-    best_choice = None  # (metrics, k, cw, spec)
+    best_choice = None                          
 
     for spec in CONTEXT_VARIANTS:
         vec_bundle = fit_vectorizer(
@@ -604,7 +604,7 @@ def step06b_context_feature_variants_sweep(config: DM2Config):
             ascending=[False, False, False, True],
         ).iloc[0]
 
-        # Train LR on train+val with selector fit on train only
+                                                               
         cw_value = _cw_value(best_cw)
         y_train = splits.train["label"].values
         y_val = splits.val["label"].values
@@ -619,7 +619,7 @@ def step06b_context_feature_variants_sweep(config: DM2Config):
         test_probs = model.predict_proba(selector.transform(vec_bundle.X_test))[:, 1]
         test_metrics = metrics_from_probs(y_test, test_probs, threshold=0.5)
 
-        # Uncertainty + fallback
+                                
         cleaned_test = [
             clean_text(
                 t,
@@ -692,7 +692,7 @@ def step06b_context_feature_variants_sweep(config: DM2Config):
     )
     (out_dir / "06b_best_variant.txt").write_text(best_txt + "\n")
 
-    # Simple figures
+                    
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(7, 4))
@@ -760,7 +760,7 @@ def _ensure_selector(config: DM2Config, splits, vec_bundle):
     out_dir = Path(config.output_dir)
     chosen = _parse_chosen(out_dir / "06_chosen_k.txt")
     if not chosen:
-        # Generate selection outputs if missing
+                                               
         step06_feature_selection(config)
         chosen = _parse_chosen(out_dir / "06_chosen_k.txt")
     best_k, best_cw = chosen
@@ -879,8 +879,8 @@ def step08_ensemble(config: DM2Config) -> None:
             }
         )
 
-    # Include strongest LR reference so downstream scoreboards can compare against
-    # the best context-aware linear model, not only tree ensembles.
+                                                                                  
+                                                                   
     (
         best_lr_splits,
         best_lr_vec_bundle,
@@ -913,7 +913,7 @@ def step08_ensemble(config: DM2Config) -> None:
         cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
         plot_confusion(cm, out_dir / "08_confusion_matrix_rf.png", ["Negative", "Positive"])
 
-    # Fallback stats
+                    
     fallback_rows = []
     fallback_rows.append(
         {"dataset": "test", **_fallback_statistics(splits.test["clean_text"], vec_bundle.X_test, config.min_nnz)}
@@ -948,7 +948,7 @@ def step09_uncertainty_eval(config: DM2Config) -> None:
     X_test_sel = selector.transform(vec_bundle.X_test)
     test_probs = model.predict_proba(X_test_sel)[:, 1]
 
-    # Uncertainty with fallback
+                               
     cleaned_test = [
         clean_text(
             t,
@@ -972,7 +972,7 @@ def step09_uncertainty_eval(config: DM2Config) -> None:
         else np.nan
     )
 
-    # Confusion on covered subset
+                                 
     covered_mask = decisions["decision"] != -1
     if covered_mask.any():
         cm = confusion_matrix(
@@ -1045,7 +1045,7 @@ def step09_uncertainty_eval(config: DM2Config) -> None:
         )
     pd.DataFrame(three_star_payload).to_csv(out_dir / "09_uncertainty_3star.csv", index=False)
 
-    # Hard-case comparison: baseline V0 vs best variant
+                                                       
     base_vec_bundle = fit_vectorizer(
         splits,
         variant=CONTEXT_VARIANTS[0],
@@ -1110,7 +1110,7 @@ def step09_uncertainty_eval(config: DM2Config) -> None:
         )
     pd.DataFrame(hard_rows).to_csv(out_dir / "hard_cases_comparison.csv", index=False)
 
-    # Persist artifacts for downstream / demo use
+                                                 
     models_dir = Path("models")
     persist_core_artifacts(models_dir, vec_bundle.vectorizer, selector, model)
     save_json(
@@ -1182,7 +1182,7 @@ def step10_threshold_sweep(config: DM2Config) -> None:
     sweep_df = pd.DataFrame(sweep_rows)
     sweep_df.to_csv(out_dir / "10_threshold_sweep.csv", index=False)
 
-    # Recommendation
+                    
     feasible = sweep_df[sweep_df["selective_precision_0"] >= 0.50]
     pool = feasible if not feasible.empty else sweep_df
     best_row = pool.sort_values(
