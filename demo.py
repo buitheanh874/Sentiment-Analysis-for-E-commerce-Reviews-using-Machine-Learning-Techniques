@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+﻿                       
 """
 NLP Demo: Customer Review Sentiment Classification
 ===================================================
@@ -34,12 +34,12 @@ def _configure_console_stdout() -> None:
         return
     sys.stdout = io.TextIOWrapper(stdout.buffer, encoding="utf-8", errors="replace")
 
-# ============== Configuration ==============
+                                             
 VERSION = "1.0.0"
-THRESHOLDS = DEFAULT_THRESHOLDS  # default fallback
-MIN_NNZ = MIN_NNZ_DEFAULT  # default fallback
+THRESHOLDS = DEFAULT_THRESHOLDS                    
+MIN_NNZ = MIN_NNZ_DEFAULT                    
 
-# ============== Load Models ==============
+                                           
 def load_models(base_dir: Path, verbose: bool = True):
     """Load vectorizer, selector, and classifier from models/ directory."""
     models_dir = base_dir / "models"
@@ -49,7 +49,7 @@ def load_models(base_dir: Path, verbose: bool = True):
     model_path = models_dir / "best_lr_model.joblib"
     meta_path = models_dir / "variant_meta.json"
     
-    # Check if models exist
+                           
     missing = []
     for path in [vectorizer_path, selector_path, model_path]:
         if not path.exists():
@@ -66,28 +66,28 @@ def load_models(base_dir: Path, verbose: bool = True):
     model = joblib.load(model_path)
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
     
-    # Model metadata
+                    
     model_mtime = datetime.fromtimestamp(os.path.getmtime(model_path))
     k_features = selector.k if hasattr(selector, 'k') else selector.get_support().sum()
     
-    # Get vocab size - handle both TfidfVectorizer and FeatureUnion
+                                                                   
     if hasattr(vectorizer, 'vocabulary_'):
         vocab_size = len(vectorizer.vocabulary_)
     elif hasattr(vectorizer, 'transformer_list'):
-        # FeatureUnion: sum vocab sizes from TF-IDF components
+                                                              
         vocab_size = 0
         for name, trans in vectorizer.transformer_list:
             if hasattr(trans, 'vocabulary_'):
                 vocab_size += len(trans.vocabulary_)
             elif hasattr(trans, 'named_steps'):
-                # Pipeline: look for tfidf step
+                                               
                 for step_name, step in trans.named_steps.items():
                     if hasattr(step, 'vocabulary_'):
                         vocab_size += len(step.vocabulary_)
             elif hasattr(trans, 'feature_names_'):
                 vocab_size += len(trans.feature_names_)
     else:
-        vocab_size = k_features  # Fallback
+        vocab_size = k_features            
     
     class_weight = getattr(model, 'class_weight', None)
     thresholds = tuple(meta.get("thresholds", DEFAULT_THRESHOLDS))
@@ -130,7 +130,7 @@ def load_issue_model(base_dir: Path, verbose: bool = True):
     return issue_bundle
 
 
-# ============== Prediction ==============
+                                          
 def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle=None):
     """
     Predict sentiment for a given review text.
@@ -177,20 +177,20 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             result.setdefault("issue_thresholds", {})
         return result
 
-    # Special case for common single-word reviews (including abbreviations)
+                                                                           
     SINGLE_WORD_POSITIVE = [
-        # Standard words
+                        
         "ok", "okay", "Ð¾Ðº", "oke", "good", "great", "nice", "love", "excellent", 
         "amazing", "perfect", "awesome", "wonderful", "fantastic", "superb", "brilliant",
-        # Abbreviations
+                       
         "gr8", "gud", "gd", "luv", "thx", "tks", "ty", "tyvm", "tysm", "noice", "lit", "fire",
         "10/10", "5/5", "a+", "perf",
     ]
     SINGLE_WORD_NEGATIVE = [
-        # Standard words  
+                          
         "bad", "terrible", "awful", "horrible", "worst", "hate", "trash", "poor",
         "disappointed", "disappointing", "useless", "scam", "fraud", "fake",
-        # Abbreviations
+                       
         "sux", "sucks", "meh", "nah", "ugh", "wtf", "0/10", "1/10", "f",
     ]
     
@@ -216,17 +216,17 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             "min_nnz": min_nnz,
         }, fallback_issue_tags=[])
     
-    # Rating pattern detection (e.g., "2/10", "3/5", "1 star")
+                                                              
     import re
     rating_match = re.match(r'^(\d+)\s*/\s*(\d+)$', text_clean)
     if rating_match:
         score, total = int(rating_match.group(1)), int(rating_match.group(2))
         ratio = score / total if total > 0 else 0.5
-        if ratio >= 0.7:  # 7/10, 4/5, 5/5
+        if ratio >= 0.7:                  
             label = "POSITIVE"
-        elif ratio <= 0.4:  # 0-4/10, 0-2/5
+        elif ratio <= 0.4:                 
             label = "NEGATIVE"
-        else:  # 5-6/10, 3/5
+        else:               
             label = "NEEDS_ATTENTION"
         return _attach_issue_outputs({
             "label": label,
@@ -247,12 +247,12 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
     tfidf_vec = vectorizer.transform([text])
     prob_positive = model.predict_proba(selector.transform(tfidf_vec))[0, 1]
 
-    # === NEGATION-AWARE COMPLAINT DETECTION ===
-    # Fix false positives: "not bad", "no problem", "without issues" should NOT be flagged
+                                                
+                                                                                          
     
     CONTRAST_MARKERS = ["but", "however", "although", "though", "yet", "except"]
     
-    # Grouped by issue type (for future categorization)
+                                                       
     COMPLAINT_KEYWORDS = {
         "shipping": ["slow", "late", "delayed", "wait", "waiting"],
         "quality": ["bad", "poor", "terrible", "awful", "horrible", "worst", "cheap", "flimsy", "defective"],
@@ -264,15 +264,15 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
     }
     ALL_COMPLAINT_WORDS = [w for words in COMPLAINT_KEYWORDS.values() for w in words]
     
-    # Slang/multi-meaning words that should NOT trigger complaint (false positive prevention)
+                                                                                             
     SLANG_EXCLUSIONS = ["badass", "bad ass", "sick", "wicked", "killer", "insane"]
     
-    # Negation patterns that neutralize complaint words
+                                                       
     NEGATION_PATTERNS = ["not ", "no ", "without ", "never had ", "zero ", "none ", "didn't have "]
     
     text_lower = text.lower()
     
-    # Check for slang exclusions first
+                                      
     has_slang_positive = any(slang in text_lower for slang in SLANG_EXCLUSIONS)
     
     def has_real_complaint(text_lower, keywords):
@@ -284,19 +284,19 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             if keyword not in text_lower:
                 continue
             
-            # Find all occurrences of the keyword
+                                                 
             idx = 0
             while True:
                 pos = text_lower.find(keyword, idx)
                 if pos == -1:
                     break
                 
-                # Check if preceded by negation pattern
-                prefix = text_lower[max(0, pos - 15):pos]  # Look back 15 chars
+                                                       
+                prefix = text_lower[max(0, pos - 15):pos]                      
                 is_negated = any(neg in prefix for neg in NEGATION_PATTERNS)
                 
                 if not is_negated:
-                    return True  # Found un-negated complaint keyword
+                    return True                                      
                 
                 idx = pos + 1
         
@@ -313,19 +313,19 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
     has_contrast = any(marker in text_lower for marker in CONTRAST_MARKERS)
     has_complaint = has_real_complaint(text_lower, ALL_COMPLAINT_WORDS) and not has_slang_positive
     issue_tags = get_issue_tags(text_lower, COMPLAINT_KEYWORDS) if has_complaint else []
-    mixed_signal = has_contrast and has_complaint  # positive text but has concern
+    mixed_signal = has_contrast and has_complaint                                 
     
-    # Count complaint occurrences (for p>=0.95 exception)
+                                                         
     complaint_count = sum(1 for w in ALL_COMPLAINT_WORDS if w in text_lower)
     
-    # === TRIAGE POLICY (Final Teacher-approved 4-state) ===
-    # 1. NEGATIVE: p <= 0.40 (strong negative signal)
-    # 2. POSITIVE: p >= 0.95 AND single complaint + no contrast (very confident + minor issue)
-    #           OR p >= 0.60 AND no complaint keyword
-    # 3. NEEDS_ATTENTION: has complaint keyword (intentionally high recall on complaints)
-    # 4. UNCERTAIN: fallback (too_short, threshold_band, sparse)
+                                                            
+                                                     
+                                                                                              
+                                                     
+                                                                                         
+                                                                
     
-    # Rule 1: Strong negative â†’ NEGATIVE
+                                          
     if prob_positive <= 0.40:
         return _attach_issue_outputs({
             "label": "NEGATIVE",
@@ -339,8 +339,8 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             "min_nnz": min_nnz,
         }, fallback_issue_tags=issue_tags)
     
-    # Rule 2 exception: Very confident positive (p>=0.95) with single complaint + no contrast
-    # â†’ Allow POSITIVE to reduce false alarm (business tunable)
+                                                                                             
+                                                                 
     if prob_positive >= 0.95 and has_complaint and complaint_count == 1 and not has_contrast:
         return _attach_issue_outputs({
             "label": "POSITIVE",
@@ -348,13 +348,13 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             "probability": prob_positive,
             "preprocessed_text": cleaned,
             "fallback_reason": "very_confident_positive",
-            "issue_tags": issue_tags,  # Still show tags for transparency
+            "issue_tags": issue_tags,                                    
             "mixed_signal": False,
             "thresholds": thresholds,
             "min_nnz": min_nnz,
         }, fallback_issue_tags=issue_tags)
     
-    # Rule 3: Has complaint keyword â†’ NEEDS_ATTENTION (high recall on complaints)
+                                                                                   
     if has_complaint:
         return _attach_issue_outputs({
             "label": "NEEDS_ATTENTION",
@@ -368,7 +368,7 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
             "min_nnz": min_nnz,
         }, fallback_issue_tags=issue_tags)
 
-    # Apply standard uncertainty rule for remaining cases
+                                                         
     decision_row = apply_uncertainty_rule(
         np.array([prob_positive]),
         [cleaned],
@@ -395,7 +395,7 @@ def predict_sentiment(text: str, vectorizer, selector, model, meta, issue_bundle
     }, fallback_issue_tags=[])
 
 
-# ============== Display Result ==============
+                                              
 def display_result(result: dict, original_text: str = None):
     """Pretty print prediction result."""
     print("\n" + "=" * 60)
@@ -411,7 +411,7 @@ def display_result(result: dict, original_text: str = None):
         display_text = original_text[:80] + "..." if len(original_text) > 80 else original_text
         print(f"\n  Input: \"{display_text}\"")
     
-    # Symbol based on sentiment
+                               
     if "POSITIVE" in label and "Uncertain" not in label:
         symbol = "[+]"
     elif "NEGATIVE" in label and "Uncertain" not in label:
@@ -421,7 +421,7 @@ def display_result(result: dict, original_text: str = None):
     
     print(f"\n  {symbol} Sentiment: {label}")
     
-    # Handle NaN probability for fallback cases
+                                               
     if np.isnan(prob):
         print(f"      P(Positive): N/A")
         print(f"      Confidence:  {confidence}")
@@ -432,14 +432,14 @@ def display_result(result: dict, original_text: str = None):
         print(f"      P(Positive): {prob:.4f}")
         print(f"      Confidence:  {confidence}")
         
-        # Visual probability bar
+                                
         bar_length = 40
         filled = int(prob * bar_length)
         bar = "#" * filled + "-" * (bar_length - filled)
         print(f"\n  Negative |{bar}| Positive")
         print(f"         0% {' ' * (bar_length - 8)} 100%")
     
-    # Threshold visualization
+                             
     low, high = result.get("thresholds", THRESHOLDS)
     print(f"\n  Thresholds: Negative <= {low:.2f} | Uncertain | {high:.2f} <= Positive")
 
@@ -463,7 +463,7 @@ def display_result(result: dict, original_text: str = None):
     print("=" * 60 + "\n")
 
 
-# ============== Interactive Mode ==============
+                                                
 def interactive_mode(vectorizer, selector, model, meta, issue_bundle=None):
     """Run interactive demo loop."""
     print("=" * 60)
@@ -504,7 +504,7 @@ def interactive_mode(vectorizer, selector, model, meta, issue_bundle=None):
             print("\nTip: Enter a number (1-6) to try that example.\n")
             continue
         
-        # Check if user entered a number for example
+                                                    
         if user_input.isdigit():
             idx = int(user_input) - 1
             if 0 <= idx < len(examples):
@@ -514,14 +514,14 @@ def interactive_mode(vectorizer, selector, model, meta, issue_bundle=None):
                 print(f"Please enter a number from 1-{len(examples)}")
                 continue
         
-        # Predict and display
+                             
         result = predict_sentiment(
             user_input, vectorizer, selector, model, meta, issue_bundle=issue_bundle
         )
         display_result(result, user_input)
 
 
-# ============== Batch Mode ==============
+                                          
 def batch_mode(reviews: list, vectorizer, selector, model, meta, issue_bundle=None):
     """Process multiple reviews at once."""
     print("\n" + "=" * 80)
@@ -537,10 +537,10 @@ def batch_mode(reviews: list, vectorizer, selector, model, meta, issue_bundle=No
         label = result["label"]
         prob = result["probability"]
         
-        # Truncate long reviews
+                               
         display_text = review[:42] + "..." if len(review) > 45 else review
         
-        # Handle NaN probability
+                                
         prob_str = "N/A" if np.isnan(prob) else f"{prob:.3f}"
         print(f"{i:<4} {prob_str:>6} {label:<22} {display_text:<45}")
         if label in {"NEGATIVE", "NEEDS_ATTENTION"}:
@@ -562,7 +562,7 @@ def batch_mode(reviews: list, vectorizer, selector, model, meta, issue_bundle=No
     print()
 
 
-# ============== JSON Output Mode ==============
+                                                
 def json_output_mode(
     reviews: list, vectorizer, selector, model, meta, model_info: dict, issue_bundle=None
 ):
@@ -572,7 +572,7 @@ def json_output_mode(
             review, vectorizer, selector, model, meta, issue_bundle=issue_bundle
         )
         
-        # Build clean JSON record
+                                 
         record = {
             "text": review,
             "clean": result["preprocessed_text"],
@@ -587,7 +587,7 @@ def json_output_mode(
         print(json.dumps(record, ensure_ascii=False))
 
 
-# ============== Main ==============
+                                    
 def main():
     _configure_console_stdout()
     parser = argparse.ArgumentParser(
@@ -610,14 +610,14 @@ Examples:
     
     base_dir = Path(__file__).resolve().parent
     
-    # Load models (quiet if JSON mode)
+                                      
     verbose = not (args.json or args.quiet)
     vectorizer, selector, model, meta, model_info = load_models(base_dir, verbose=verbose)
     issue_bundle = load_issue_model(base_dir, verbose=verbose)
     
     if args.reviews:
         if args.json:
-            # JSON output mode
+                              
             json_output_mode(
                 args.reviews,
                 vectorizer,
@@ -628,10 +628,10 @@ Examples:
                 issue_bundle=issue_bundle,
             )
         else:
-            # Batch mode
+                        
             batch_mode(args.reviews, vectorizer, selector, model, meta, issue_bundle=issue_bundle)
     else:
-        # Interactive mode
+                          
         interactive_mode(vectorizer, selector, model, meta, issue_bundle=issue_bundle)
 
 

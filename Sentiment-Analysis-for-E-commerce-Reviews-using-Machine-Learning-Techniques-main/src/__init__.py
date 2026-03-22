@@ -1,4 +1,0 @@
-﻿"""
-NLP sentiment classification package.
-"""
-

@@ -601,16 +601,17 @@ body[data-app-view="admin"] .product-grid {
 
 .catalog-rail .catalog-context-image {
   width: 100%;
-  height: 208px;
+  height: 496px;
   justify-self: stretch;
+  padding: 4px;
 }
 
 .catalog-rail .catalog-context-name {
-  font-size: 1.02rem;
+  font-size: 1.08rem;
 }
 
 .catalog-rail .catalog-context-note {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
 }
 
 .admin-hero-side:empty {

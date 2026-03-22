@@ -103,7 +103,7 @@ def build_assessment() -> Dict[str, object]:
         ("demo_recording", _exists(ROOT / "docs" / "demo_recording.mp4"), 0.10),
     ]
 
-    # Weighted estimate from observable artifacts only.
+                                                       
     ratios = {
         "Content representation": _weighted_score(content_checks, cap=0.95),
         "Project significance": _weighted_score(significance_checks, cap=1.00),
@@ -139,9 +139,9 @@ def build_assessment() -> Dict[str, object]:
 
 
 def _to_markdown(payload: Dict[str, object]) -> str:
-    rubric_percent: Dict[str, float] = payload["rubric_percent"]  # type: ignore[assignment]
-    rubric_points: Dict[str, float] = payload["rubric_points_out_of_4"]  # type: ignore[assignment]
-    checks = payload["checks"]  # type: ignore[assignment]
+    rubric_percent: Dict[str, float] = payload["rubric_percent"]                            
+    rubric_points: Dict[str, float] = payload["rubric_points_out_of_4"]                            
+    checks = payload["checks"]                            
 
     lines: List[str] = [
         "# Rubric & Syllabus Assessment",

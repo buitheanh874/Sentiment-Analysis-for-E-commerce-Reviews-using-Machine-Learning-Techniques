@@ -475,7 +475,7 @@ def main() -> None:
         try:
             tokenizer, transformer_model = load_transformer_bundle(base_dir)
             transformer_status = "ready"
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:                
             exc_msg = str(exc).strip() or exc.__class__.__name__
             transformer_status = f"unavailable ({exc_msg[:64]})"
 
