@@ -3,272 +3,702 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NLP Review Ops</title>
+  <title>NLPSHOP CX Ops Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="/static/styles.css?v=20260320b" />
+  <link rel="stylesheet" href="/static/styles.css?v=20260321q" />
+  <style>
+    body::before,
+    body::after {
+      display: none;
+    }
+
+    .admin-shell {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+      align-items: start;
+    }
+
+    .catalog-rail {
+      position: sticky;
+      top: 98px;
+      align-self: start;
+      display: grid;
+      gap: 12px;
+    }
+
+    .dashboard-content {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .top-control-cluster {
+      display: grid;
+      gap: 4px;
+      justify-items: end;
+    }
+
+    .top-control-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .top-control-group {
+      display: grid;
+      gap: 4px;
+    }
+
+    .top-control-label {
+      margin: 0;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .admin-select--dark {
+      min-width: 220px;
+      color: #223239;
+      background: #ffffff;
+      border-color: #ffffff;
+    }
+
+    .top-context-note {
+      margin: 0;
+      max-width: none;
+      font-size: 0.72rem;
+      line-height: 1.25;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.64);
+      flex: 1;
+    }
+
+    .admin-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .admin-hero-main,
+    .admin-hero-side {
+      display: grid;
+      gap: 10px;
+    }
+
+    .admin-control-panel {
+      display: grid;
+      gap: 8px;
+    }
+
+    .admin-select {
+      width: 100%;
+      border: 1px solid #aab6bb;
+      border-radius: 7px;
+      padding: 8px 10px;
+      font-size: 0.92rem;
+      font-family: "Source Sans 3", sans-serif;
+      color: #49575d;
+      background: #f7fafa;
+    }
+
+    .admin-action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .admin-summary-card {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      min-height: 158px;
+      padding: 20px;
+    }
+
+    .admin-summary-value {
+      margin: 0;
+      font-size: 2.6rem;
+      font-weight: 700;
+      line-height: 0.98;
+      color: #0f1111;
+    }
+
+    .admin-summary-inline-note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6a7a80;
+      font-weight: 500;
+    }
+
+    .admin-summary-stack {
+      display: grid;
+      gap: 2px;
+      align-items: end;
+    }
+
+    .admin-summary-period {
+      margin: 0;
+      font-size: 0.78rem;
+      color: #76888d;
+    }
+
+    .admin-status-strip {
+      display: grid;
+      gap: 8px;
+    }
+
+    .admin-analysis-grid {
+      display: grid;
+      grid-template-columns: minmax(290px, 330px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .admin-analysis-stack {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.92fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .admin-span-two {
+      grid-column: 1 / -1;
+    }
+
+    .admin-queue-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 316px;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .queue-main-column {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .legacy-hide {
+      display: none !important;
+    }
+
+    .mismatch-chart {
+      display: grid;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .mismatch-row {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mismatch-row-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .mismatch-row-label {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #223239;
+    }
+
+    .mismatch-row-meta {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #66777c;
+    }
+
+    .mismatch-bar {
+      display: flex;
+      height: 18px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eef3f5;
+      border: 1px solid #d7e0e3;
+    }
+
+    .mismatch-segment {
+      height: 100%;
+      min-width: 0;
+    }
+
+    .mismatch-segment--risk {
+      background: linear-gradient(90deg, #e15a4f 0%, #ef7f5a 100%);
+    }
+
+    .mismatch-segment--clean {
+      background: linear-gradient(90deg, #89c9a6 0%, #cfe8d8 100%);
+    }
+
+    .mismatch-legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .mismatch-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      color: #4f6066;
+    }
+
+    .mismatch-legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .mismatch-note {
+      margin: 10px 0 0;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1180px) {
+      .admin-shell,
+      .admin-hero,
+      .admin-analysis-grid,
+      .admin-queue-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .catalog-rail {
+        position: static;
+      }
+
+      .top-control-cluster {
+        justify-items: stretch;
+      }
+
+      .top-control-row {
+        justify-content: flex-start;
+      }
+
+      .top-context-note {
+        text-align: left;
+      }
+
+      .admin-analysis-stack {
+        grid-template-columns: 1fr;
+      }
+
+      #metrics-panel {
+        grid-column: auto;
+      }
+
+      .admin-span-two {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .admin-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .admin-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body data-app-view="customer">
+<body data-app-view="admin">
   <header class="site-header">
     <div class="header-top">
       <div class="logo-block">
         <div class="logo-mark">nlp<span>shop</span></div>
-        <div class="logo-sub">review understanding</div>
+        <div class="logo-sub">customer experience ops</div>
       </div>
 
       <div class="ship-block">
         <span class="ship-label">Workspace</span>
-        <span class="ship-value">NLP Team</span>
+        <span class="ship-value">Admin / Manager Console</span>
       </div>
 
-      <div class="admin-chip" data-view="admin">
-        <span class="admin-chip-label">Console</span>
-        <span class="admin-chip-value">Admin / CSKH Dashboard</span>
-      </div>
+      <div class="top-control-cluster">
+        <div class="top-control-row">
+          <label class="top-control-group" for="date-range-select">
+            <span class="top-control-label">Date Range</span>
+            <select id="date-range-select" class="admin-select admin-select--dark">
+              <option value="today" selected>Today: Mar 14, 2026</option>
+              <option value="yesterday">Yesterday: Mar 13, 2026</option>
+              <option value="last_7_days">Last 7 Days</option>
+              <option value="this_month">This Month</option>
+            </select>
+          </label>
 
-      <div class="search-block" data-view="customer">
-        <select aria-label="Search category">
-          <option>All</option>
-          <option>Gift Cards</option>
-          <option>Customer Reviews</option>
-          <option>Related Products</option>
-        </select>
-        <input type="text" value="Search this product page" readonly />
-        <button type="button" aria-label="Search">Go</button>
-      </div>
+          <label class="top-control-group" for="mock-product-filter">
+            <span class="top-control-label">Product Filter</span>
+            <select
+              id="mock-product-filter"
+              class="admin-select admin-select--dark"
+              disabled
+              title="MOCKED - Requires Phase 2 Database Schema Update: Missing Product_ID FK mapping in review rows."
+            >
+              <option>All Products (Store-wide)</option>
+              <option>Gift Card Floral [requires product_id mapping]</option>
+              <option>Gift Card Birthday [requires product_id mapping]</option>
+            </select>
+          </label>
 
-      <div class="header-actions" data-view="customer">
-        <div class="action-tile">
-          <span class="small">Hello, Team</span>
-          <span class="large">Account & Lists</span>
-        </div>
-        <div class="action-tile">
-          <span class="small">Returns</span>
-          <span class="large">& Orders</span>
-        </div>
-        <div class="cart-tile">
-          <span class="cart-icon">Cart</span>
-          <span>Cart</span>
+          <div id="header-batch-actions" class="header-batch-actions" aria-live="polite"></div>
         </div>
       </div>
     </div>
 
-    <nav class="header-sub" data-view="customer">
-      <a href="#">All</a>
-      <a href="#">Today's Deals</a>
-      <a href="#">Gift Cards</a>
-      <a href="#">Registry</a>
-      <a href="#">Prime Video</a>
-      <a href="#">Customer Service</a>
-      <a href="#">Categories</a>
-      <a href="#">Best Sellers</a>
-      <a href="#">Memberships</a>
-    </nav>
+    <div class="header-sub" data-view="admin">
+      <a href="#issue-mix">Issue Mix</a>
+      <a href="#summary-panel">Hidden Risk</a>
+      <a href="#attention-queue">Attention Queue</a>
+      <a href="#manual-test">Manual Test</a>
+    </div>
   </header>
 
-  <section class="view-switch-bar">
-    <div class="page-wrap view-switch-inner">
-      <div class="view-switch-copy">
-        <p class="view-switch-label">Persona Toggle</p>
-        <p id="view-switch-text" class="view-switch-text">
-          Customer View: browse the product page and submit a new review.
-        </p>
+  <main class="page-wrap admin-shell">
+    <aside class="catalog-rail" aria-label="Catalog context">
+      <div id="catalog-context-card" class="catalog-context-card">
+        <img id="catalog-context-image" class="catalog-context-image" src="" alt="Catalog reference" />
+        <div class="catalog-context-copy">
+          <p class="catalog-context-label">Catalog Reference</p>
+          <p id="catalog-context-name" class="catalog-context-name">Loading product image...</p>
+          <p id="catalog-context-note" class="catalog-context-note">Reference visual for the current review set.</p>
+        </div>
       </div>
-      <div class="view-switch-group" role="tablist" aria-label="Dashboard views">
-        <button id="customer-view-btn" class="view-switch-btn active" type="button" data-view-target="customer">
-          Customer View
-        </button>
-        <button id="admin-view-btn" class="view-switch-btn" type="button" data-view-target="admin">
-          Admin / CSKH Dashboard
-        </button>
+
+      <article class="card rail-context-card">
+        <div class="section-heading section-heading--compact">
+          <span class="section-icon" aria-hidden="true">&#128202;</span>
+          <div>
+            <h3>Batch Snapshot</h3>
+            <p class="muted">Live triage context from the current queue</p>
+          </div>
+        </div>
+        <div id="rail-snapshot-grid" class="rail-snapshot-grid">
+          <p class="muted">Waiting for batch analysis...</p>
+        </div>
+      </article>
+    </aside>
+
+    <div class="dashboard-content">
+    <section class="card admin-hero admin-hero--compact">
+      <div class="admin-hero-main">
+        <h1 class="hero-title">
+          <span class="section-icon section-icon--hero" aria-hidden="true">🧭</span>
+          <span>Customer Experience Operations Dashboard</span>
+        </h1>
+        <div class="hero-meta-row">
+          <span class="hero-meta-pill">Store-wide live view</span>
+          <span id="hero-batch-pill" class="hero-meta-pill">0 live reviews</span>
+          <span class="hero-meta-pill hero-meta-pill--soft">Queue sorted by risk</span>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <main class="page-wrap">
-    <section class="product-grid">
-      <aside class="card product-left" data-view="customer">
-        <div class="product-image-frame">
-          <img id="main-product-image" src="" alt="Main product image" />
-        </div>
-        <div id="product-thumb-grid" class="thumb-grid">
-          <button class="thumb active" type="button"></button>
-        </div>
-        <button id="run-sample-from-left" class="outline-btn" type="button">Refresh batch</button>
-      </aside>
-
-      <section class="card product-center">
-        <div data-view="customer">
-          <p class="breadcrumbs">Giftcards &gt; NLP &gt; Review Intelligence</p>
-          <h1>NLP Project: Sentiment Analysis for E-commerce Reviews using Machine Learning Techniques</h1>
-          <p class="byline">by SkyDom+</p>
-          <p class="byline-sub">Supervisor: Dr. Pham Quang Nhat Minh</p>
-          <div class="rating-line">
-            <span id="product-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-            <span id="product-rating-value">4.7 out of 5</span>
-            <span id="product-rating-count">(0 reviews)</span>
-          </div>
-          <hr />
-          <p class="description">
-            Browse the mock product page, read recent customer reviews, and submit a new review to
-            the AI pipeline.
-          </p>
-          <ul class="highlights">
-            <li>Customer-facing product detail page with gallery and rating breakdown.</li>
-            <li>New review submission flow for end-user input.</li>
-            <li>Recent customer reviews generated from the active batch.</li>
-          </ul>
-        </div>
-
-        <div class="dashboard-hero" data-view="admin">
-          <p class="breadcrumbs">Operations &gt; Review Understanding &gt; Triage Console</p>
-          <h1>Admin / CSKH Dashboard</h1>
-          <p class="description">
-            Monitor the trained sentiment and issue-classification pipeline, inspect the attention
-            queue, and move escalations into the case-resolution workflow.
-          </p>
-          <ul class="highlights">
-            <li>Manager insight panel for issue distribution across the active review batch.</li>
-            <li>Batch metrics, issue summary, and attention queue for CSKH triage.</li>
-            <li>Selected review analysis with workflow escalation context.</li>
-          </ul>
-          <div id="status-strip" class="status-strip"></div>
-        </div>
-      </section>
-
-      <aside class="product-right" data-view="admin">
-        <article class="card manager-insight-card">
-          <h3>Manager Insight Panel</h3>
-          <p class="muted">
-            Distribution of issue labels predicted by the active model for the current review batch.
-          </p>
-          <div class="ops-pie-layout">
-            <div id="ops-label-pie" class="ops-label-pie">
-              <div class="ops-pie-center">
-                <p id="ops-total-flags">0</p>
-                <span>issue hits</span>
-              </div>
-            </div>
-            <div id="ops-label-legend" class="ops-label-legend"></div>
-          </div>
-          <p id="ops-batch-note" class="muted">Batch loading...</p>
+      <div class="admin-hero-side">
+        <div class="admin-action-row">
+          <button id="run-sample-from-left" class="prime-btn" type="button">↻ Refresh Active Batch</button>
           <p id="run-message" class="run-message">System ready.</p>
-        </article>
-      </aside>
+        </div>
+      </div>
     </section>
 
-    <nav class="review-tabs" data-view="customer">
-      <a href="#">Top</a>
-      <a href="#">About this item</a>
-      <a href="#">Similar</a>
-      <a href="#">From the Brand</a>
-      <a href="#">From the Author</a>
-      <a class="active" href="#">Reviews</a>
-    </nav>
+    <section id="status-strip" class="status-strip admin-status-strip hidden" aria-hidden="true">
+      <article class="status-card">
+        <div class="status-card-head">
+          <span class="status-icon" aria-hidden="true">🚦</span>
+          <div class="status-copy">
+            <p class="status-label">Runtime Snapshot</p>
+            <p class="status-value">Loading active pipeline...</p>
+          </div>
+        </div>
+        <p class="status-meta">Condensed deployment status will appear here after the runtime responds.</p>
+      </article>
+    </section>
 
-    <section class="review-grid">
-      <aside class="left-column">
-        <article class="card" data-view="customer">
-          <h3>Customer reviews</h3>
-          <p id="left-overall-score" class="overall-score">4.7 out of 5</p>
-          <p id="left-rating-count" class="muted">0 global ratings</p>
-          <div id="rating-bars" class="rating-bars"></div>
-          <a class="muted-link" href="#">How customer reviews and ratings work</a>
-        </article>
+    <section id="admin-toolbar" class="admin-toolbar" aria-label="Batch controls"></section>
 
-        <article class="card" data-view="customer">
-          <h3>Review this product</h3>
-          <p class="muted">Share your thoughts with other customers.</p>
-          <button id="write-review-btn" class="outline-btn" type="button">Write a customer review</button>
-          <div id="review-compose-panel" class="review-compose-panel hidden" aria-live="polite">
-            <label for="review-compose-rating">Rating</label>
-            <select id="review-compose-rating">
-              <option value="5">5 stars</option>
-              <option value="4">4 stars</option>
-              <option value="3">3 stars</option>
-              <option value="2">2 stars</option>
-              <option value="1">1 star</option>
-            </select>
-            <label for="review-compose-text">Your review</label>
-            <textarea id="review-compose-text" rows="4" maxlength="1200"></textarea>
-            <p id="review-compose-error" class="compose-error hidden"></p>
-            <div class="compose-actions">
-              <button id="review-compose-submit" class="prime-btn" type="button">Submit review</button>
-              <button id="review-compose-cancel" class="outline-btn" type="button">Cancel</button>
+    <section class="admin-summary-grid">
+      <article class="card admin-summary-card">
+        <div class="summary-head">
+          <span class="summary-icon" aria-hidden="true">⭐</span>
+          <div>
+            <p class="status-label">Average Batch Rating</p>
+            <p class="admin-summary-period" data-current-period>(for current period)</p>
+          </div>
+        </div>
+        <div class="admin-summary-stack">
+          <p id="left-overall-score" class="admin-summary-value">4.7</p>
+          <p class="admin-summary-inline-note">out of 5 stars</p>
+        </div>
+        <p id="product-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+        <p class="muted">Computed from the current live batch.</p>
+      </article>
+
+      <article class="card admin-summary-card">
+        <div class="summary-head">
+          <span class="summary-icon" aria-hidden="true">📥</span>
+          <div>
+            <p class="status-label">Active Batch Size</p>
+            <p class="admin-summary-period" data-current-period>(for current period)</p>
+          </div>
+        </div>
+        <div class="admin-summary-stack">
+          <p id="left-rating-count" class="admin-summary-value">0</p>
+          <p class="admin-summary-inline-note">reviews in active batch</p>
+        </div>
+        <p class="muted">Rows currently loaded into the live analysis batch.</p>
+      </article>
+
+      <article class="card admin-summary-card">
+        <div class="summary-head">
+          <span class="summary-icon" aria-hidden="true">🚩</span>
+          <div>
+            <p class="status-label">Issue Signals</p>
+            <p class="admin-summary-period" data-current-period>(for current period)</p>
+          </div>
+        </div>
+        <p id="ops-batch-note" class="customer-say-text">
+          Loading NLP categorization for the active batch.
+        </p>
+        <div id="customer-say-tags" class="tag-row">
+          <span class="tag">waiting for model output</span>
+        </div>
+      </article>
+
+      <article class="card admin-summary-card">
+        <div class="summary-head">
+          <span class="summary-icon" aria-hidden="true">🧠</span>
+          <div>
+            <p class="status-label">Owner Insight</p>
+            <p class="admin-summary-period" data-current-period>(for current period)</p>
+          </div>
+        </div>
+        <p id="customer-say-text" class="customer-say-text">
+          Owner insight will be generated from the active batch once analysis completes.
+        </p>
+        <p class="muted">Narrative summary generated from current prediction outputs.</p>
+      </article>
+    </section>
+
+    <section class="admin-analysis-grid">
+      <article id="issue-mix" class="card manager-insight-card">
+        <div class="row-between">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">🧩</span>
+            <div>
+              <h3>Issue Label Distribution</h3>
+              <p class="muted">Store-wide issue mix from the active batch</p>
             </div>
           </div>
-        </article>
-
-        <article id="issues-panel" class="card hidden" data-view="admin">
-          <h3>Issue Summary</h3>
-          <div class="table-wrap small">
-            <table id="issues-table">
-              <thead>
-                <tr>
-                  <th>Issue Label</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+        </div>
+        <div class="ops-pie-layout">
+          <div id="ops-label-pie" class="ops-label-pie">
+            <div class="ops-pie-center">
+              <p id="ops-total-flags">0</p>
+              <span>issue hits</span>
+            </div>
           </div>
-        </article>
-      </aside>
+          <div id="ops-label-legend" class="ops-label-legend"></div>
+        </div>
+        <div id="issue-mix-snapshot" class="issue-snapshot-grid"></div>
+      </article>
 
-      <section class="center-column">
-        <article class="card" data-view="admin">
-          <h3>Customers say</h3>
-          <p id="customer-say-text" class="customer-say-text">
-            System is loading current batch to generate owner insights.
+      <div class="admin-analysis-stack">
+        <article id="summary-panel" class="card hidden">
+          <div class="row-between">
+            <div class="section-heading">
+              <span class="section-icon" aria-hidden="true">🔎</span>
+              <div>
+              <h3>Hidden Risk Detection</h3>
+              <p class="muted">NLP vs star rating mismatch for the active batch</p>
+              </div>
+            </div>
+          </div>
+          <div id="mismatch-chart" class="mismatch-chart"></div>
+          <div class="mismatch-legend">
+            <span class="mismatch-legend-item">
+              <span class="mismatch-legend-swatch mismatch-segment--risk"></span>
+              Hidden or active risk
+            </span>
+            <span class="mismatch-legend-item">
+              <span class="mismatch-legend-swatch mismatch-segment--clean"></span>
+              Clean or aligned
+            </span>
+          </div>
+          <p id="mismatch-insight" class="muted mismatch-note">
+            Mismatch insight will appear after the current batch is analyzed.
           </p>
-          <p class="muted">AI generated from prediction outputs</p>
-          <div id="customer-say-tags" class="tag-row"></div>
         </article>
 
-        <article id="summary-panel" class="card hidden" data-view="admin">
-          <h3>Batch Metrics</h3>
+        <article id="distribution-panel" class="card hidden">
+          <div class="section-heading section-heading--compact">
+            <span class="section-icon" aria-hidden="true">📊</span>
+            <div>
+              <h3>Rating Breakdown</h3>
+              <p class="muted">Observed star distribution in the current pool</p>
+            </div>
+          </div>
+          <div id="distribution-bars" class="distribution-bars"></div>
+          <div id="rating-bars" class="rating-bars hidden"></div>
+        </article>
+
+        <article id="metrics-panel" class="card hidden admin-span-two">
+          <div class="section-heading section-heading--compact">
+            <span class="section-icon" aria-hidden="true">&#128230;</span>
+            <div>
+              <h3>Batch Metrics</h3>
+              <p class="muted">Operational mix for the current live batch</p>
+            </div>
+          </div>
           <div id="kpi-grid" class="kpi-grid"></div>
         </article>
 
-        <article class="card">
-          <div class="row-between">
-            <h3 id="reviews-section-title">Recent Customer Reviews</h3>
-            <span id="reviews-section-note" class="muted">Customer-facing review feed.</span>
+        <article id="triage-focus-panel" class="card hidden admin-span-two">
+          <div class="section-heading section-heading--compact">
+            <span class="section-icon" aria-hidden="true">&#127919;</span>
+            <div>
+              <h3>Triage Focus</h3>
+              <p class="muted">What Ops should act on first from the current batch</p>
+            </div>
           </div>
-          <div id="reviews-feed" class="reviews-feed current-batch-feed">
-            <p class="muted">Loading current batch reviews...</p>
-          </div>
-        </article>
-      </section>
-
-      <aside class="right-column">
-        <article id="distribution-panel" class="card hidden" data-view="customer">
-          <h3>Rating Breakdown</h3>
-          <div id="distribution-bars" class="distribution-bars"></div>
+          <div id="triage-focus-content" class="triage-focus-content"></div>
         </article>
 
-        <article id="single-review-panel" class="card single-review-panel" data-view="admin">
-          <h3>Selected Review Analysis</h3>
-          <p id="single-review-hint" class="muted">
-            Click Analyze on a queue item to inspect prediction details for that review.
-          </p>
-          <div id="single-review-content"></div>
-        </article>
-      </aside>
-    </section>
-
-    <section class="recommended-section card" data-view="customer">
-      <div class="row-between">
-        <h3>Products related to this item</h3>
-        <a href="#">See more</a>
       </div>
-      <div id="recommended-grid" class="recommended-grid"></div>
     </section>
+
+    <section class="admin-queue-grid">
+      <article id="attention-queue" class="card">
+        <div class="row-between">
+          <div class="section-heading">
+            <span class="section-icon" aria-hidden="true">🚨</span>
+            <div>
+            <h3 id="reviews-section-title">Attention Queue</h3>
+            <p id="reviews-section-note" class="muted">Prioritized by risk score for CSKH triage.</p>
+            </div>
+          </div>
+        </div>
+        <div id="reviews-feed" class="reviews-feed current-batch-feed">
+          <p class="muted">Loading current batch reviews...</p>
+        </div>
+      </article>
+
+      <div class="queue-side-rail">
+      <article id="single-review-panel" class="card single-review-panel">
+        <div class="section-heading section-heading--compact">
+          <span class="section-icon" aria-hidden="true">🧾</span>
+          <div>
+            <h3>Selected Review Analysis</h3>
+            <p class="muted">Prediction details, workflow state, and routing context</p>
+          </div>
+        </div>
+        <p id="single-review-hint" class="muted">
+          Click Analyze on a queue item to inspect prediction details for that review.
+        </p>
+        <div id="single-review-content"></div>
+      </article>
+      <article id="playbook-panel" class="card playbook-panel">
+        <div class="section-heading section-heading--compact">
+          <span class="section-icon" aria-hidden="true">🛠</span>
+          <div>
+            <h3>Resolution Playbook</h3>
+            <p class="muted">Suggested next-best action for CSKH and Ops handoff</p>
+          </div>
+        </div>
+        <div id="playbook-content" class="playbook-content">
+          <p class="muted">Select a queue item to load the recommended recovery path.</p>
+        </div>
+      </article>
+      </div>
+    </section>
+
+    <section id="manual-test" class="card">
+      <div class="row-between">
+        <div class="section-heading">
+          <span class="section-icon" aria-hidden="true">🧪</span>
+          <div>
+          <h3>Manual NLP Test Tool</h3>
+          <p class="muted">
+            Input custom text and run it through the same pipeline used by the active batch.
+          </p>
+          </div>
+        </div>
+        <button id="write-review-btn" class="outline-btn" type="button">📝 Open Test Console</button>
+      </div>
+
+      <div class="prompt-chip-row">
+        <button type="button" class="prompt-chip" data-prompt-text="Delivery took too long and customer support never replied." data-prompt-rating="2">Late delivery</button>
+        <button type="button" class="prompt-chip" data-prompt-text="Gift card code says already redeemed even though this is a new purchase." data-prompt-rating="1">Redeemed already</button>
+        <button type="button" class="prompt-chip" data-prompt-text="The gift card looks great, but the packaging arrived damaged and refund support was confusing." data-prompt-rating="3">Mixed complaint</button>
+      </div>
+
+      <div id="review-compose-panel" class="review-compose-panel" aria-live="polite">
+        <label for="review-compose-rating">Simulated Rating</label>
+        <select id="review-compose-rating">
+          <option value="5">5 stars</option>
+          <option value="4">4 stars</option>
+          <option value="3">3 stars</option>
+          <option value="2">2 stars</option>
+          <option value="1">1 star</option>
+        </select>
+
+        <label for="review-compose-text">Text Payload</label>
+        <textarea
+          id="review-compose-text"
+          rows="4"
+          maxlength="1200"
+          placeholder="Type a difficult review, complaint, or edge case here..."
+        ></textarea>
+
+        <p id="review-compose-error" class="compose-error hidden"></p>
+
+        <div class="compose-actions">
+          <button id="review-compose-submit" class="prime-btn" type="button">▶ Run Prediction</button>
+          <button id="review-compose-cancel" class="outline-btn" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="legacy-hide" aria-hidden="true">
+      <img id="main-product-image" src="" alt="Legacy hidden product" />
+      <div id="product-thumb-grid"></div>
+      <span id="product-rating-value"></span>
+      <span id="product-rating-count"></span>
+      <div id="recommended-grid"></div>
+    </div>
+    </div>
   </main>
 
-  <script src="/static/app.js?v=20260320b"></script>
+  <script src="/static/app.js?v=20260321q"></script>
 </body>
 </html>

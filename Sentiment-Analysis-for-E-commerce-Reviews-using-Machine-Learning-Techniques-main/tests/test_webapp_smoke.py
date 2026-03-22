@@ -23,7 +23,7 @@ def test_webapp_root_serves_html():
         response = client.get("/")
     assert response.status_code == 200
     assert "text/html" in response.headers.get("content-type", "")
-    assert "Persona Toggle" in response.text
+    assert "Customer Experience Operations Dashboard" in response.text
 
 
 def test_webapp_catalog_endpoint():
